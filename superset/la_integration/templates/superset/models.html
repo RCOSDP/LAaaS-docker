@@ -1,0 +1,60 @@
+{% extends "superset/basic.html" %}
+{% block title %}{{ _("LA Integration!") }}{% endblock %}
+{% block body %}
+<div class="container">
+  {% include 'superset/flash_wrapper.html' %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">
+        <div class="row">
+          <div class="col-md-6">
+            <h2>{{ _("LA Integration") }}</h2>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<div class="panel-body">
+<form id="action_form" action="/superset/execute" method="get">
+<p>Select the course: 
+<select name="course_select">
+ {% for course in course_names %}
+  <option value="{{ course }}">{{ course }}</option>
+ {% endfor %}
+</select>
+</p>
+<p>Select the Insertion method, if result table already exists(default is replace).:
+<input type="radio" name="insertion_method" value="append" >append </input>
+<input type="radio" name="insertion_method" value="replace" checked>replace </input>
+</p>
+<p>
+[Note: 1. If you have already executed the program and selecting different course then you should select <b>"replace"</b> option.</p>
+<p>2. Else if you have running the executing the same program on the same course again then you should either select <b>"append"</b> or <b>"replace"</b> option.] </p>
+<div class="table-responsive">
+ <table class="table table-bordered table-hover">  
+<thead>
+  <tr>
+    <th>Select a Model</th>
+    <th>Analytical Models</th>
+  </tr>
+<thead>
+    {% for file in files_path %}
+    <tr>
+    {% if loop.index == 1 %}
+      <td><input type="radio" name="file_select" value="{{ file }}" checked></td>
+    {% else %}
+      <td><input type="radio" name="file_select" value="{{ file }}" ></td>
+    {% endif %}
+    <td><a href="/superset/source/{{ file }}/">{{ file }}</a></td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+<input type="submit" value="Execute Model">
+</form>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+

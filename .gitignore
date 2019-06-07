@@ -1,0 +1,11 @@
+**/.idea/*
+**/vendor/*
+moodle.sql
+.vscode/*
+learning_locker/data/*
+open_lrw/data/*
+xapi_stmt_gen/log/*
+elcampus_la/xapi_stmt_gen/log/*
+superset_db/data/*
+metabase/*
+**/.DS_Store

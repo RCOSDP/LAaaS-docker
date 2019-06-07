@@ -1,0 +1,95 @@
+version: '3'
+services:
+  learning_locker:
+    build: learning_locker
+    container_name: learning_locker
+    ports:
+     - "80:80"
+    volumes:
+      - ./learning_locker/data:/var/lib/mongodb
+    working_dir: /var/www/learninglocker
+    command: bash -c "sh db_setup.sh && /usr/sbin/httpd -DFOREGROUND"
+  xapi_stmt_gen:
+    build: xapi_stmt_gen
+    container_name: xapi_stmt_gen
+    volumes:
+      - ./xapi_stmt_gen/log:/usr/local/src/xapi_stmt_gen/log
+    tty: true
+    environment:
+      - TZ=Asia/Tokyo
+  openlrw_mongo:
+    image: mongo:latest
+    restart: always
+    env_file:
+      - open_lrw/.env
+    container_name: openlrw_mongo
+    volumes:
+      - ./open_lrw/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+      - ./open_lrw/data:/data/db
+    ports:
+      - "27017:27017"
+  openlrw:
+    build:
+      context: open_lrw
+      dockerfile: Dockerfile
+    container_name: openlrw_web
+    depends_on:
+      - openlrw_mongo
+    ports:
+      - "9966:9966"
+    env_file:
+      - open_lrw/.env
+    command: bash -c "/app/docker-start.sh"
+  caliper:
+    container_name: caliper
+    build:
+      context: caliper
+      dockerfile: Dockerfile
+    tty: true
+  xapi_elcampus:
+    container_name: xapi_elcampus
+    build: elcampus_la/xapi_stmt_gen
+    volumes:
+      - ./elcampus_la/xapi_stmt_gen/log:/usr/local/src/xapi_stmt_gen/log
+    tty: true
+    environment:
+      - TZ=Asia/Tokyo
+    depends_on:
+      - xapi_stmt_gen
+  caliper_elcampus:
+    container_name: caliper_elcampus
+    build: elcampus_la/caliper_stmt_gen
+    tty: true
+  superset:
+    build: superset
+    container_name: superset
+    ports:
+     - "8088:8088"
+    command: bash -c ". ./venv/bin/activate && superset runserver"
+  superset_db:
+    build: superset_db
+    container_name: superset_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./superset_db/data:/var/lib/pgsql/data
+    user: postgres
+    command: bash -c "/usr/pgsql-9.4/bin/postgres -D /var/lib/pgsql/9.4/data"
+  metabase:
+    image: metabase/metabase
+    container_name: metabase
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./metabase/data:/metabase-data
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
+  jupyterhub:
+    build: jupyterhub
+    container_name: jupyterhub
+    ports:
+      - "8001:8000"
+networks:
+  default:
+    external:
+      name: moodle-docker_default
