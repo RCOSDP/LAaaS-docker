@@ -42,7 +42,7 @@ $ git clone https://github.com/RCOSDP/LAaaS-docker.git
 * xAPIステートメント変換スクリプトでイベントの処理状況を管理するためのテーブル( `xapi_records_processed` )を作成
 
 ----
-$ cd NII-RCOS
+$ cd LAaaS-docker
 $ bin/moodle_install
 ----
 
