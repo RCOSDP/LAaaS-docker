@@ -1,0 +1,54 @@
+{
+    "chmod": "0755",
+    "directories": [
+        "app",
+        "bootstrap",
+        "config",
+        "vendor"
+    ],
+    "files": [
+        "composer.json"
+    ],
+    "finder": [
+        {
+            "notName": "/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/|*\\.bat",
+            "exclude": [
+                "doc",
+                "docs",
+                "ci",
+                "test",
+                "test_old",
+                "tests",
+                "Test",
+                "Tests",
+                "vendor-bin"
+            ],
+            "in": "vendor"
+        }
+    ],
+    "blacklist":[
+        "README.md",
+        "CHANGELOG.md",
+        "UPGRADE.md",
+        "CONTRIBUTING.md",
+        "LICENSE",
+        "LICENSE.md",
+        "phpcbf",
+        "phpcs",
+        "test",
+        "tests",
+        "Test",
+        "Tests",
+        "phpunit.xml",
+        "phpunit.xml.dist",
+        "phpcs.xml",
+        "phpcs.xml.dist",
+        "phive.xml"
+    ],
+    "exclude-composer-files": false,
+    "compression": "GZ",
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\Json"
+    ]
+}

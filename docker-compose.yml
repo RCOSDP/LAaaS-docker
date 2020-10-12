@@ -1,14 +1,30 @@
 version: '3'
 services:
-  learning_locker:
-    build: learning_locker
-    container_name: learning_locker
+  learninglocker:
+    build: learninglocker
+    container_name: learninglocker
+    depends_on:
+      - learninglocker_mongo
+      - learninglocker_redis
     ports:
-     - "80:80"
+      - "3000:3000"
+      - "8080:8080"
+      - "8081:8081"
+    working_dir: /usr/local/src/learninglocker
+    command: bash -c "source ~/.bashrc && yarn migrate && pm2 start pm2/all.json && cd ../xapi-service && pm2 start pm2/xapi.json && pm2 logs"
+  learninglocker_mongo:
+    image: mongo:4.0.8
+    container_name: learninglocker_mongo
+    restart: always
     volumes:
-      - ./learning_locker/data:/var/lib/mongodb
-    working_dir: /var/www/learninglocker
-    command: bash -c "sh db_setup.sh && /usr/sbin/httpd -DFOREGROUND"
+      - ./learninglocker/mongo_data:/data/db
+  learninglocker_redis:
+    image: redis:5.0.4
+    container_name: learninglocker_redis
+    restart: always
+    volumes:
+      - ./learninglocker/redis_data:/data
+    command: redis-server --appendonly yes
   xapi_stmt_gen:
     build: xapi_stmt_gen
     container_name: xapi_stmt_gen
@@ -40,31 +56,38 @@ services:
     env_file:
       - open_lrw/.env
     command: bash -c "/app/docker-start.sh"
-  caliper:
-    container_name: caliper
+  caliper_stmt_gen:
+    container_name: caliper_stmt_gen
     build:
       context: caliper
       dockerfile: Dockerfile
-    tty: true
-  xapi_elcampus:
-    container_name: xapi_elcampus
-    build: elcampus_la/xapi_stmt_gen
-    volumes:
-      - ./elcampus_la/xapi_stmt_gen/log:/usr/local/src/xapi_stmt_gen/log
-    tty: true
-    environment:
-      - TZ=Asia/Tokyo
+    env_file:
+      - caliper/.env
     depends_on:
-      - xapi_stmt_gen
-  caliper_elcampus:
-    container_name: caliper_elcampus
-    build: elcampus_la/caliper_stmt_gen
-    tty: true
+      - caliper_log_db
+      - openlrw
+      - openlrw_mongo
+  caliper_log_db:
+    image: postgres:11
+    container_name: caliper_log_db
+    environment:
+      - POSTGRES_USER=caliper_cli
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=caliper_log
+    ports:
+      - "15432:5432"
+    volumes:
+      - ./caliper_log/init:/docker-entrypoint-initdb.d
+      - ./caliper_log/data:/var/lib/postgresql/data
   superset:
     build: superset
     container_name: superset
     ports:
-     - "8088:8088"
+      - "8088:8088"
+    environment:
+      - LANG=en_US.utf-8
+    depends_on:
+      - superset_db
     command: bash -c ". ./venv/bin/activate && superset runserver"
   superset_db:
     build: superset_db
@@ -72,18 +95,8 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./superset_db/data:/var/lib/pgsql/data
+      - ./superset_db/data:/var/lib/pgsql/9.6/data
     user: postgres
-    command: bash -c "/usr/pgsql-9.4/bin/postgres -D /var/lib/pgsql/9.4/data"
-  metabase:
-    image: metabase/metabase
-    container_name: metabase
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./metabase/data:/metabase-data
-    environment:
-      - MB_DB_FILE=/metabase-data/metabase.db
   jupyterhub:
     build: jupyterhub
     container_name: jupyterhub

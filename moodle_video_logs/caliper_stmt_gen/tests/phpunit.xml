@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="../vendor/autoload.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         testdox="true">
+    <testsuites>
+        <testsuite name="Translator">
+            <directory suffix="Test.php">./Translator</directory>
+        </testsuite>
+        <testsuite name="Sender">
+            <directory suffix="Test.php">./Sender</directory>
+        </testsuite>
+        <testsuite name="Recipe">
+            <directory suffix="Test.php">./Recipe</directory>
+        </testsuite>
+        <testsuite name="Generator">
+            <directory suffix="Test.php">./Generator</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../app/Recipe</directory>
+            <directory suffix=".php">../app/Translator</directory>
+            <directory suffix="Generator.php">../app</directory>
+            <directory suffix="Sender.php">../app</directory>
+        </whitelist>
+    </filter>
+    <php>
+        <server name="APP_ENV" value="testing" />
+        <env name="OPENLRW_APIKEY" value="<api-key>" />
+        <env name="OPENLRW_HOST" value="localhost:9966/key/caliper" />
+    </php>
+</phpunit>

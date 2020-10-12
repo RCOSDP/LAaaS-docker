@@ -1,0 +1,6 @@
+{
+    "require": {
+        "openlrw/api-client": "^0.2.7",
+        "vlucas/phpdotenv": "^3.6"
+    }
+}

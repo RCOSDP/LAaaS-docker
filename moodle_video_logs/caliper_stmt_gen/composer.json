@@ -1,0 +1,24 @@
+{
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php": "^7.3",
+    "imsglobal/caliper": "^1.1",
+    "vlucas/phpdotenv": "^3.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.3"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit -c ./tests/ --colors=always",
+    "test-cov": "vendor/bin/phpunit --coverage-html ./coverage -c ./tests/ --colors=always"
+  }
+}

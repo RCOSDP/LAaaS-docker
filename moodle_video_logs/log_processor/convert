@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+"""Output CSV used to generate video statements."""
+import sys
+
+import pandas as pd
+
+
+def main():
+    """Main function."""
+    df = pd.read_csv(
+        sys.stdin,
+        header=None,
+        sep='\t'
+    )
+
+    # Set column names
+    df.columns = [
+        'date',            # YYYY-MM-DD
+        'time',            # HH:MM:SS
+        'tz',              # Timezone
+        'v-event',         # Event name
+        'v-event-detail',  # Event detail
+        'v-file',          # File name
+        'v-src-query',     # Secure Token
+        'v-current',       # Current playback time
+        'u-ip',            # User IP
+        'u-user-agent',    # User Agent
+        'm-referrer',      # Moodle URL
+        'm-user-id',       # Moodle user ID
+        'm-course-id',     # Moodle course ID(for LTI only)
+        'nonce',           # Nonce(for LTI only)
+        'videoplayerlog',  # 'videoplayerlog'(for LTI only)
+    ]
+    # Construct object id consisting of m-referrer
+    df['m-referrer'] = df.apply(_construct_object_id, axis=1)
+    # Remove prefix
+    df['m-user-id'] = df['m-user-id'].map(_remove_lti_log_prefix)
+    df['m-course-id'] = df['m-course-id'].map(_remove_lti_log_prefix)
+    # Add timestamp column
+    df['timestamp'] = df.apply(_concat_date_time, axis=1)
+
+    df = df[[
+        'timestamp',
+        'v-event',
+        'v-event-detail',
+        'v-file',
+        'v-src-query',
+        'v-current',
+        'm-referrer',
+        'm-user-id',
+        'm-course-id',
+        'nonce',
+        'videoplayerlog',
+    ]]
+    df.rename(
+        columns={
+            'v-event': 'eventname',
+            'v-event-detail': 'eventdetail',
+            'v-file': 'file',
+            'v-src-query': 'query',
+            'v-current': 'current',
+            'm-referrer': 'referrer',
+            'm-user-id': 'userid',
+            'm-course-id': 'courseid',
+        }, inplace=True
+    )
+
+    df.sort_values('timestamp', inplace=True)
+
+    # Append 'force-ended' event if 'xxx-ended' event cannot be found
+    force_ended = []
+    for query in df['query'].unique():
+        filtered = df[df['query'] == query]
+        ended = filtered[filtered['eventname'].str.contains('ended')]
+        if len(ended) == 0:
+            last_row = filtered.iloc[-1]
+            force_ended.append({
+                'timestamp': last_row['timestamp'],
+                'eventname': 'force-ended',
+                'eventdetail': last_row['eventdetail'],
+                'file': last_row['file'],
+                'query': last_row['query'],
+                'current': last_row['current'],
+                'referrer': last_row['referrer'],
+                'userid': last_row['userid'],
+                'courseid': last_row['courseid'],
+                'nonce': last_row['nonce'],
+                'videoplayerlog': last_row['videoplayerlog'],
+            })
+    df = pd.concat(
+        [df, pd.DataFrame(force_ended)],
+        sort=False
+    ).sort_values('timestamp')
+
+    df.to_csv(sys.stdout, index=False)
+
+
+def _remove_lti_log_prefix(x):
+    """Remove LMS domain from string."""
+    return str(x).replace('lms.nii.ac.jp:', '')
+
+
+def _construct_object_id(row):
+    """Return object ID."""
+    scheme = 'https'
+    if str(row['m-referrer']).startswith(f'{scheme}://'):
+        return row['m-referrer']
+    else:
+        # LTI logs
+        domain = 'lms.nii.ac.jp'
+        course_id = _remove_lti_log_prefix(row['m-course-id'])
+        resource_id = _remove_lti_log_prefix(row['m-referrer'])
+        return f'{scheme}://{domain}/{course_id}/{resource_id}'
+
+
+def _concat_date_time(row):
+    """Return datetime string."""
+    return '{}T{}+09:00'.format(row['date'], row['time'])
+
+
+if __name__ == '__main__':
+    main()

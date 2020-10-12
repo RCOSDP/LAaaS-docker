@@ -1,0 +1,4 @@
+Dockerfile
+/vendor/
+/tests/
+/coverage/
