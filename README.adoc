@@ -25,10 +25,10 @@
 * Docker version 18.09.2
 * Docker compose version 1.23.2
 
-== NII-RCOSのインストール
+== LAaaS-dockerのインストール
 
 ----
-$ git clone https://github.com/udzuki/NII-RCOS.git
+$ git clone https://github.com/RCOSDP/LAaaS-docker.git
 ----
 
 == Moodleのインストール
