@@ -7,3 +7,4 @@ REPO_DIR=$(dirname $BIN_DIR)
 export MOODLE_DOCKER_WWWROOT=$REPO_DIR/moodle-docker/moodle
 export MOODLE_DOCKER_DB=pgsql
 $REPO_DIR/moodle-docker/bin/moodle-docker-compose up -d
+$REPO_DIR/moodle-docker/bin/moodle-docker-wait-for-db
