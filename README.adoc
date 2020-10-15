@@ -243,7 +243,7 @@ openlrw_web | 2019-03-24 16:43:36.147  INFO 8 --- [           main] org.apereo.o
 DB_LOG_HOST=caliper_log_db
 #DB_LOG_DATABASE=caliper_log
 #DB_LOG_USERNAME=caliper_cli
-#DB_LOG_PASSWORD=''
+#DB_LOG_PASSWORD=caliper
 ...
 
 変更後
