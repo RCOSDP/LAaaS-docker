@@ -49,7 +49,7 @@ return [
             'port' => env('DB_LOG_PORT', '5432'),
             'database' => env('DB_LOG_DATABASE', 'caliper_log'),
             'username' => env('DB_LOG_USERNAME', 'caliper_cli'),
-            'password' => env('DB_LOG_PASSWORD', ''),
+            'password' => env('DB_LOG_PASSWORD', 'caliper'),
             'charset' => 'utf8',
             'schema' => 'public',
             'sslmode' => 'prefer'

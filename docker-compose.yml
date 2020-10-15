@@ -72,7 +72,7 @@ services:
     container_name: caliper_log_db
     environment:
       - POSTGRES_USER=caliper_cli
-      - POSTGRES_PASSWORD=
+      - POSTGRES_PASSWORD=caliper
       - POSTGRES_DB=caliper_log
     ports:
       - "15432:5432"
