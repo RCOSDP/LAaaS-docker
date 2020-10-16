@@ -1,6 +1,7 @@
 FROM composer AS builder
 WORKDIR /build
 COPY composer.json .
+COPY composer.lock .
 RUN composer install --no-dev
 RUN composer dumpautoload -o
 
