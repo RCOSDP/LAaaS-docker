@@ -232,7 +232,7 @@ openlrw_web | 2019-03-24 16:43:36.147  INFO 8 --- [           main] org.apereo.o
 
 <<<
 === Caliperステートメント変換スクリプト実行ログの起動
-`docker-compose.yml` の `caliper_log_db` にデフォルトの設定が記載されている。変更する場合、`caliper/.env` 内の `DB_LOG_*` の項目も合わせて変更する。その際、先頭の `#` を削除する。
+`docker-compose.yml` の `caliper_log_db` にデフォルトの設定が記載されている。変更する場合、`caliper/.env` 内の `DB_LOG_*` の項目も合わせて変更する。
 
 .caliper/.env
 ----
@@ -241,9 +241,9 @@ openlrw_web | 2019-03-24 16:43:36.147  INFO 8 --- [           main] org.apereo.o
 変更前
 ...
 DB_LOG_HOST=caliper_log_db
-#DB_LOG_DATABASE=caliper_log
-#DB_LOG_USERNAME=caliper_cli
-#DB_LOG_PASSWORD=caliper
+DB_LOG_DATABASE=caliper_log
+DB_LOG_USERNAME=caliper_cli
+DB_LOG_PASSWORD=caliper
 ...
 
 変更後
