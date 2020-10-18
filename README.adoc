@@ -134,6 +134,7 @@ image::learninglocker/stores.png[align=center]
 image::learninglocker/add-new-lrs.png[align=center]
 
 <<<
+[[learninglocker_client_settings]]
 ==== クライアント情報の設定
 サイドメニューの `Settings>Clients` から `New xAPI store client` を選択する。
 `Overall Scopes` の `All` にチェックを入れ、LRSとして事前に作成したLRSを指定する。
@@ -166,7 +167,7 @@ const config = {
 …
 ----
 <1> `LRS.url` はLearning Lockerのクライアント情報として表示される `xAPI Endpoint` とは異なる
-<2> <<_クライアント情報の設定>>で確認したLRSのクライアント情報を設定
+<2> <<learninglocker_client_settings>>で確認したLRSのクライアント情報を設定
 
 なお、 `<learning-locker-container-ip-address>` は以下の方法で確認することができる。
 
@@ -262,6 +263,7 @@ $ docker-compose up -d caliper_log_db
 ----
 
 <<<
+[[caliper_settings]]
 === Caliperステートメント変換スクリプトの設定
 `openlrw_mongo` のMongoDBに接続する。ログイン情報は `open_lrw/.env` に従う。
 
@@ -475,7 +477,7 @@ image::jupyterhub/get-statements-from-learninglocker.png[align=center]
 <<<
 ==== OpenLRWからステートメントを取得
 ノートブック「link:jupyterhub/notebooks/get_statements_from_openlrw.ipynb[get_statements_from_openlrw]」を活用し、OpenLRWのAPIを使用したステートメント取得が可能であることを確認する。 +
-まず `username` 、 `password` にそれぞれ<<Caliperステートメント変換スクリプトの設定>>で取得した `apiKey` と `apiSecret` を設定し、JWTトークンを取得する。 +
+まず `username` 、 `password` にそれぞれ<<caliper_settings>>で取得した `apiKey` と `apiSecret` を設定し、JWTトークンを取得する。 +
 その後、 `Authorization` ヘッダに取得したJWTトークンを設定し、 `url` のユーザーIDを変更することで任意のユーザーのイベントを取得する。
 
 image::jupyterhub/get-statements-from-openlrw.png[align=center]
