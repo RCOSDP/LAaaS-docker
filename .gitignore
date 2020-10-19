@@ -1,8 +1,10 @@
 **/.idea/*
 **/vendor/*
 moodle.sql
-.vscode/*
-learning_locker/data/*
+**/.vscode/*
+/learninglocker/mongo_data/*
+/learninglocker/redis_data/*
+caliper_log/data/*
 open_lrw/data/*
 xapi_stmt_gen/log/*
 elcampus_la/xapi_stmt_gen/log/*

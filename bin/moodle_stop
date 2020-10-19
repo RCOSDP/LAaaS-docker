@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+BIN_DIR=$(cd $(dirname $0); pwd)
+REPO_DIR=$(dirname $BIN_DIR)
+
+export MOODLE_DOCKER_WWWROOT=$REPO_DIR/moodle-docker/moodle
+export MOODLE_DOCKER_DB=pgsql
+$REPO_DIR/moodle-docker/bin/moodle-docker-compose down
