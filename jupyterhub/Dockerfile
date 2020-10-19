@@ -9,13 +9,13 @@ RUN apt-get update && \
 RUN conda create -y -n py3 python=3 anaconda && \
     conda create -y -n py2 python=2 anaconda && \
     /bin/bash -c "source activate py2 && ipython kernel install && pip install pymongo" && \
-    /bin/bash -c "source activate py3 && ipython kernel install && conda install -y -c conda-forge jupyterhub && conda install -c r r-irkernel && pip install pymongo" && \
+    /bin/bash -c "source activate py3 && ipython kernel install && conda install -y -c conda-forge jupyterhub && conda install -c r r-irkernel && conda install -c anaconda psycopg2 && pip install pymongo" && \
     # Create the first jupyterhub user
     useradd -m -p $(echo "jupyter" | openssl passwd -1 -stdin) -s /bin/bash jupyter
 
 # Copy sample notebooks
-COPY get_statements_from_learninglocker.ipynb /home/jupyter/
-COPY get_statements_from_openlrw.ipynb /home/jupyter/
+COPY notebooks/*.ipynb /home/jupyter/
+RUN chown jupyter:jupyter /home/jupyter/*.ipynb
 
 EXPOSE 8000
 

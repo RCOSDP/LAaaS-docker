@@ -1,5 +1,5 @@
-/* Create database used to execute analytical models in customized Superset */
-CREATE DATABASE superset;
+/* Create database used to store data analysis results done with JupyterHub */
+CREATE DATABASE jupyter;
 
 /* Create database that stores xAPI statements */
 CREATE DATABASE learninglocker;
@@ -19,55 +19,103 @@ CREATE FOREIGN TABLE users (
   "updated_at" TIMESTAMP,
   "verified" TEXT
 ) SERVER mongodb_learninglocker_server OPTIONS (
-  --uri 'mongodb://learning_locker:27017',
-  host 'learning_locker',
+  --uri 'mongodb://learninglocker_mongo:27017',
+  host 'learninglocker_mongo',
   port '27017',
   db 'learninglocker',
   collection 'users'
 );
-CREATE FOREIGN TABLE statements (
- "_id" TEXT NOT NULL,
+CREATE FOREIGN TABLE xapi_statements (
+ "_id" VARCHAR NOT NULL,
  "active" BOOLEAN,
- "client_id" TEXT,
- "lrs._id" TEXT NOT NULL,
- "lrs_id" TEXT,
- "statement.actor.account.homePage" TEXT,
- "statement.actor.account.name" TEXT,
- "statement.actor.objectType" TEXT,
- "statement.authority.mbox" TEXT,
- "statement.authority.name" TEXT,
- "statement.authority.objectType" TEXT,
- "statement.context.contextActivities.parent.definition.name" TEXT,
- "statement.context.contextActivities.parent.definition.name.type" TEXT,
- "statement.context.contextActivities.parent.id" TEXT,
- "statement.context.contextActivities.parent.objectType" TEXT,
- "statement.context.platform" TEXT,
- "statement.context.statement.id" TEXT,
- "statement.context.statement.objectType" TEXT,
- "statement.id" TEXT,
- "statement.object.definition.description.en-US" TEXT,
- "statement.object.definition.name.en-US" TEXT,
- "statement.object.definition.type" TEXT,
- "statement.object.id" TEXT,
- "statement.object.objectType" TEXT,
- "statement.result.completion" VARCHAR,
- "statement.result.score.max" VARCHAR,
- "statement.result.score.min" VARCHAR,
- "statement.result.score.raw" VARCHAR,
- "statement.result.score.scaled" VARCHAR,
- "statement.result.success" VARCHAR,
- "statement.stored" TEXT,
- "statement.timestamp" TEXT,
- "statement.verb.display.en-US" TEXT,
- "statement.verb.id" TEXT,
- "statement.version" TEXT,
+ "client_id" VARCHAR,
+ "lrs._id" VARCHAR NOT NULL,
+ "lrs_id" VARCHAR,
+ "statement.actor.account.homePage" VARCHAR,
+ "statement.actor.account.name" VARCHAR,
+ "statement.actor.objectType" VARCHAR,
+ "statement.authority.mbox" VARCHAR,
+ "statement.authority.name" VARCHAR,
+ "statement.authority.objectType" VARCHAR,
+ "statement.context.contextActivities.parent.definition.name" VARCHAR,
+ "statement.context.contextActivities.parent.definition.name.type" VARCHAR,
+ "statement.context.contextActivities.parent.id" VARCHAR,
+ "statement.context.contextActivities.parent.objectType" VARCHAR,
+ "statement.context.platform" VARCHAR,
+ "statement.context.statement.id" VARCHAR,
+ "statement.context.statement.objectType" VARCHAR,
+ "statement.id" VARCHAR,
+ "statement.object.definition.description.en" VARCHAR,
+ "statement.object.definition.name.en" VARCHAR,
+ "statement.object.definition.type" VARCHAR,
+ "statement.object.definition.moreInfo" VARCHAR,
+ "statement.object.id" VARCHAR,
+ "statement.object.objectType" VARCHAR,
+ "statement.result.score.scaled" INTEGER,
+ "statement.result.score.raw" INTEGER,
+ "statement.result.score.min" INTEGER,
+ "statement.result.score.max" INTEGER,
+ "statement.result.success" BOOLEAN,
+ "statement.result.completion" BOOLEAN,
+ "statement.result.duration" VARCHAR,
+ "statement.stored" VARCHAR,
+ "statement.timestamp" VARCHAR,
+ "statement.verb.display.en" VARCHAR,
+ "statement.verb.display.ja" VARCHAR,
+ "statement.verb.id" VARCHAR,
+ "statement.version" VARCHAR,
  "stored" TIMESTAMP,
  "timestamp" TIMESTAMP,
  "voided" BOOLEAN
 ) SERVER mongodb_learninglocker_server OPTIONS (
-  --uri 'mongodb://learning_locker:27017',
-  host 'learning_locker',
+  --uri 'mongodb://learninglocker_mongo:27017',
+  host 'learninglocker_mongo',
   port '27017',
   db 'learninglocker',
   collection 'statements'
+);
+
+/* Create database that stores Caliper statements */
+CREATE DATABASE openlrw;
+\c openlrw
+CREATE EXTENSION multicorn;
+CREATE SERVER mongodb_openlrw_server FOREIGN DATA WRAPPER multicorn OPTIONS (
+  wrapper 'yam_fdw.Yamfdw'
+);
+CREATE FOREIGN TABLE caliper_statements (
+ "_id" VARCHAR NOT NULL,
+ "userId" VARCHAR,
+ "organizationId" VARCHAR,
+ "tenantId" VARCHAR,
+ "event._id" VARCHAR,
+ "event.context" VARCHAR,
+ "event.type" VARCHAR,
+ "event.agent._id" VARCHAR,
+ "event.agent.type" VARCHAR,
+ "event.agent.name" VARCHAR,
+ "event.agent.description" VARCHAR,
+ "event.action" VARCHAR,
+ "event.object._id" VARCHAR,
+ "event.object.type" VARCHAR,
+ "event.object.name" VARCHAR,
+ "event.object.currentTime" VARCHAR,
+ "event.object.extensions.courseId" VARCHAR,
+ "event.object.extensions.nonce" VARCHAR,
+ "event.object.extensions.videoplayerlog" VARCHAR,
+ "event.target._id" VARCHAR,
+ "event.target.type" VARCHAR,
+ "event.target.currentTime" VARCHAR,
+ "event.edApp._id" VARCHAR,
+ "event.edApp.type" VARCHAR,
+ "event.generated._id" VARCHAR,
+ "event.generated.type" VARCHAR,
+ "event.eventTime" TIMESTAMP
+) SERVER mongodb_openlrw_server OPTIONS (
+  --uri 'mongodb://openlrw_mongo:27017',
+  host 'openlrw_mongo',
+  port '27017',
+  db 'caliper',
+  user 'caliper',
+  password 'caliper',
+  collection 'mongoEvent'
 );

@@ -199,6 +199,12 @@
   - object.definition.name['en'] = attempt_submitted
   - object.definition.description['en'] = attempt_submitted
   - object.definition.type = http://adlnet.gov/expapi/activities/assessment
+  - result.score.raw = <mdl_grade_grades.rawgrade>
+  - result.score.min = <mdl_grade_grades.rawgrademin>
+  - result.score.max = <mdl_grade_grades.rawgrademax>
+  - result.success = <mdl_grade_grades.rawgrade> >= <mdl_grade_items.gradepass>
+  - result.completion = <mdl_quiz_attempts.state> === 'finished'
+  - result.duration = <mdl_quiz_attempts.timefinish> - <mdl_quiz_attempts.timestart>
 
 * \\mod_quiz\\event\\report_viewed
   - verb.id = urn:x-moodle-event-action:viewed
@@ -273,7 +279,6 @@
   - object.definition.type = http://adlnet.gov/expapi/activities/workshop
 
 * \\mod_workshop\\event\\submission_created
-  - timestamp = <mdl_workshop_submissions.timecreated> found by <mdl_logstore_standard_log.objectid> (Converted)
   - verb.id = urn:x-moodle-event-action:created
   - context.contextActivities.grouping
     - grouping.objectType = Activity
@@ -322,7 +327,6 @@
   - object.definition.type = http://adlnet.gov/expapi/activities/workshop
 
 * \\mod_workshop\\event\\submission_assessed
-  - timestamp = <mdl_workshop_assessments.timecreated> found by <mdl_logstore_standard_log.objectid> (Converted)
   - verb.id = urn:x-moodle-event-action:assessed
   - context.contextActivities.grouping
     - grouping.objectType = Activity
@@ -503,7 +507,6 @@
   - object.definition.type = http://adlnet.gov/expapi/activities/assign
 
 * \\mod_assign\\event\\assessable_submitted
-  - timestamp = <mdl_assign_submission.timecreated> found by <mdl_logstore_standard_log.objectid> (Converted)
   - verb.id = urn:x-moodle-event-action:submitted
   - context.contextActivities.grouping
     - grouping.objectType = Activity
@@ -552,7 +555,6 @@
   - object.definition.type = http://adlnet.gov/expapi/activities/assign
 
 * \\mod_assign\\event\\submission_graded
-  - timestamp = <mdl_assign_grades.timecreated> found by <mdl_logstore_standard_log.objectid> (Converted)
   - verb.id = urn:x-moodle-event-action:graded
   - context.contextActivities.grouping
     - grouping.objectType = Activity

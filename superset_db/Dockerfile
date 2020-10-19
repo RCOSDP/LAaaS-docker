@@ -1,27 +1,49 @@
 FROM centos:centos7
-WORKDIR /usr/local/src
-COPY setup.sql .
+
+# Install dependencies
 RUN yum update -y && \
-    yum install -y epel-release && \
-    yum install -y https://download.postgresql.org/pub/repos/yum/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-3.noarch.rpm && \
-    yum install -y postgresql94 postgresql94-server postgresql94-contrib postgresql94-devel.x86_64 && \
-    yum install -y pgxnclient python-devel python-pip python-psycopg2 && \
-    python -m pip install pymongo==3.1.1 && \
-    yum install -y make gcc gcc-c++ which git && \
-    export PATH=/usr/pgsql-9.4/bin:$PATH && \
-    pgxn install multicorn && \
+    yum install -y \
+      gcc \
+      gcc-c++ \
+      git \
+      make \
+      python-devel \
+      which
+
+# Install pip and setuptools
+RUN yum install -y epel-release && \
+    yum install -y python-pip && \
     pip install --upgrade pip && \
-    pip install setuptools --upgrade && \
-    git clone https://github.com/asya999/yam_fdw.git
-WORKDIR /usr/local/src/yam_fdw
-RUN python setup.py install
+    pip install setuptools --upgrade
+
+# Install PostgreSQL 9.6
+RUN yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
+    yum install -y \
+      postgresql96-contrib \
+      postgresql96-devel \
+      postgresql96-server
+
+# Add path to commands
+ENV PATH $PATH:/usr/pgsql-9.6/bin
+
+# Install Multicorn
+WORKDIR /usr/local/src
+RUN git clone git://github.com/Kozea/Multicorn.git --depth 1 -b v1.4.0 && \
+    cd Multicorn && \
+    make && make install
+
+# Install yam_fdw
+WORKDIR /usr/local/src
+RUN git clone https://github.com/asya999/yam_fdw.git && \
+    cd yam_fdw && \
+    python setup.py install
+
+# Prepare init scripts
 USER postgres
-RUN /usr/pgsql-9.4/bin/initdb -D /var/lib/pgsql/9.4/data
-COPY postgresql.conf /var/lib/pgsql/9.4/data/
-COPY pg_hba.conf /var/lib/pgsql/9.4/data/
-USER root
-RUN chown postgres:postgres /var/lib/pgsql/9.4/data/postgresql.conf /var/lib/pgsql/9.4/data/pg_hba.conf
-USER postgres
-RUN  /usr/pgsql-9.4/bin/pg_ctl -D /var/lib/pgsql/9.4/data -l /var/lib/pgsql/9.4/data/log start && \
-     sleep 5 && \
-     psql -f /usr/local/src/setup.sql
+ENV PGDATA /var/lib/pgsql/9.6/data
+COPY --chown=postgres:postgres \
+  entrypoint.sh pg_hba.conf postgresql.conf setup.sql /init/
+RUN chmod 755 /init/entrypoint.sh
+EXPOSE 5432
+ENTRYPOINT ["/init/entrypoint.sh"]
+CMD ["postgres"]

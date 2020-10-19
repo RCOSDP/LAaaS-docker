@@ -1,0 +1,8 @@
+.editorconfig
+.env.testing
+phpcs.xml
+setup.sql
+statement.md
+database
+vendor
+tests

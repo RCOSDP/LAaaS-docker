@@ -1,16 +1,20 @@
-FROM composer AS builder
-WORKDIR /build
-COPY composer.json .
-RUN composer install --no-dev
-RUN composer dumpautoload -o
-
-FROM php:7.3-alpine
-
-RUN apk update && \
-    apk --no-cache upgrade && \
-    apk --no-cache add postgresql-dev && \
-    docker-php-ext-install pdo pdo_pgsql pgsql mbstring
-
-WORKDIR /dump
-COPY --from=builder /build/vendor ./vendor
+FROM composer:1.9 AS builder
+WORKDIR /stage
 COPY . .
+RUN composer install --no-dev && \
+    composer build
+
+FROM php:7.3-alpine AS runtime
+WORKDIR /app
+RUN apk update &&\
+    apk --no-cache add sqlite postgresql-dev autoconf &&\
+    docker-php-ext-install \
+        pdo \
+        mysqli pdo_mysql\
+        pgsql pdo_pgsql\
+        mbstring &&\
+    docker-php-ext-enable pdo pdo_pgsql pdo_mysql
+COPY --from=builder /stage/builds/caliper-cli /app
+
+ENTRYPOINT [ "/app/caliper-cli" ]
+CMD ["generate"]
