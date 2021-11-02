@@ -21,7 +21,7 @@ RUN yum update -y && \
 
 COPY requirements.txt .
 RUN . venv/bin/activate && \
-    pip install --upgrade setuptools pip && \
+    pip install setuptools pip && \
     pip install -r requirements.txt && \
     export LANG=en_US.utf-8 && \
     fabmanager create-admin --app superset --username admin --firstname admin --lastname user --email admin@fab.org --password admin && \

@@ -13,7 +13,7 @@ RUN yum update -y && \
 # Install pip and setuptools
 RUN yum install -y epel-release && \
     yum install -y python-pip && \
-    pip install --upgrade pip && \
+    curl https://bootstrap.pypa.io/pip/2.7/get-pip.py -o get-pip.py && python get-pip.py && rm get-pip.py && \
     pip install setuptools --upgrade
 
 # Install PostgreSQL 9.6
