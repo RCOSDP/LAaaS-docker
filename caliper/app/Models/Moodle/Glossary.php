@@ -32,20 +32,20 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $scale
  * @property integer $timecreated
  * @property integer $timemodified
- * @property int $completionentries
+ * @property integer $completionentries
  */
 class Glossary extends MoodleBase
 {
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'glossary';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

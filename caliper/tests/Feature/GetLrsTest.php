@@ -35,7 +35,7 @@ class MockEvent
     private $username;
     public function __construct(string $uname)
     {
-        $this->username = $uname;   
+        $this->username = $uname;
     }
 
     public function getUserName(): string

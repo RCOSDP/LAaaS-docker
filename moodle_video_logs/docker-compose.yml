@@ -11,6 +11,7 @@ services:
     tty: true
     environment:
       - TZ=Asia/Tokyo
+    restart: always
   caliper_stmt_gen:
     container_name: caliper_video_logs
     build: caliper_stmt_gen
@@ -19,6 +20,7 @@ services:
     tty: true
     environment:
       - TZ=Asia/Tokyo
+    restart: always
 networks:
   default:
     external:

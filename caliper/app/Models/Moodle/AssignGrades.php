@@ -18,7 +18,7 @@ class AssignGrades extends MoodleBase
 {
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

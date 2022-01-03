@@ -11,7 +11,7 @@
   },
   "require": {
     "php": "^7.3",
-    "imsglobal/caliper": "^1.1",
+    "imsglobal/caliper": "1.2.0-beta",
     "vlucas/phpdotenv": "^3.0"
   },
   "require-dev": {

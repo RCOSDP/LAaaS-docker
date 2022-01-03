@@ -58,12 +58,13 @@ use App\Models\Moodle\MoodleBase;
  * @property string $firstnamephonetic
  * @property string $middlename
  * @property string $alternatename
+ * @property string $moodlenetprofile
  */
 class User extends MoodleBase
 {
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'user';
@@ -77,7 +78,7 @@ class User extends MoodleBase
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'string';
@@ -137,7 +138,8 @@ class User extends MoodleBase
         'lastnamephonetic',
         'firstnamephonetic',
         'middlename',
-        'alternatename'
+        'alternatename',
+        'moodlenetprofile'
     ];
 
     /**

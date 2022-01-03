@@ -16,11 +16,12 @@
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
 
-    <exclude-pattern>/app/Models</exclude-pattern>
+    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+        <exclude-pattern>*/tests/Feature/GetLrsTest.php</exclude-pattern>
+    </rule>
+
     <exclude-pattern>/bootstrap/</exclude-pattern>
     <exclude-pattern>/builds/</exclude-pattern>
     <exclude-pattern>/config/</exclude-pattern>
     <exclude-pattern>/vendor/</exclude-pattern>
-    <exclude-pattern>/tests/CreatesApplication.php</exclude-pattern>
-    <exclude-pattern>/tests/TestCase.php</exclude-pattern>
 </ruleset>

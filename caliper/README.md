@@ -1,244 +1,393 @@
 # Learning Analysis for Moodle
-## caliper statement generator
-### Statement definitions
-#### common defenitions
-- agent.id = <MOODLE_URL>/user/<mdl_logstore_standard_log.userid>
-- agent.name = <mdl_user.username>
+## Caliper statement definitions
+### logstore_standard_log
+#### Common definitions
+- agent.id = <MOODLE_URL>/user/profile.php?id=<mdl_logstore_standard_log.userid>
+- agent.name = <mdl_user.username> (Converted to SHA256 hash)
 - agent.description = <mdl_user.description>
+- agent.type = Person
 - eventTime = <mdl_logstore_standard_log.timecreated>(Converted)
 - edApp.id = <MOODLE_URL>
 - edApp.type = SoftwareApplication
+- edApp.name = moodle
 
 #### Definitions according to <mdl_logstore_standard_log.eventname>
 - \core\event\dashboard_viewed
-    - type = NavigationEvent
+    - type = ViewEvent
     - action = Viewed
-    - object = edApp
+    - object.id = <MOODLE_URL>/user/profile.php?id=<mdl_logstore_standard_log.userid>
+    - object.type = WebPage
 
 - \core\event\course_viewed
-    - type = NavigationEvent
+    - type = ViewEvent
     - action = Viewed
-    - object.id = <MOODLE_URL>/course/<mdl_logstore_standard_log.objectid>
-    - object.name = <mdl_course.fullname>
+    - object.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.type = WebPage
 
 - \core\event\user_loggedin
     - type = SessionEvent
     - action = LoggedIn
-    - object = edApp
+    - object.id = <MOODLE_URL>
+    - object.type = SoftwareApplication
 
 - \core\event\user_loggedout
     - type = SessionEvent
-    - action = LoggedIn
-    - object = edApp
+    - action = LoggedOut
+    - object.id = <MOODLE_URL>
+    - object.type = SoftwareApplication
 
-- \mdl_assign\event\assessable_submitted
+- \mod_assign\event\assessable_submitted
     - type = AssignableEvent
     - action = Submitted
-    - object.id = <MOODLE_URL>/mod/assign/<mdl_assign_submission.assignment>
-    - object.name = <mdl_assign.name>
-    - object.start = <mdl_assign.allowsubmissionsfromdate>
-    - object.due = <mdl_assign.duedate>
-    - generated.id = object.id/attempt/<mdl_assign_submission.attemptnumber>
-    - generated.count = <mdl_assign_submission.attemptnumber>
-    - generated.assignee.id = <MOODLE_URL>/user/<mdl_assign_submission.userid>
-    - generated.assignee.name = <mdl_user.username>
-    - generated.assignee.description = <mdl_user.description>
+    - object.id = <MOODLE_URL>/mod/assign/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.type = AssignableDigitalResource
+    - object.name = <mdl_assign.name> related to <mdl_assign_submission> found by <mdl_logstore_standard_log.objectid>
+    - object.description = <mdl_assign.intro>
+    - object.maxAttempts = <mdl_assign.maxattempts>
+    - object.maxScore = <mdl_assign.grade>
+    - object.dateToStartOn = <mdl_assign.allowsubmissionsfromdate>
+    - object.dateToSubmit = <mdl_assign.duedate>
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
 
-- \mdl_assign\event\submission_graded
-    - type = NavigationEvent
-    - action = NavigatedTo
-    - object.id = <MOODLE_URL>/user/<mdl_logstore_standard_log.userid>/attempt/<mdl_assign_grade.attemptnumber>
-    - object.name = <mdl_assign.intro>
-    - object.attempt = <mdl_assign_grade.attemptnumber>
-    - object.start = <mdl_assign.allowsubmissionsfromdate>
-    - object.due = <mdl_assign.duedate>
-    - object.assignee.id = <mdl_assign_grade.userid>
-    - object.assignee.name = <mdl_user.username>
-    - object.assignee.description = <mdl_user.description>
-    - generated.id = object.id/result
-    - generated.max_score = <mdl_assign.grade>
-    - generated.score = <mdl_assign_graded.grade>
-    - generated.comment = <mdl_assignfeedback_comment.commenttext>
-
-- \mdl_assign\event\submission_graded
-    - type = GradedEvent
+- \mod_assign\event\submission_graded
+    - type = GradeEvent
     - action = Graded
-    - object.id = <MOODLE_URL>/mod/assign/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/assign/view.php?id=<mdl_logstore_standard_log.contextinstanceid>&rownum=0&action=grader&userid=<mdl_logstore_standard_log.userid>
+    - object.type = Attempt
+    - object.count = <mdl_assign_grade.attemptnumber> found by <mdl_logstore_standard_log.objectid>
+    - object.assignable.id = <MOODLE_URL>/mod/assign/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.assignable.type = AssignableDigitalResource
+    - generated.id = <MOODLE_URL>/mod/assign/view.php?id=<mdl_logstore_standard_log.contextinstanceid>&rownum=0&action=grader&userid=<mdl_logstore_standard_log.userid>#result
+    - generated.type = Score
+    - generated.scoreGiven = <mdl_assign_grade.grade>
+    - generated.comment = <mdl_assignfeedback_comment.commenttext> found by <mdl_assign_grade.assignment> and <mdl_assign_grade.grade>
+    - generated.scoredBy.id = <MOODLE_URL>/user/profile.php?id=<mdl_user.id> found by <mdl_assign_grade.grader>
+    - generated.scoredBy.type = Person
+    - generated.scoredBy.name = <mdl_user.username>
+    - generated.scoredBy.description = <mdl_user.description>
 
-
-- \mdl_book\event\course_module_viewed
-    - type = navigationevent
-    - action = navigatedto
-    - object.id = <moodle_url>/mod/book/<mdl_logstore_standard_log.objectid>
-    - object.name = <moodle_url>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = eventtype::<module_type>
-
-- \mdl_chat\event\course_module_viewed
+- \mod_book\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/chat/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/book/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_choice\event\course_module_viewed
+- \mod_chat\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/choice/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/chat/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_data\event\course_module_viewed
+- \mod_choice\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/data/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/choice/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_facetoface\event\course_module_viewed
+- \mod_data\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/facetoface/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/data/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_feedback\event\course_module_viewed
+- \mod_feedback\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/feedback/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/feedback/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_folder\event\course_module_viewed
+- \mod_folder\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/folder/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/folder/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_forum\event\course_module_viewed
+- \mod_forum\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/forum/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/forum/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_forum\event\subscription_created
+- \mod_forum\event\subscription_created
     - type = ForumEvent
     - action = Subscribed
-    - object.id = <MOODLE_URL>/mod/forum/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/forum/subscribers.php?id=<mdl_logstore_standard_log.other['forumid']>&edit=on
+    - object.name = <mdl_forum.name> found by <mdl_logstore_standard_log.other['forumid']>
+    - object.type = Forum
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
 
-- \mdl_forum\event\subscription_deleted
+- \mod_forum\event\subscription_deleted
+    - type = ForumEvent
+    - action = Unsubscribed
+    - object.id = <MOODLE_URL>/mod/forum/subscribers.php?id=<mdl_logstore_standard_log.other['forumid']>&edit=on
+    - object.name = <mdl_forum.name> found by <mdl_logstore_standard_log.other['forumid']>
+    - object.type = Forum
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+
+- \mod_forum\event\discussion_viewed
+    - type = ViewEvent
+    - action = Viewed
+    - object.id = <MOODLE_URL>/mod/forum/discuss.php?d=<mdl_logstore_standard_log.objectid>
+    - object.name = <mdl_forum_discussions.name> found by <mdl_logstore_standard_log.objectid>
+    - object.type = Thread
+    - object.isPartOf.id = <MOODLE_URL>/mod/forum/view.php?f=<mdl_forum_discussions.forum>
+    - object.isPartOf.name = <mdl_forum.name> found by <mdl_forum_discussions.forum>
+    - object.isPartOf.type = Forum
+    - object.isPartOf.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.isPartOf.type = CourseSection
+    - object.isPartOf.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+
+- \mod_glossary\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/forum/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/glossary/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_forum\event\discuttion_viewed
+- \mod_imscp\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/forum/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/imscp/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_glossary\event\course_module_viewed
+- \mod_lesson\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/glossary/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/lesson/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_imscp\event\course_module_viewed
+- \mod_lti\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/imscp/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/lti/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_lesson\event\course_module_viewed
+- \mod_page\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/lesson/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/page/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_lti\event\course_module_viewed
+- \mod_quiz\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/lti/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/quiz/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_page\event\course_module_viewed
-    - type = NavigationEvent
-    - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/page/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
-
-- \mdl_quiz\event\course_module_viewed
-    - type = NavigationEvent
-    - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/quiz/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
-
-- \mdl_quiz\event\attempt_started
+- \mod_quiz\event\attempt_started
     - type = AssessmentEvent
     - action = Started
-    - object.id = <MOODLE_URL>/mod/quiz/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
-    - generated.id = <MOODLE_URL>/mod/attempt/<mdl_quiz_attempts.attempt>
+    - object.id = <MOODLE_URL>/mod/quiz/attempt.php?attempt=<mdl_logstore_standard_log.objectid>&cmid=<mdl_logstore_standard_log.contextinstanceid>
+    - object.type = Assessment
+    - object.name = <mdl_quiz.name> related to <mdl_quiz_attempts> found by <mdl_logstore_standard_log.objectid>
+    - object.maxScore = <mdl_quiz.grade>
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - generated.id = <MOODLE_URL>/mod/quiz/attempt.php?attempt=<mdl_logstore_standard_log.objectid>&cmid=<mdl_logstore_standard_log.contextinstanceid>#result
+    - generated.type = Attempt
+    - generated.count = <mdl_quiz_attempts.attempt> found by <mdl_logstore_standard_log.objectid>
 
-- \mdl_quiz\event\attempt_submitted
+- \mod_quiz\event\attempt_submitted
     - type = AssessmentEvent
     - action = Submitted
-    - object.id = <MOODLE_URL>/mod/quiz/<mdl_logstore_standard_log.objectid>
+    - object.id = <MOODLE_URL>/mod/quiz/attempt.php?attempt=<mdl_logstore_standard_log.objectid>&cmid=<mdl_logstore_standard_log.contextinstanceid>
+    - object.type = Assessment
+    - object.name = <mdl_quiz.name> related to <mdl_quiz_attempts> found by <mdl_logstore_standard_log.objectid>
+    - object.maxScore = <mdl_quiz.grade>
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - generated.id = <MOODLE_URL>/mod/quiz/attempt.php?attempt=<mdl_logstore_standard_log.objectid>&cmid=<mdl_logstore_standard_log.contextinstanceid>#result
+    - generated.type = Attempt
+    - generated.count = <mdl_quiz_attempts.attempt>
 
-- \mdl_resource\event\course_module_viewed
+- \mod_resource\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/resource/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/resource/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_scorm\event\course_module_viewed
+- \mod_scorm\event\scoreraw_submitted
+    - type = GradeEvent
+    - action = Graded
+    - object.id = <MOODLE_URL>/mod/scorm/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_scorm.name> found by <mdl_logstore_standard_log.objectid>
+    - object.type = Attempt
+    - generated.id = <MOODLE_URL>/mod/scorm/view.php?id=<mdl_logstore_standard_log.contextinstanceid>#result
+    - generated.scoreGiven = <mdl_logstore_standard_log.other['cmivalue']>
+    - generated.type = Score
+
+- \mod_scorm\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/scorm/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/scorm/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_survey\event\course_module_viewed
+- \mod_survey\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/survey/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/survey/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_url\event\course_module_viewed
+- \mod_url\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/url/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/url/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_wiki\event\course_module_viewed
+- \mod_wiki\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/wiki/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/wiki/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
-- \mdl_workshop\event\course_module_viewed
+- \mod_workshop\event\course_module_viewed
     - type = NavigationEvent
     - action = NavigatedTo
-    - object.id = <MOODLE_URL>/mod/workshop/<mdl_logstore_standard_log.objectid>
-    - object.name = <MOODLE_URL>/<mdl_logstore_standard_log.objecttable.name>
-    - object.type = EventType::<module_type>
+    - object.id = <MOODLE_URL>/mod/workshop/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
+    - object.name = <mdl_logstore_standard_log.objecttable.name>
+    - object.description = <mdl_logstore_standard_log.objecttable.intro>
+    - object.type = DigitalResource
+    - object.isPartOf.id = <MOODLE_URL>/course/view.php?id=<mdl_logstore_standard_log.courseid>
+    - object.isPartOf.type = CourseSection
+    - object.isPartOf.name = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
+    - object.isPartOf.category = <mdl_course_categories.name> found by <mdl_course.category>
 
+### scorm_scoes_track
+#### Common definitions
+- agent.id = <MOODLE_URL>/user/profile.php?id=<mdl_mdl_scorm_scoes_track.userid>
+- agent.name = <mdl_user.username> (Converted to SHA256 hash)
+- agent.description = <mdl_user.description>
+- agent.type = Person
+- eventTime = <mdl_scorm_scoes_track.timemodified>(Converted)
+- edApp.id = <MOODLE_URL>
+- edApp.type = SoftwareApplication
+- edApp.name = moodle
+
+#### Definitions according to <mdl_scorm_scoes_track.element>
+- cmi.core.total_time
+    - type = AssessmentEvent
+    - action = Submitted
+    - object.id = <mdl_logstore_standard_log.other['loadedcontent']> of latest \mod_scorm\event\sco_launched event
+    - object.name = <mdl_scorm_scoes.launch> found by <mdl_scorm_scoes_track.scoid>
+    - object.description = <mdl_scorm_scoes.title>
+    - object.type = Assessment
+    - generated.id = <mdl_logstore_standard_log.other['loadedcontent']>#result
+    - generated.count = <mdl_scorm_scoes_track.attempt>
+    - generated.duration = <mdl_scorm_scoes_track.value> (Converted to ISO 8601 duration format)
+    - generated.type = Attempt

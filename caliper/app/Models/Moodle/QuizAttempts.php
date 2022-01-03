@@ -8,7 +8,7 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $id
  * @property integer $quiz
  * @property string $userid
- * @property int $attempt
+ * @property integer $attempt
  * @property integer $uniqueid
  * @property string $layout
  * @property integer $currentpage
@@ -23,10 +23,10 @@ use App\Models\Moodle\MoodleBase;
  */
 class QuizAttempts extends MoodleBase
 {
-    const CREATED_AT = null;
+    public const CREATED_AT = null;
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

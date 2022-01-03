@@ -2,7 +2,10 @@
 
 namespace App\Translator;
 
-use App\Models\Moodle\{Event, User};
+use App\Models\Moodle\{
+    Event,
+    User,
+};
 
 final class UserLoggedin extends Translator
 {
@@ -18,7 +21,7 @@ final class UserLoggedin extends Translator
         return $this->actor;
     }
 
-    public function getObject(): string
+    public function getObject()
     {
         return $this->object;
     }

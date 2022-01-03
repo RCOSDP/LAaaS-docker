@@ -40,19 +40,22 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $overallfeedbackfiles
  * @property string $overallfeedbackfiletypes
  * @property integer $overallfeedbackmaxbytes
+ * @property integer $submissiontypetext
+ * @property integer $submissiontypefile
  */
 class Workshop extends MoodleBase
 {
+    public const CREATED_AT = null;
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'workshop';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -94,7 +97,9 @@ class Workshop extends MoodleBase
         'overallfeedbackmode',
         'overallfeedbackfiles',
         'overallfeedbackfiletypes',
-        'overallfeedbackmaxbytes'
+        'overallfeedbackmaxbytes',
+        'submissiontypetext',
+        'submissiontypefile'
     ];
 
     /**

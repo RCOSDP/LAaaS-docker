@@ -10,11 +10,9 @@ final class SenderServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Collection::macro('send', function () {
-
             $this->map(function ($envelope) {
                     Sender::send($envelope);
             });
-
         });
     }
 }

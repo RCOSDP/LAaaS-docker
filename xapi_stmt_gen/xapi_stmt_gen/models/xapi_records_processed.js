@@ -2,11 +2,15 @@
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('xapi_records_processed', {
-    id: {
-      type: DataTypes.INTEGER,
+    objecttable: {
+      type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+    },
+    objectid: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      primaryKey: true,
     },
     status: {
       type: DataTypes.INTEGER,

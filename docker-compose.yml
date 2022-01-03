@@ -33,6 +33,7 @@ services:
     tty: true
     environment:
       - TZ=Asia/Tokyo
+      - INTERVAL=-1
   openlrw_mongo:
     image: mongo:latest
     restart: always
@@ -67,6 +68,16 @@ services:
       - caliper_log_db
       - openlrw
       - openlrw_mongo
+  learning_analytics_db:
+    image: postgres:11
+    container_name: learning_analytics_db
+    environment:
+      - POSTGRES_USER=learning_analytics
+      - POSTGRES_PASSWORD=learning_analytics
+      - POSTGRES_DB=learning_analytics
+    volumes:
+      - ./learning_analytics_db/init:/docker-entrypoint-initdb.d
+      - ./learning_analytics_db/data:/var/lib/postgresql/data
   caliper_log_db:
     image: postgres:11
     container_name: caliper_log_db
@@ -84,19 +95,36 @@ services:
     container_name: superset
     ports:
       - "8088:8088"
-    environment:
-      - LANG=en_US.utf-8
     depends_on:
-      - superset_db
-    command: bash -c ". ./venv/bin/activate && superset runserver"
-  superset_db:
-    build: superset_db
-    container_name: superset_db
+      - superset-db
+    environment:
+      - SECRET_KEY=JmAH_gnn9y5T8Wgjt4IBlzjmYMHEGOQONLuJyfmMMOg
+    #  - ADMIN_USERNAME=admin
+    #  - ADMIN_FIRSTNAME=admin
+    #  - ADMIN_LASTNAME=user
+    #  - ADMIN_EMAIL=admin@fab.org
+    #  - ADMIN_PASSWORD=admin
+  superset-db:
+    build: superset-db
+    container_name: superset-db
     ports:
       - "5433:5432"
     volumes:
-      - ./superset_db/data:/var/lib/pgsql/9.6/data
+      - ./superset-db/data:/var/lib/pgsql/9.6/data
     user: postgres
+    environment:
+      - LRS_HOST=learninglocker_mongo
+      - LRS_PORT=27017
+      - LRS_DB=learninglocker
+      - LRS_DB_USER=
+      - LRS_DB_PASSWORD=
+      - LRS_COLLECTION=statements
+      - LRW_HOST=openlrw_mongo
+      - LRW_PORT=27017
+      - LRW_DB=caliper
+      - LRW_DB_USER=caliper
+      - LRW_DB_PASSWORD=caliper
+      - LRW_COLLECTION=mongoEvent
   jupyterhub:
     build: jupyterhub
     container_name: jupyterhub

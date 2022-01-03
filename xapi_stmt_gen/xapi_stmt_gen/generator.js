@@ -1,27 +1,60 @@
 'use strict';
-const adl = require('adl-xapiwrapper');
+const axios = require('axios');
+const axiosRetry = require('axios-retry');
 const config = require('./config/app');
-const db = require('./db-config');
+const crypto = require('crypto');
+const laDB = require('./la-db-config');
+const lmsDB = require('./lms-db-config');
+const http = require('http');
 const log4js = require('log4js');
 const logger = log4js.getLogger();
-const sleep = require('system-sleep');
+const phpUnserialize = require('phpunserialize');
+const Sequelize = require('sequelize');
 const uuid = require('node-uuid');
 
-const COURSE = db.import('./models/mdl_course');
-const GRADE_ITEMS = db.import('./models/mdl_grade_items');
-const GRADE_GRADES = db.import('./models/mdl_grade_grades');
-const LOGSTORE_STANDARD_LOG = db.import('./models/mdl_logstore_standard_log');
-const QUIZ = db.import('./models/mdl_quiz');
-const QUIZ_ATTEMPTS = db.import('./models/mdl_quiz_attempts');
-const USER = db.import('./models/mdl_user');
-const XAPI_RECORDS_PROCESSED = db.import('./models/xapi_records_processed');
+const COURSE = lmsDB.import('./models/mdl_course');
+const GRADE_ITEMS = lmsDB.import('./models/mdl_grade_items');
+const GRADE_GRADES = lmsDB.import('./models/mdl_grade_grades');
+const LOGSTORE_STANDARD_LOG = lmsDB.import('./models/mdl_logstore_standard_log');
+const QUIZ = lmsDB.import('./models/mdl_quiz');
+const QUIZ_ATTEMPTS = lmsDB.import('./models/mdl_quiz_attempts');
+const SCORM = lmsDB.import('./models/mdl_scorm');
+const SCORM_SCOES = lmsDB.import('./models/mdl_scorm_scoes');
+const SCORM_SCOES_TRACK = lmsDB.import('./models/mdl_scorm_scoes_track');
+const USER = lmsDB.import('./models/mdl_user');
+
+const EPPN = laDB.import('./models/eppn');
+const XAPI_RECORDS_PROCESSED = laDB.import('./models/xapi_records_processed');
+
+const Op = Sequelize.Op;
+
+const STATUS = {
+  SUCCEEDED: 0,
+  SKIPPED: 1,
+  FAILED: 2,
+};
+
+axiosRetry(
+  axios,
+  {
+    retries: 20,
+    retryCondition: e => {
+      const condition = axiosRetry.isNetworkOrIdempotentRequestError(e);
+      if (condition) {
+        logger.warn(`Failed to send statements, retrying.. (code:${e.code} id:${JSON.parse(e.config.data)[0].id})`);
+      }
+      return condition;
+    },
+    retryDelay: axiosRetry.exponentialDelay
+  }
+);
 
 log4js.configure('config/log4js.json');
 if (process.env.XAPI_GEN_LOG_LEVEL !== undefined) {
   logger.level = process.env.XAPI_GEN_LOG_LEVEL;
 }
 
-logger.info('Start xAPI statement generator.');
+logger.info('Starting xAPI statement generator.');
 
 // defining xAPI variables
 const courseViewed = [
@@ -78,12 +111,6 @@ const resourceCourseModuleViewed = [
   'コースモジュールが閲覧されました。',
   'urn:x-moodle-event-action:viewed'
 ];
-const scormCourseModuleViewed = [
-  'scorm_course_module_viewed',
-  '\\mod_scorm\\event\\course_module_viewed',
-  'コースモジュールが閲覧されました。',
-  'urn:x-moodle-event-action:viewed'
-];
 const workshopCourseModuleViewed = [
   'workshop_course_module_viewed',
   '\\mod_workshop\\event\\course_module_viewed',
@@ -115,7 +142,7 @@ const attemptStarted = [
   'urn:x-moodle-event-action:started'
 ];
 const attemptSubmitted = [
-  'attempt_submitted',
+  '', // Set quiz name
   '\\mod_quiz\\event\\attempt_submitted',
   '小テスト受験が送信されました。',
   'urn:x-moodle-event-action:submitted'
@@ -331,7 +358,7 @@ const assignSubmissionFormViewed = [
   'urn:x-moodle-event-action:viewed'
 ];
 const userGraded = [
-  'user_graded',
+  '', // Set SCORM name
   '\\core\\event\\user_graded',
   'ユーザーは段階的に評価されています',
   'urn:x-moodle-event-action:graded'
@@ -408,22 +435,34 @@ const userListViewed = [
   'ユーザーリストが表示されました',
   'urn:x-moodle-event-action:viewed'
 ];
+const scormCourseModuleViewed = [
+  '', // Set SCORM name
+  '\\mod_scorm\\event\\course_module_viewed',
+  'コースモジュールが閲覧されました。',
+  'urn:x-moodle-event-action:viewed'
+];
 const scormReportViewed = [
-  'scorm_report_viewed',
+  '', // Set SCORM name
   '\\mod_scorm\\event\\report_viewed',
-  'scormレポートが表示されました',
+  'SCORMレポートが表示されました',
   'urn:x-moodle-event-action:viewed'
 ];
 const scoLaunched = [
-  'sco_launched',
+  '', // Set SCORM name
   '\\mod_scorm\\event\\sco_launched',
-  '嵐が始まった',
+  'SCOを起動しました',
   'urn:x-moodle-event-action:launched'
 ];
 const scormStatusSubmitted = [
-  'scorm_status_submitted',
+  '', // Set SCORM name
   '\\mod_scorm\\event\\status_submitted',
-  'scormのステータスが送信されました',
+  'SCORMのステータスが送信されました',
+  '' // Set depending on cmivalue in other
+];
+const scormScorerawSubmitted = [
+  '', // Set SCORM name
+  '\\mod_scorm\\event\\scoreraw_submitted',
+  'SCORMのスコアが送信されました',
   'urn:x-moodle-event-action:submitted'
 ];
 const outlineActivityReportViewed = [
@@ -925,117 +964,214 @@ function timechange(time) {
 }
 
 /**
- * Creates records used to identify processed standard logs in LMS database.
- * @param {Array.<number>} translatedLogIds - translated standard log ids
- * @param {Array.<number>} skippedLogIds - skipped standard log ids
+ * Creates records used to identify processed logs in LMS database.
+ * @param {string} objecttable - processed table name
+ * @param {Array.<number>} objectids - object ids
+ * @param {number} status - 0: SUCCEEDED, 1: SKIPPED, 2: FAILED
  */
-async function createProcessedRecords(translatedLogIds, skippedLogIds) {
+async function createProcessedRecords(objecttable, objectids, status) {
     let processed = [];
-    translatedLogIds.forEach(id => {
+    objectids.forEach(id => {
       processed.push({
-        id: id,
-        status: 0,
-        send_date: db.fn('NOW') // eslint-disable-line camelcase
+        objecttable: objecttable,
+        objectid: id,
+        status: status,
+        send_date: lmsDB.fn('NOW') // eslint-disable-line camelcase
       });
     });
-    skippedLogIds.forEach(id => {
-      processed.push({
-        id: id,
-        status: 1,
-        send_date: db.fn('NOW') // eslint-disable-line camelcase
-      });
-    });
-    await XAPI_RECORDS_PROCESSED.bulkCreate(processed).catch(err => {
+    return XAPI_RECORDS_PROCESSED.bulkCreate(
+      processed
+    ).catch(err => {
+      process.exitCode = 1;
       throw new Error(
         'Failed to create processed records in LMS database' +
-        `(${config.db.host}) - ${err}`
+        `(status:${status}, objectids:${objectids}, host:${config.db.lms.host}) - ${err}`
       );
     });
 }
 
+axios.defaults.timeout = 0;
+axios.defaults.httpAgent = new http.Agent({
+  keepAlive: true,
+  maxSockets: 30,
+  maxTotalSockets: 30,
+  maxFreeSockets: 30,
+  timeout: 0
+});
+
 /**
  * Sends xAPI statements to LRS.
- * @param {xapi: Object} xapis - xAPI statements
- * @param {Object} lrs - LRS
- * @param {string} scope - scope name
+ * @param {Object} statements - xAPI statements
+ * @param {Object} lrs - LRS client
  */
-function sendStatements(xapis, lrs, scope) {
-  logger.info(
-    `[SCOPE:${scope}] Sending ${xapis.length} statements ` +
-    `to ${config.LRS.url}...`
-  );
-  lrs.sendStatements(
-    xapis,
-    function(err, resp, bdy) { // eslint-disable-line no-unused-vars
-    if (err) {
-      throw new Error(
-        `[SCOPE:${scope}] Failed to send statements` +
-        `(HTTP status:${resp.statusCode}) - ${err}`
-      );
-    } else {
-      logger.info(`[SCOPE:${scope}] ${xapis.length} statements added.`);
-    }
+async function sendStatements(statements, lrs) {
+  return axios({
+    'method': 'POST',
+    'url': lrs.url + 'statements',
+    'auth': lrs.auth,
+    'headers': {
+      'Content-Type': 'application/json',
+      'X-Experience-API-Version': '1.0.1'
+    },
+    'data': JSON.stringify(statements)
   });
-  sleep(3000);
+}
+
+/**
+ * Checks if LRSes are scoped.
+ */
+function isScoped() {
+  if ('scoped' in config.LRS.clients) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Returns LRS settings found by scope.
+ */
+function getLRS(scope) {
+  let lrses = {};
+  if ('default' in config.LRS.clients) {
+    lrses['default'] = {
+      'url':config.LRS.url,
+      'auth':{
+        'username':config.LRS.clients.default.user,
+        'password':config.LRS.clients.default.pass
+      },
+    };
+  }
+  if ('scoped' in config.LRS.clients) {
+    config.LRS.clients.scoped.forEach(client => {
+      lrses[client.scope] = {
+        'url':config.LRS.url,
+        'auth':{
+          'username':client.user,
+          'password':client.pass
+        },
+      };
+    });
+  }
+  return lrses[scope];
 }
 
 /**
  * Route xAPI statements to LRSes.
+ * @param {string} objecttable - processed table name
  * @param {xapi: Object} xapis - xAPI statements
- * @param {number: string} usernames -
- *        usernames in user table(key:user.id, value:user.username)
- * @param {Object} lrs - default LRS client
- * @param {string: Object} scopedLrses -
- *        scoped LRS clients(key:ePPN scope, value:LRS client)
- * @param {boolean} isScoped - if LRSes are scoped
  */
-function routeStatements(xapis, usernames, lrs, scopedLrses, isScoped){
-  if (!isScoped) {
-    sendStatements(xapis, lrs, 'default');
-  } else {
-    // Determine LRS based on ePPN scope
-    let scopedXapis = {};
-    let unknownXapis = [];
-    xapis.forEach(xapi => {
-      const userid = xapi.actor.account.name;
-      const username = usernames[userid];
-      if (username !== undefined && username.includes('@')) {
-        // Get scope from ePPN
-        const scope = username.split('@')[1];
-        if (scope in scopedLrses){
-          // Create array of statements per scope
-          if (scope in scopedXapis) {
-            scopedXapis[scope].push(xapi);
-          } else {
-            scopedXapis[scope] = [xapi];
-          }
-        } else {
-          logger.warn(
-            `The LRS corresponding the scope, ${scope}, cannot be found ` +
-            'in config/app.js, sending the statement to the default LRS.'
-          );
-          unknownXapis.push(xapi);
-        }
-      } else {
-        logger.warn(
-          `The user(id:${userid}, username:${username}) doesn't have ` +
-          'an ePPN scope, sending the statement to the default LRS.'
-        );
-        unknownXapis.push(xapi);
-      }
+async function routeStatements(objecttable, xapis){
+  let promises = [];
+  for (const scope in xapis) {
+    const objectids = xapis[scope].map((value, index, array) => {
+      return value.objectid;
     });
+    const statements = xapis[scope].map((value, index, array) => {
+      return value.statement;
+    });
+    const lrs = getLRS(scope);
+    const seq = objectids[0];
+    logger.info(
+      `[SEQ:${seq}][SCOPE:${scope}] Sending ${statements.length} statements ` +
+      `to ${config.LRS.url}statements...`
+    );
+    const promise = sendStatements(statements, lrs).then(() => {
+      logger.info(`[SEQ:${seq}][SCOPE:${scope}] ${statements.length} statements added.`);
+      return createProcessedRecords(objecttable, objectids, STATUS.SUCCEEDED);
+    }).catch(error => {
+      let message = `[SEQ:${seq}][SCOPE:${scope}] Failed to send statements`;
+      if (error.response) {
+        message += `(HTTP status:${error.response.status})`;
+      }
+      message += ` - ${error.message}`;
+      logger.error(message);
+      return createProcessedRecords(objecttable, objectids, STATUS.FAILED);
+    });
+    promises.push(promise);
+  }
+  return Promise.all(promises);
+}
 
-    // Send statements without scope
-    if (unknownXapis.length > 0) {
-      sendStatements(unknownXapis, lrs, 'default');
-    }
-    // Send statements to scoped LRSes
-    for (let scope in scopedXapis) {
-      const lrs = scopedLrses[scope];
-      const xapis = scopedXapis[scope];
-      sendStatements(xapis, lrs, scope);
+/**
+ * Returns ePPN scope.
+ * @param {string} username - username
+ */
+function getScopeFromEppn(username) {
+  if (username && username.includes('@')) {
+    // Get scope from ePPN
+    return username.split('@')[1];
+  }
+  return null;
+}
+
+/**
+ * Determines LRS based on user attributes.
+ * @param {number: Object} userAttrs -
+ *        user attributes(key:user.id, value:username, hash, and scope)
+ * @param {number} userid - user id
+ */
+function getLRSScope(userAttrs, userid) {
+  let scope = 'default';
+  if (isScoped()) {
+    scope = userid in userAttrs ? userAttrs[userid].scope : null;
+    if (!scope) {
+      logger.trace(
+        `The user(id:${userid}) doesn't have ` +
+        'an ePPN scope, sending the statement to the default LRS.'
+      );
+      scope = 'default';
+    } else if (!getLRS(scope)) {
+      logger.trace(
+        `LRS for ${scope} not found, ` +
+        'sending the statement to the default LRS.'
+      );
+      scope = 'default';
     }
   }
+  return scope;
+}
+
+/**
+ * Returns actor.
+ * @param {number} userid - user id
+ * @param {string} username - username
+ */
+function getActor(userid, username) {
+  return {
+    objectType: 'Agent',
+    name: username,
+    account: {
+      name: userid,
+      homePage: config.homepage
+    }
+  };
+}
+
+/**
+ * Returns context.
+ */
+function getContext() {
+  return {
+    platform: config.platform,
+    language: config.language,
+    contextActivities: {
+      category: [
+        {
+          objectType: 'Activity',
+          id: config.category.id,
+          definition: {
+            type: config.category.definition.type,
+            name: {
+              en: config.category.definition.name,
+            },
+            description: {
+              en: config.category.definition.description,
+            }
+          }
+        },
+      ]
+    }
+  };
 }
 
 /**
@@ -1059,50 +1195,35 @@ function getCourseContext(courseNames, courseid){
 /**
  * Translates moodle standard logs into xAPI statements.
  * @param {Array.{Sequelize.Model}} logs - logstore_standard_logs
+ * @param {number: Object} userAttrs -
+ *        user attributes(key:user.id, value:username, hash, and scope)
  * @param {number: string} courseNames -
  *        course names(key:course.id, value:course.fullname)
  */
-async function translate(logs, courseNames){ // eslint-disable-line max-statements, max-len
+async function translateStandardLogs(logs, userAttrs, courseNames){ // eslint-disable-line max-statements, max-len
   let xapis = [];
-  let translatedLogIds = [];
   let skippedLogIds = [];
 
   for (const log of logs) {
-    let xapi = {};
-    xapi.actor = {};
-    xapi.verb = {};
-    xapi.context = {};
-    xapi.object = {};
-    xapi.actor.objectType = 'Agent';
-    xapi.actor.name = '';
-    xapi.actor.account = {};
-    xapi.actor.account.name = log.userid;
-    xapi.actor.account.homePage = config.homepage;
-    xapi.verb.id = '';
-    xapi.verb.display = {};
-    xapi.verb.display['en'] = log.action;
-    xapi.context.contextActivities = {};
-    xapi.context.contextActivities.category = [];
-    let category = {};
-    category.objectType = 'Activity';
-    category.id = config.category.id;
-    category.definition = {};
-    category.definition.type = config.category.definition.type;
-    category.definition.name = {};
-    category.definition.name['en'] = config.category.definition.name;
-    category.definition.description = {};
-    category.definition.description['en'] =
-      config.category.definition.description;
-    xapi.context.contextActivities.category.push(category);
-    xapi.context.platform = config.platform;
-    xapi.context.language = config.language;
-    xapi.object.definition = {};
-    xapi.object.definition.name = {};
-    if (log.timecreated !== null) {
-      xapi.timestamp = {};
-      xapi.timestamp = timechange(log.timecreated);
-    }
-    let isSkipped = false;
+    const username = log.userid in userAttrs ? userAttrs[log.userid].hash : '';
+    let xapi = {
+      id: uuid.v4(),
+      actor: getActor(log.userid, username),
+      verb: {
+        id: '',
+        display: {
+          en: log.action,
+        }
+      },
+      object: {
+        definition: {
+          name: {
+          }
+        }
+      },
+      context: getContext(),
+      timestamp: timechange(log.timecreated)
+    };
     switch (log.eventname) {
       case courseViewed[1]:
         xapi.verb.id = courseViewed[3];
@@ -1234,21 +1355,6 @@ async function translate(logs, courseNames){ // eslint-disable-line max-statemen
         xapi.object.definition.type =
           'http://adlnet.gov/expapi/activities/module';
         break;
-      case scormCourseModuleViewed[1]:
-        xapi.verb.id = scormCourseModuleViewed[3];
-        xapi.context.contextActivities.grouping =
-          [getCourseContext(courseNames, log.courseid)];
-        xapi.object.id =
-          xapi.actor.account.homePage +
-          '/mod/scorm/view.php?id='+ log.contextinstanceid;
-        xapi.object.definition.name['en'] =
-          scormCourseModuleViewed[0];
-        xapi.object.definition.description = {};
-        xapi.object.definition.description['en'] =
-          scormCourseModuleViewed[0];
-        xapi.object.definition.type =
-          'http://adlnet.gov/expapi/activities/module';
-        break;
       case workshopCourseModuleViewed[1]:
         xapi.verb.id = workshopCourseModuleViewed[3];
         xapi.context.contextActivities.grouping =
@@ -1351,77 +1457,51 @@ async function translate(logs, courseNames){ // eslint-disable-line max-statemen
         xapi.object.definition.type =
           'http://adlnet.gov/expapi/activities/assessment';
         break;
-      case attemptSubmitted[1]:
+      case attemptSubmitted[1]: {
+        const quizAttempt = await findQuizAttemptBy(log.objectid);
+        const quiz = quizAttempt ? await findQuizBy(quizAttempt.quiz) : null;
+        const gradeItem = quiz ? await findGradeItemBy({itemmodule: 'quiz', iteminstance: quiz.id}) : null;
+        const attemptGrade = gradeItem ? await findGradeGradeBy({itemid: gradeItem.id, userid: log.userid}) : null;
+        const quizname = quiz ? quiz.name : '';
         xapi.verb.id = attemptSubmitted[3];
+        xapi.object = {
+          id: `${xapi.actor.account.homePage}/mod/quiz/view.php?id=${log.contextinstanceid}`,
+          definition: {
+            type: 'http://adlnet.gov/expapi/activities/assessment',
+            name: {
+              en: quizname
+            },
+            description: {
+              en: quizname
+            }
+          }
+        };
+        if (quizAttempt) {
+          xapi.result = {
+            completion: quizAttempt.state === 'finished'
+          };
+          const seconds = quizAttempt.timefinish - quizAttempt.timestart;
+          if (seconds > 0) {
+            xapi.result.duration = `PT${seconds}S`;
+          }
+          if (attemptGrade) {
+            xapi.result.score = {
+              min: parseFloat(attemptGrade.rawgrademin),
+              max: parseFloat(attemptGrade.rawgrademax)
+            };
+            // grade_grades.rawgrade is nullable
+            if (attemptGrade.rawgrade) {
+              xapi.result.score.raw = parseFloat(attemptGrade.rawgrade);
+              if (gradeItem) {
+                xapi.result.success = attemptGrade.rawgrade >= gradeItem.gradepass;
+              }
+            }
+          }
+        }
         xapi.context.contextActivities.grouping =
           [getCourseContext(courseNames, log.courseid)];
-        xapi.object.id =
-          xapi.actor.account.homePage +
-          '/mod/quiz/view.php?id=' +
-          log.contextinstanceid;
-        xapi.object.definition.name['en'] =
-          attemptSubmitted[0];
-        xapi.object.definition.description = {};
-        xapi.object.definition.description['en'] =
-          attemptSubmitted[0];
-        xapi.object.definition.type =
-          'http://adlnet.gov/expapi/activities/assessment';
-
-        const quizAttempt = await QUIZ_ATTEMPTS.findByPk(
-          log.objectid,
-          {attributes: ['quiz', 'state', 'timefinish', 'timestart']}
-        ).catch(err => {
-          logger.warn(`Failed to retrieve quiz_attempt - ${err}`);
-        });
-        if (quizAttempt === null || quizAttempt === undefined) {
-          break;
-        }
-
-        const quiz = await QUIZ.findByPk(
-          quizAttempt.quiz,
-          {attributes: ['id']}
-        ).catch(err => {
-          logger.warn(`Failed to retrieve quiz - ${err}`);
-        });
-        if (quiz === null || quiz === undefined) {
-          break;
-        }
-
-        const gradeItem = await GRADE_ITEMS.findOne({
-          where: {itemmodule: 'quiz', iteminstance: quiz.id},
-          attributes: ['id', 'gradepass']
-        }).catch(err => {
-          logger.warn(`Failed to retrieve grade_item - ${err}`);
-        });
-        if (gradeItem === null || gradeItem === undefined){
-          break;
-        }
-
-        const attemptGrade = await GRADE_GRADES.findOne({
-          where: {itemid: gradeItem.id, userid: log.userid},
-          attributes: ['rawgrade', 'rawgrademin', 'rawgrademax']
-        }).catch(err => {
-          logger.warn(`Failed to retrieve grade_grade - ${err}`);
-        });
-        if (attemptGrade === null || attemptGrade === undefined){
-          break;
-        }
-
-        xapi.result = {
-          score: {
-            raw: parseFloat(attemptGrade.rawgrade),
-            min: parseFloat(attemptGrade.rawgrademin),
-            max: parseFloat(attemptGrade.rawgrademax)
-          },
-          success: attemptGrade.rawgrade >= gradeItem.gradepass,
-          completion: quizAttempt.state === 'finished'
-        };
-
-        const seconds = quizAttempt.timefinish - quizAttempt.timestart;
-        if (seconds > 0) {
-          xapi.result.duration = `PT${seconds}S`;
-        }
         break;
+      }
       case quizReportViewed[1]:
         xapi.verb.id = quizReportViewed[3];
         xapi.context.contextActivities.grouping =
@@ -1975,22 +2055,43 @@ async function translate(logs, courseNames){ // eslint-disable-line max-statemen
         xapi.object.definition.type =
           'http://adlnet.gov/expapi/activities/assign';
         break;
-      case userGraded[1]:
+      case userGraded[1]: {
+        const grade = await findGradeGradeBy({id: log.objectid});
+        const gradeItem = grade ? await findGradeItemBy({id: grade.itemid}) : null;
+        // grade_items.itemname is nullable
+        const itemname = gradeItem ? (gradeItem.itemname ? gradeItem.itemname : '') : '';
         xapi.verb.id = userGraded[3];
+        xapi.object = {
+          id: `${xapi.actor.account.homePage}/grade/edit/tree/index.php?id=${log.contextinstanceid}`,
+          definition: {
+            type: 'http://adlnet.gov/expapi/activities/grade',
+            name: {
+              en: itemname
+            },
+            description: {
+              en: itemname
+            }
+          }
+        };
+        if (grade) {
+          xapi.result = {
+            score: {
+              min: parseFloat(grade.rawgrademin),
+              max: parseFloat(grade.rawgrademax)
+            }
+          };
+          // grade_grades.rawgrade is nullable
+          if (grade.rawgrade) {
+            xapi.result.score.raw = parseFloat(grade.rawgrade);
+            if (gradeItem) {
+              xapi.result.success = grade.rawgrade >= gradeItem.gradepass;
+            }
+          }
+        }
         xapi.context.contextActivities.grouping =
           [getCourseContext(courseNames, log.courseid)];
-        xapi.object.id =
-          xapi.actor.account.homePage +
-          '/grade/edit/tree/index.php?id=' +
-          log.contextinstanceid;
-        xapi.object.definition.name['en'] =
-          userGraded[0];
-        xapi.object.definition.description = {};
-        xapi.object.definition.description['en'] =
-          userGraded[0];
-        xapi.object.definition.type =
-          'http://adlnet.gov/expapi/activities/grade';
         break;
+      }
       case commentCreated[1]:
         xapi.verb.id = commentCreated[3];
         xapi.context.contextActivities.grouping =
@@ -2183,7 +2284,27 @@ async function translate(logs, courseNames){ // eslint-disable-line max-statemen
         xapi.object.definition.type =
           'http://adlnet.gov/expapi/activities/participants';
         break;
+      case scormCourseModuleViewed[1]: {
+        const scorm = await findScormBy(log.objectid);
+        const scormname = scorm ? scorm.name : 'SCORM';
+        xapi.verb.id = scormCourseModuleViewed[3];
+        xapi.context.contextActivities.grouping =
+          [getCourseContext(courseNames, log.courseid)];
+        xapi.object.id =
+          xapi.actor.account.homePage +
+          '/mod/scorm/view.php?id='+ log.contextinstanceid;
+        xapi.object.definition.name['en'] = scormname;
+        xapi.object.definition.description = {};
+        xapi.object.definition.description['en'] = scormname;
+        xapi.object.definition.type =
+          'http://id.tincanapi.com/activitytype/legacy-learning-standard';
+        break;
+      }
       case scormReportViewed[1]:
+        const other = phpUnserialize(log.other);
+        const scormid = other['scormid'];
+        const scorm = await findScormBy(scormid);
+        const scormname = scorm ? scorm.name : 'SCORM';
         xapi.verb.id = scormReportViewed[3];
         xapi.context.contextActivities.grouping =
           [getCourseContext(courseNames, log.courseid)];
@@ -2191,46 +2312,83 @@ async function translate(logs, courseNames){ // eslint-disable-line max-statemen
           xapi.actor.account.homePage +
           '/mod/scorm/report.php?id=' +
           log.contextinstanceid;
-        xapi.object.definition.name['en'] =
-          scormReportViewed[0];
+        xapi.object.definition.name['en'] = scormname;
         xapi.object.definition.description = {};
-        xapi.object.definition.description['en'] =
-          scormReportViewed[0];
+        xapi.object.definition.description['en'] = scormname;
         xapi.object.definition.type =
-          'http://adlnet.gov/expapi/activities/scorm';
+          'http://id.tincanapi.com/activitytype/legacy-learning-standard';
         break;
-      case scoLaunched[1]:
+      case scoLaunched[1]: {
+        const sco = await findScormScoBy(log.objectid);
+        const launch = sco ? sco.launch : 'SCO';
+        const title = sco ? sco.title : 'SCO';
         xapi.verb.id = scoLaunched[3];
         xapi.context.contextActivities.grouping =
           [getCourseContext(courseNames, log.courseid)];
-        xapi.object.id =
-          xapi.actor.account.homePage +
-          '/mod/scorm/view.php?id=' +
-          log.contextinstanceid;
-        xapi.object.definition.name['en'] =
-          scoLaunched[0];
+        const other = phpUnserialize(log.other);
+        const loadedcontent = other['loadedcontent'];
+        xapi.object.id = loadedcontent;
+        xapi.object.definition.name['en'] = launch;
         xapi.object.definition.description = {};
-        xapi.object.definition.description['en'] =
-          scoLaunched[0];
+        xapi.object.definition.description['en'] = title;
         xapi.object.definition.type =
-          'http://adlnet.gov/expapi/activities/scorm';
+          'http://id.tincanapi.com/activitytype/legacy-learning-standard';
         break;
-      case scormStatusSubmitted[1]:
-        xapi.verb.id = scormStatusSubmitted[3];
+      }
+      case scormStatusSubmitted[1]: {
+        const scorm = await findScormBy(log.objectid);
+        const scormname = scorm ? scorm.name : 'SCORM';
+        const other = phpUnserialize(log.other);
+        const scormstatus = other['cmivalue'];
+        switch (scormstatus) {
+          case 'failed':
+          case 'passed':
+          case 'completed':
+            break;
+          default:
+            process.exitCode = 1;
+            throw new Error(`Invalid status ${scormstatus} detected.`);
+        }
+        xapi.verb.id = `urn:x-moodle-event-action:${scormstatus}`;
+        xapi.verb.display['en'] = scormstatus;
         xapi.context.contextActivities.grouping =
           [getCourseContext(courseNames, log.courseid)];
         xapi.object.id =
           xapi.actor.account.homePage +
           '/mod/scorm/view.php?id=' +
           log.contextinstanceid;
-        xapi.object.definition.name['en'] =
-          scormStatusSubmitted[0];
+        xapi.object.definition.name['en'] = scormname;
         xapi.object.definition.description = {};
-        xapi.object.definition.description['en'] =
-          scormStatusSubmitted[0];
+        xapi.object.definition.description['en'] = scormname;
         xapi.object.definition.type =
-          'http://adlnet.gov/expapi/activities/scorm';
+          'http://id.tincanapi.com/activitytype/legacy-learning-standard';
         break;
+      }
+      case scormScorerawSubmitted[1]: {
+        const scorm = await findScormBy(log.objectid);
+        const scormname = scorm ? scorm.name : 'SCORM';
+        xapi.verb.id = scormScorerawSubmitted[3];
+        xapi.context.contextActivities.grouping =
+          [getCourseContext(courseNames, log.courseid)];
+        xapi.object.id =
+          xapi.actor.account.homePage +
+          '/mod/scorm/view.php?id=' +
+          log.contextinstanceid;
+        xapi.object.definition.name['en'] = scormname;
+        xapi.object.definition.description = {};
+        xapi.object.definition.description['en'] = scormname;
+        xapi.object.definition.type =
+          'http://id.tincanapi.com/activitytype/legacy-learning-standard';
+
+        const other = phpUnserialize(log.other);
+        const rawscore = other['cmivalue'];
+        xapi.result = {
+          score: {
+            raw: parseFloat(rawscore),
+          }
+        };
+        break;
+      }
       case outlineActivityReportViewed[1]:
         xapi.verb.id = outlineActivityReportViewed[3];
         xapi.context.contextActivities.grouping =
@@ -3256,24 +3414,111 @@ async function translate(logs, courseNames){ // eslint-disable-line max-statemen
             'http://adlnet.gov/expapi/activities/forum';
         break;
       default:
-        isSkipped = true;
-        break;
+        skippedLogIds.push(log.id);
+        logger.trace(
+          `Standard log ${log.id} (eventname: ${log.eventname}) skipped.`
+        );
+        continue;
     }
-    if (!isSkipped) {
-      xapi.id = uuid.v4();
-      xapis.push(xapi);
-      translatedLogIds.push(log.id);
-      logger.info(
-        `Standard log ${log.id} (eventname: ${log.eventname}) translated.`
-      );
-    } else {
-      skippedLogIds.push(log.id);
-      logger.info(
-        `Standard log ${log.id} (eventname: ${log.eventname}) skipped.`
-      );
+    const scope = getLRSScope(userAttrs, log.userid);
+    if (!(scope in xapis)) {
+      xapis[scope] = [];
     }
+    xapis[scope].push({
+      objectid: log.id,
+      statement: xapi
+    });
+    logger.trace(
+      `Standard log ${log.id} (eventname: ${log.eventname}) translated.`
+    );
   }
-  return [xapis, translatedLogIds, skippedLogIds];
+  for (const scope in xapis) {
+    logger.trace(`[SCOPE:${scope}] ${xapis[scope].length} logs translated.`);
+  }
+  await createProcessedRecords('logstore_standard_log', skippedLogIds, STATUS.SKIPPED);
+  return xapis;
+}
+
+/**
+ * Translates scorm_scoes_tracks into xAPI statements.
+ * @param {Array.{Sequelize.Model}} tracks - scorm_scoes_track objects
+ * @param {number: Object} userAttrs -
+ *        user attributes(key:user.id, value:username, hash, and scope)
+ * @param {number: string} courseNames -
+ *        course names(key:course.id, value:course.fullname)
+ */
+async function translateScoTracks(tracks, userAttrs, courseNames){ // eslint-disable-line max-statements, max-len
+  let xapis = [];
+  let skippedLogIds = [];
+
+  for (const track of tracks) {
+    const username = track.userid in userAttrs ? userAttrs[track.userid].hash : '';
+    let xapi = {
+      id: uuid.v4(),
+      actor: getActor(track.userid, username),
+      context: getContext(),
+      timestamp: timechange(track.timemodified)
+    };
+    switch (track.element) {
+      case 'cmi.core.total_time':
+        const scorm = await findScormBy(track.scormid);
+        // Get SCO URL from sco_launched log
+        const log = await findLatestLogBy(scoLaunched[1], track.scoid);
+        const other = phpUnserialize(log.other);
+        const loadedcontent = other['loadedcontent'];
+        const sco = await findScormScoBy(track.scoid);
+        xapi.verb = {
+          id: 'urn:x-moodle-event-action:attended',
+          display: {
+            en: 'attended'
+          }
+        };
+        xapi.object = {
+          id: loadedcontent,
+          definition: {
+            type: 'http://id.tincanapi.com/activitytype/legacy-learning-standard',
+            name: {
+              en: sco ? sco.launch : 'SCO'
+            },
+            description: {
+              en: sco ? sco.title : 'SCO'
+            }
+          }
+        };
+        var time = track.value.split(':');
+        var seconds = (+time[0]) * 60 * 60 + (+time[1]) * 60 + (+time[2]);
+        xapi.result = {
+          duration: `PT${seconds}S`
+        };
+        if (scorm) {
+          xapi.context.contextActivities.grouping =
+            [getCourseContext(courseNames, scorm.course)];
+        }
+        break;
+      default:
+        skippedLogIds.push(track.id);
+        logger.trace(
+          `SCORM SCO track ${track.id} (element: ${track.element}) skipped.`
+        );
+        continue;
+    }
+    const scope = getLRSScope(userAttrs, track.userid);
+    if (!(scope in xapis)) {
+      xapis[scope] = [];
+    }
+    xapis[scope].push({
+      objectid: track.id,
+      statement: xapi
+    });
+    logger.trace(
+      `SCORM SCO track ${track.id} (element: ${track.element}) translated.`
+    );
+  }
+  for (const scope in xapis) {
+    logger.trace(`[SCOPE:${scope}] ${xapis[scope].length} logs translated.`);
+  }
+  await createProcessedRecords('scorm_scoes_track', skippedLogIds, STATUS.SKIPPED);
+  return xapis;
 }
 
 /**
@@ -3281,71 +3526,219 @@ async function translate(logs, courseNames){ // eslint-disable-line max-statemen
  * @param {number} limit - limit value
  */
 async function findLogs(limit){
-  // Execute static SQL to join tables without relation
-  const sql =
-    'SELECT c.* FROM ' + config.db.prefix + 'logstore_standard_log AS c ' +
-    'LEFT JOIN xapi_records_processed AS l ON ' +
-    'c.id = l.id WHERE l.id IS NULL LIMIT ' + limit;
-
-  return await db.query(
-    sql,
-    {model: LOGSTORE_STANDARD_LOG, raw: true}
-  ).catch(err => {
+  const lastLogProcessed = await XAPI_RECORDS_PROCESSED.findOne({
+    where: {objecttable: 'logstore_standard_log'},
+    attributes: ['objectid'],
+    order: [['objectid', 'DESC']],
+    limit: 1, // findOne does not add LIMIT 1
+    raw: true,
+  }).catch(err => {
+    process.exitCode = 1;
+    throw new Error(`Failed to retrieve xapi_records_processed - ${err}`);
+  });
+  return LOGSTORE_STANDARD_LOG.findAll({
+    where: {
+      id: {
+        [Op.gt]: lastLogProcessed ? lastLogProcessed.objectid : -1
+      }
+    },
+    order: [['id', 'ASC']],
+    limit: limit,
+    raw: true,
+  }).catch(err => {
+    process.exitCode = 1;
     throw new Error(`Failed to retrieve logstore_standard_logs - ${err}`);
   });
 }
 
 /**
- * Translates moodle standard logs into xAPI statements and send them to LRS.
- * Processes 100 standard logs at each iteration until no more data exists.
+ * Finds log by eventname and objectid.
+ * @param {string} eventname - event name
+ * @param {number} objectid - object id
+ */
+async function findLatestLogBy(eventname, objectid){
+  return LOGSTORE_STANDARD_LOG.findOne({
+    where: {eventname: eventname, objectid: objectid},
+    attributes: ['id', 'other'],
+    order: [['timecreated', 'DESC']]
+  }).catch(err => {
+    logger.warn(`Failed to retrieve logstore_standard_log - ${err}`);
+  });
+}
+
+/**
+ * Finds quiz attempt by id.
+ * @param {number} id - quiz attempt id
+ */
+async function findQuizAttemptBy(id) {
+  return QUIZ_ATTEMPTS.findByPk(
+    id,
+    {attributes: ['quiz', 'state', 'timefinish', 'timestart']}
+  ).catch(err => {
+    logger.warn(`Failed to retrieve quiz_attempt - ${err}`);
+  });
+}
+
+/**
+ * Finds quiz by id.
+ * @param {number} id - quiz id
+ */
+async function findQuizBy(id) {
+  return QUIZ.findByPk(
+    id,
+    {attributes: ['id', 'name']}
+  ).catch(err => {
+    logger.warn(`Failed to retrieve quiz - ${err}`);
+  });
+}
+
+/**
+ * Filters grade item with given where clause.
+ * @param {string: string} where - where clause
+ */
+async function findGradeItemBy(where) {
+  return GRADE_ITEMS.findOne({
+    where: where,
+    attributes: ['id', 'itemname', 'gradepass']
+  }).catch(err => {
+    logger.warn(`Failed to retrieve grade_item - ${err}`);
+  });
+}
+
+/**
+ * Filters grade with given where clause.
+ * @param {string: string} where - where clause
+ */
+async function findGradeGradeBy(where) {
+  return GRADE_GRADES.findOne({
+    where: where,
+    attributes: ['itemid', 'rawgrade', 'rawgrademin', 'rawgrademax']
+  }).catch(err => {
+    logger.warn(`Failed to retrieve grade_grade - ${err}`);
+  });
+}
+
+/**
+ * Finds SCORM by id.
+ * @param {number} id - scorm id
+ */
+async function findScormBy(id){
+  return SCORM.findByPk(
+    id, {attributes: ['name', 'course']}
+  ).catch(err => {
+    logger.warn(`Failed to retrieve scorm - ${err}`);
+  });
+}
+
+/**
+ * Finds SCORM SCO by id.
+ * @param {number} id - sco id
+ */
+async function findScormScoBy(id){
+  return SCORM_SCOES.findByPk(
+    id, {attributes: ['launch', 'title']}
+  ).catch(err => {
+    logger.warn(`Failed to retrieve scorm_scoes - ${err}`);
+  });
+}
+
+/**
+ * Selects limited number of SCO tracks.
+ * @param {number} limit - limit value
+ */
+async function findScormScoesTracks(limit){
+  const lastLogProcessed = await XAPI_RECORDS_PROCESSED.findOne({
+    where: {objecttable: 'scorm_scoes_track'},
+    attributes: ['objectid'],
+    order: [['objectid', 'DESC']],
+    limit: 1, // findOne does not add LIMIT 1
+    raw: true,
+  }).catch(err => {
+    process.exitCode = 1;
+    throw new Error(`Failed to retrieve xapi_records_processed - ${err}`);
+  });
+  return SCORM_SCOES_TRACK.findAll({
+    where: {
+      id: {
+        [Op.gt]: lastLogProcessed ? lastLogProcessed.objectid : -1
+      }
+    },
+    order: [['id', 'ASC']],
+    limit: limit,
+    raw: true
+  }).catch(err => {
+    process.exitCode = 1;
+    throw new Error(`Failed to retrieve scorm_scoes_track - ${err}`);
+  });
+}
+
+const waitForInterval = () => {
+  const time = +process.env.INTERVAL || 5000
+  return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, time);
+  });
+};
+
+/**
+ * Translates moodle logs into xAPI statements and send them to LRS.
+ * Processes logs until no more data exists.
  */
 module.exports = async function main() { // eslint-disable-line max-statements
-  let lrs;
-  let scopedLrses = {};
-  let isScoped = false;
   if (!('default' in config.LRS.clients) && !('scoped' in config.LRS.clients)) {
+    process.exitCode = 1;
     throw new Error('Specify LRS clients in config/app.js');
   }
-  if ('default' in config.LRS.clients) {
-    const opts = {
-      'url':config.LRS.url,
-      'auth':{
-        'user':config.LRS.clients.default.user,
-        'pass':config.LRS.clients.default.pass
-      },
-    };
-    lrs = new adl.XAPIWrapper(opts);
-  }
-  if ('scoped' in config.LRS.clients) {
-    isScoped = true;
-    config.LRS.clients.scoped.forEach(client => {
-      const opts = {
-        'url':config.LRS.url,
-        'auth':{
-          'user':client.user,
-          'pass':client.pass
-        },
-      };
-      scopedLrses[client.scope] = new adl.XAPIWrapper(opts);
+
+  // Retrieve all users
+  const users = await USER.findAll({
+    attributes: ['id', 'username'],
+    raw: true
+  }).catch(err => {
+    process.exitCode = 1;
+    throw new Error(`Failed to retrieve users - ${err}`);
+  });
+
+  // Retrieve all eppns
+  const eppns = await EPPN.findAll({
+    attributes: ['username', 'hash', 'scope'],
+    raw: true
+  }).catch(err => {
+    process.exitCode = 1;
+    throw new Error(`Failed to retrieve ePPN - ${err}`);
+  });
+
+  let userAttrs = [];
+  let newEppns = [];
+  for (const user of users) {
+    const eppn = eppns.find((eppn) => {
+      if (eppn['username'] === user.username) {
+        return eppn;
+      }
     });
+    if (eppn) {
+      userAttrs[user.id] = eppn;
+    } else {
+      const hash = crypto.createHash('sha256').update(user.username).digest('hex');
+      const scope = getScopeFromEppn(user.username);
+      userAttrs[user.id] = {
+        username: user.username, // may not be ePPN format
+        hash: hash,
+        scope: scope, // nullable
+        acl: scope ? scope.replace(/[.-]/g, '_') : null // used for RLS
+      };
+      if (scope) {
+        newEppns.push(userAttrs[user.id]);
+      }
+    }
   }
-
-  const limit = 100;
-  let translatedStmtCount = 0;
-  let skippedStmtCount = 0;
-
-  // Retrieve all usernames from user table
-  let usernames = [];
-  if (isScoped) {
-    await USER.findAll({
-      attributes: ['id', 'username'],
-      raw: true
-    }).then(users => {
-      users.forEach(user => {
-        usernames[user.id] = user.username;
-      });
-    }).catch(err => {
-      throw new Error(`Failed to retrieve users - ${err}`);
+  if (newEppns.length > 0) {
+    await EPPN.bulkCreate(newEppns).catch(err => {
+      process.exitCode = 1;
+      throw new Error(
+        `Failed to create ePPN(${config.db.la.host}) - ${err}`
+      );
     });
   }
 
@@ -3359,24 +3752,59 @@ module.exports = async function main() { // eslint-disable-line max-statements
       courseNames[course.id] = course.fullname;
     });
   }).catch(err => {
+    process.exitCode = 1;
     throw new Error(`Failed to retrieve courses - ${err}`);
   });
 
+  await XAPI_RECORDS_PROCESSED.sync();
+
   // Iterate logstore_standard_logs to be processed
+  const limit = 'limit' in config ? config.limit : 500;
+  const chunkSize = 'chunkSize' in config ? config.chunkSize : 100;
   while (true){
     let logs = await findLogs(limit);
     if (logs.length === 0) {
       logger.info(
-        'Finished translation ' +
-        `#Translated:${translatedStmtCount} #Skipped:${skippedStmtCount}`
+        'Finished logstore_standard_logs translation.'
       );
-      return;
+      break;
     }
-    const [xapis, translatedLogIds, skippedLogIds] =
-      await translate(logs, courseNames);
-    translatedStmtCount += translatedLogIds.length;
-    skippedStmtCount += skippedLogIds.length;
-    routeStatements(xapis, usernames, lrs, scopedLrses, isScoped);
-    await createProcessedRecords(translatedLogIds, skippedLogIds);
+    let promises = [];
+    let chunk = logs.splice(0, chunkSize);
+    while (chunk.length > 0) {
+      const promise = translateStandardLogs(
+        chunk, userAttrs, courseNames
+      ).then((xapis) => {
+        return routeStatements('logstore_standard_log', xapis);
+      });
+      promises.push(promise);
+      chunk = logs.splice(0, chunkSize);
+    }
+    await Promise.all(promises);
+    await waitForInterval();
+  }
+
+  // Iterate scorm_scoes_track to be processed
+  while (true){
+    let logs = await findScormScoesTracks(limit);
+    if (logs.length === 0) {
+      logger.info(
+        'Finished scorm_scoes_track translation.'
+      );
+      break;
+    }
+    let promises = [];
+    let chunk = logs.splice(0, chunkSize);
+    while (chunk.length > 0) {
+      const promise = translateScoTracks(
+        chunk, userAttrs, courseNames
+      ).then((xapis) => {
+        return routeStatements('scorm_scoes_track', xapis);
+      });
+      promises.push(promise);
+      chunk = logs.splice(0, chunkSize);
+    }
+    await Promise.all(promises);
+    await waitForInterval();
   }
 };

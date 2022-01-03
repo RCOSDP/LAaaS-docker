@@ -2,7 +2,10 @@
 
 namespace App\Translator;
 
-use App\Models\Moodle\{Event, User};
+use App\Models\Moodle\{
+    Event,
+    User,
+};
 
 final class DashboardViewed extends Translator
 {

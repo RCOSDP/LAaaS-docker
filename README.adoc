@@ -2,8 +2,8 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2020年10月12日
-:revnumber: 2.0.0版
+:revdate: 2022年1月1日
+:revnumber: 3.0.0版
 :doctype: book
 :version-label:
 :chapter-label:
@@ -39,7 +39,6 @@ $ git clone https://github.com/RCOSDP/LAaaS-docker.git
 * `moodle-docker` の設定で `MOODLE_DOCKER_DBUSER` および `POSTGRES_USER` を `moodleuser` に変更( `moodle-docker/base.yml` )
 * Moodleの設定でMoodleデータベースのテーブル名に付与する接頭辞を `mdl_` に変更( `moodle-docker/moodle/config.php` )
 * Moodleのコンテナ群を起動
-* xAPIステートメント変換スクリプトでイベントの処理状況を管理するためのテーブル( `xapi_records_processed` )を作成
 
 ----
 $ cd LAaaS-docker
@@ -69,18 +68,19 @@ image::moodle.png[align=center]
 次のコンテナを起動する。
 
 |===
-   |項目                  |名称                     |コンテナ名
-.5+|学習活動のデータストア|Learning Locker(Web)     |learninglocker
-                       .2+|Learning Locker(DB)      |learninglocker_mongo
-                                                    |learninglocker_redis
-                          |OpenLRW(Web)             |openlrw_web
-                          |OpenLRW(DB)              |openlrw_mongo
-.3+|ステートメント変換     |xAPIステートメント変換   |xapi_stmt_gen
-                          |Caliperステートメント変換          |caliper_stmt_gen
-                          |Caliperステートメント変換(db)   |caliper_log_db
-.4+|分析システム          |Superset(Web)              |superset
-                          |Superset(DB)             |superset_db
-                          |JupyterHub(Web/DB)       |jupyterhub
+   |項目                  |名称                          |コンテナ名
+.5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
+                       .2+|Learning Locker(DB)           |learninglocker_mongo
+                                                         |learninglocker_redis
+                          |OpenLRW(Web)                  |openlrw_web
+                          |OpenLRW(DB)                   |openlrw_mongo
+.4+|ステートメント変換    |xAPIステートメント変換        |xapi_stmt_gen
+                          |Caliperステートメント変換     |caliper_stmt_gen
+                          |Caliperステートメント変換(db) |caliper_log_db
+                          |Learning Analytics DB         |learning_analytics_db
+.3+|分析システム          |Superset(Web)                 |superset
+                          |Superset(DB)                  |superset-db
+                          |JupyterHub(Web/DB)            |jupyterhub
 |===
 
 ----
@@ -198,13 +198,13 @@ image::learninglocker/source.png[align=center]
 なお、Moodleログの処理済み件数を算出する場合は以下のコマンドを実行する。
 
 ----
-$ docker exec -it moodle-docker_db_1 psql -U moodleuser moodle -c "SELECT count(*) FROM xapi_records_processed;"
+$ docker exec -it learning_analytics_db psql -U learning_analytics learning_analytics -c "SELECT count(*) FROM xapi_records_processed;"
 ----
 
 また、スクリプトのバージョンアップ等に伴い処理済みのMoodleログを再度処理したい場合は、以下のコマンドで変換処理の実行履歴を削除する。
 
 ----
-$ docker exec -it moodle-docker_db_1 psql -U moodleuser moodle -c "DELETE FROM xapi_records_processed;"
+$ docker exec -it learning_analytics_db psql -U learning_analytics learning_analytics -c "DELETE FROM xapi_records_processed;"
 ----
 
 <<<
@@ -328,6 +328,13 @@ $ docker-compose exec openlrw_mongo bash
 
 <<<
 === Supersetの設定
+==== データベースの初期設定
+以下のコマンドを実行し、データベースの初期設定を行う。
+
+----
+$ docker-compose exec superset /init.sh
+----
+
 ==== ログイン
 Superset( http://localhost:8088 )にアクセスし、Adminユーザでログインする（Username: `admin` 、Password: `admin` ）。
 
@@ -353,7 +360,7 @@ image::superset/xapi/list-databases.png[align=center]
 [%noheader, cols="1,3"]
 |===
 |Databases        |learninglocker
-|SQLAlchemy URI   |postgresql://postgres@superset_db:5432/learninglocker
+|SQLAlchemy URI   |postgresql://postgres@superset-db:5432/learninglocker
 |Expose in SQL Lab|チェック
 |===
 
@@ -412,7 +419,7 @@ image::superset/caliper/list-databases.png[align=center]
 [%noheader, cols="1,3"]
 |===
 |Database         |openlrw
-|SQLAlchemy URI   |postgresql://postgres@superset_db:5432/openlrw
+|SQLAlchemy URI   |postgresql://postgres@superset-db:5432/openlrw
 |Expose in SQL Lab|チェック
 |===
 
@@ -505,10 +512,10 @@ JupyterHubにログインし、ノートブック「link:jupyterhub/notebooks/im
 image::jupyterhub/import-analysis-result-to-superset.png[align=center]
 
 <<<
-`superset_db` コンテナ上に登録された分析結果は以下のコマンドで参照することができる。
+`superset-db` コンテナ上に登録された分析結果は以下のコマンドで参照することができる。
 
 ----
-$ docker exec -it superset_db psql jupyter -c "SELECT * FROM <tablename>;"
+$ docker exec -it superset-db psql jupyter -c "SELECT * FROM <tablename>;"
 
 index | object.definition.description.en |object.id            | timestamp
 --------+--------------------------------------------+------------------------------+---------------------------
@@ -523,7 +530,7 @@ Superset上で上記テーブルが格納されたjupyterデータベースを�
 [%noheader, cols="1,3"]
 |===
 |Database         |jupyter
-|SQLAlchemy URI   |postgresql://postgres@superset_db:5432/jupyter
+|SQLAlchemy URI   |postgresql://postgres@superset-db:5432/jupyter
 |Expose in SQL Lab|チェック
 |===
 

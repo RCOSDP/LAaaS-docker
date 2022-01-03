@@ -23,8 +23,18 @@ $header = [
 
 $insts = require 'tenant.php';
 
-foreach($insts as $institution)
-{
+$allTenants = $client->httpGet('/api/tenants', $header);
+$allTenantNames = [];
+foreach ($allTenants as $tenant) {
+    array_push($allTenantNames, $tenant->name);
+}
+
+foreach ($insts as $institution) {
+    //skip existing org
+    if (in_array($institution['name'], $allTenantNames)) {
+        continue;
+    }
+
     $newTenant = [
         'name' => $institution['name'],
         'description' => $institution['description'],
@@ -58,4 +68,3 @@ foreach($insts as $institution)
         'password' => $user->password
     ];
 }
-

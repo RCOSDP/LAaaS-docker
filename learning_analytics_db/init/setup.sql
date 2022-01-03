@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS eppn (
+  username VARCHAR(256) PRIMARY KEY,
+  hash CHAR(64) NOT NULL,
+  scope VARCHAR(256) NOT NULL,
+  acl VARCHAR(256) NOT NULL
+);
+ALTER TABLE eppn ENABLE ROW LEVEL SECURITY;
+CREATE POLICY scope_policy ON eppn USING (acl = current_user);

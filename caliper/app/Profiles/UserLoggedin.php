@@ -2,33 +2,44 @@
 
 namespace App\Profiles;
 
+use App\Profiles\Profiles;
+use App\Translator\UserLoggedin as AppUserLoggedin;
 use IMSGlobal\Caliper\actions\Action;
 use IMSGlobal\Caliper\entities\agent\{
-        Person,
-        SoftwareApplication,
-    };
+    Person,
+    SoftwareApplication,
+};
 use IMSGlobal\Caliper\events\SessionEvent;
 
 final class UserLoggedin extends SessionEvent
 {
-    public function __construct($dv)
+    use Profiles;
+
+    public function __construct(AppUserLoggedin $ul)
     {
         parent::__construct();
-        $actor = $dv->getActor();
+        $actor = $ul->getActor();
+        $object = $ul->getObject();
+        $edApp = $ul->getEdApp();
+
+        $actorId = $ul->getUserId($actor->id);
+
+        $this->originalUsername = $actor->username;
 
         $this
             ->setAction(new Action(Action::LOGGED_IN))
             ->setActor(
-                (new Person((string)$actor->id))
-                ->setName($actor->username)
-                ->setDescription($actor->description)
+                (new Person((string) $actorId))
+                    ->setName($ul->getAnonymizedUsername($actor->username))
+                    ->setDescription($actor->description ?? '')
             )
             ->setObject(
-                (new SoftwareApplication($dv->getObject()))
+                new SoftwareApplication((string) $object->id)
             )
-            ->setEventTime($dv->getEventTime())
+            ->setEventTime($ul->getEventTime())
             ->setEdApp(
-                new SoftwareApplication($dv->getEdApp())
+                (new SoftwareApplication((string) $edApp->id))
+                    ->setName($edApp->name)
             );
     }
 }

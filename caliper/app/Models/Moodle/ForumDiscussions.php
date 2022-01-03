@@ -2,7 +2,7 @@
 
 namespace App\Models\Moodle;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Moodle\MoodleBase;
 
 /**
  * @property integer $id
@@ -18,14 +18,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer $timestart
  * @property integer $timeend
  * @property integer $pinned
+ * @property integer $timelocked
  */
-class ForumDiscussions extends Model
+class ForumDiscussions extends MoodleBase
 {
-    const CREATED_AT = null;
-    const UPDATED_AT = null;
+    public const CREATED_AT = null;
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -45,7 +45,8 @@ class ForumDiscussions extends Model
         'usermodified',
         'timestart',
         'timeend',
-        'pinned'
+        'pinned',
+        'timelocked'
     ];
 
     /**

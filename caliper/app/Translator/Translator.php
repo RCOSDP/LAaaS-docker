@@ -8,7 +8,7 @@ use DateTime;
 abstract class Translator
 {
     use Util;
-    
+
     protected $actor;
     protected $object;
     protected $eventTime;

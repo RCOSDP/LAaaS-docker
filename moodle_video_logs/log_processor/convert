@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Output CSV used to generate video statements."""
+import os
 import sys
 
 import pandas as pd
@@ -31,6 +32,8 @@ def main():
         'nonce',           # Nonce(for LTI only)
         'videoplayerlog',  # 'videoplayerlog'(for LTI only)
     ]
+    # Replace v-current '-' with 0
+    df['v-current'] = df['v-current'].replace('-', 0)
     # Construct object id consisting of m-referrer
     df['m-referrer'] = df.apply(_construct_object_id, axis=1)
     # Remove prefix
@@ -97,7 +100,7 @@ def main():
 
 def _remove_lti_log_prefix(x):
     """Remove LMS domain from string."""
-    return str(x).replace('lms.nii.ac.jp:', '')
+    return str(x).replace(f'{os.environ["LMS_DOMAIN"]}:', '')
 
 
 def _construct_object_id(row):
@@ -107,7 +110,7 @@ def _construct_object_id(row):
         return row['m-referrer']
     else:
         # LTI logs
-        domain = 'lms.nii.ac.jp'
+        domain = os.environ['LMS_DOMAIN']
         course_id = _remove_lti_log_prefix(row['m-course-id'])
         resource_id = _remove_lti_log_prefix(row['m-referrer'])
         return f'{scheme}://{domain}/{course_id}/{resource_id}'
