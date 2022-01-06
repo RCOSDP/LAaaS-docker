@@ -1,15 +1,12 @@
 # See https://docs.anaconda.com/anaconda/reference/release-notes/#anaconda-2019-10-october-15-2019
 FROM continuumio/anaconda3:2019.10
 
-LABEL version="2.1.1"
+LABEL version="2.2.0"
 
-# Install R
-RUN apt-get update --allow-releaseinfo-change && \
-    apt-get install -y r-base
-
-# Install JupyterHub and create user
-RUN conda install -y jupyterhub r-irkernel psycopg2 -c conda-forge -c r -c anaconda && \
-    useradd -m -p $(echo "jupyter" | openssl passwd -1 -stdin) -s /bin/bash jupyter
+RUN conda install -y -c conda-forge jupyterhub=0.9.6
+RUN conda install -y -c r r-irkernel=0.8.15  # Install R
+RUN conda install -y psycopg2=2.8.4
+RUN useradd -m -p $(echo "jupyter" | openssl passwd -1 -stdin) -s /bin/bash jupyter
 
 # Copy sample notebooks
 COPY notebooks/*.ipynb /home/jupyter/
