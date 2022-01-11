@@ -1,6 +1,6 @@
 FROM centos:centos7
 
-LABEL version="2.3.0"
+LABEL version="2.3.1"
 
 # Install dependencies
 RUN yum update -y && \
@@ -28,7 +28,7 @@ ENV PATH $PATH:/usr/pgsql-9.6/bin
 
 # Install Multicorn
 WORKDIR /usr/local/src
-RUN git clone git://github.com/Kozea/Multicorn.git --depth 1 -b v1.4.0 && \
+RUN git clone https://github.com/Kozea/Multicorn.git --depth 1 -b v1.4.0 && \
     cd Multicorn && \
     make && make install
 
