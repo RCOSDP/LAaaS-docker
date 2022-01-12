@@ -409,8 +409,8 @@ image::superset/xapi/added-xapi-statements.png[align=center]
    |大項目                   |小項目             |設定値
    |Datasource & Chart Type  |Visualization Type |`Table View`
 .3+|Time                     |Time Column        |`stored`
-                             |Since              |`7 years ago`
-                             |Until              |`now`
+                             |Since              |`∞` (指定なし)
+                             |Until              |`∞` (指定なし)
    |GROUP BY                 |Metric             |`COUNT(*)`
 |===
 
@@ -479,8 +479,8 @@ image::superset/caliper/added-caliper-statements.png[align=center]
    |大項目                   |小項目             |設定値
    |Datasource & Chart Type  |Visualization Type |`Table View`
 .3+|Time                     |Time Column        |`event.eventTime`
-                             |Since              |`7 years ago`
-                             |Until              |`now`
+                             |Since              |`∞` (指定なし)
+                             |Until              |`∞` (指定なし)
    |GROUP BY                 |Metric             |`COUNT(*)`
 |===
 
@@ -584,8 +584,8 @@ JupyterHubで加工したステートメントが可視化できることを確�
    |大項目                   |小項目             |設定値
    |Datasource & Chart Type  |Visualization Type |`Distribution - Bar Chart`
 .3+|Time                     |Time Column        |`timestamp`
-                             |Since              |`7 years ago`
-                             |Until              |`now`
+                             |Since              |`∞` (指定なし)
+                             |Until              |`∞` (指定なし)
 .2+|Query                    |Metric             |`COUNT(*)`
                              |Series             |`object.id`
 |===
