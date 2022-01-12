@@ -549,7 +549,7 @@ image::superset/jupyter/add-jupyter-analysis-result.png[align=center]
 
 image::superset/jupyter/added-jupyter-analysis-result.png[align=center]
 
-グループ列、フィルター列、時刻列の指定などはテーブルの設定から必要に応じて行うこと。
+グループ列、フィルター列、時刻列の指定などはテーブルの設定(テーブル名左横の `Edit record` から `List Columns` タブを選択)から必要に応じて行うこと。
 
 image::superset/jupyter/edit-jupyter-analysis-result.png[align=center]
 
