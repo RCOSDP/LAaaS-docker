@@ -143,15 +143,9 @@ image::learninglocker/new-xapi-store-client.png[align=center]
 
 <<<
 === xAPIステートメント変換スクリプトの設定
-`xapi_stmt_gen` コンテナに接続する。
-
-----
-$ docker exec -it xapi_stmt_gen bash
-----
-
 スクリプトの設定ファイルを編集する。
 
-./usr/local/src/xapi_stmt_gen/config/app.js
+.xapi_stmt_gen/xapi_stmt_gen/config/app.js
 [source, javascript]
 ----
 const config = {
@@ -181,6 +175,13 @@ $ docker inspect learninglocker
 ...
                     "IPAddress": "xxx.xxx.xxx.xxx",
 ...
+----
+
+設定ファイルの変更を `xapi_stmt_gen` コンテナに反映する。
+
+----
+$ docker-compose build xapi_stmt_gen
+$ docker-compose up -d xapi_stmt_gen
 ----
 
 <<<
