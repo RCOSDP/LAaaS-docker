@@ -403,6 +403,17 @@ image::superset/xapi/added-xapi-statements.png[align=center]
 <<<
 `xapi_statements` テーブルを選択し、Learning Lockerに登録済みのステートメント件数が取得できることを確認する。
 
+.xAPIステートメントの件数をカウントする例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+   |Datasource & Chart Type  |Visualization Type |`Table View`
+.3+|Time                     |Time Column        |`stored`
+                             |Since              |`7 years ago`
+                             |Until              |`now`
+   |GROUP BY                 |Metric             |`COUNT(*)`
+|===
+
 image::superset/xapi/count-xapi-statements.png[align=center]
 
 <<<
@@ -461,6 +472,17 @@ image::superset/caliper/added-caliper-statements.png[align=center]
 
 <<<
 `caliper_statements` テーブルを選択し、OpenLRWに登録済みのステートメント件数が取得できることを確認する。
+
+.Caliperステートメントの件数をカウントする例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+   |Datasource & Chart Type  |Visualization Type |`Table View`
+.3+|Time                     |Time Column        |`event.eventTime`
+                             |Since              |`7 years ago`
+                             |Until              |`now`
+   |GROUP BY                 |Metric             |`COUNT(*)`
+|===
 
 image::superset/caliper/count-caliper-statements.png[align=center]
 
@@ -556,4 +578,16 @@ image::superset/jupyter/edit-jupyter-analysis-result.png[align=center]
 <<<
 JupyterHubで加工したステートメントが可視化できることを確認すること。
 
-image::superset/jupyter/visualize-jupyter-analysis-result.png[align=center]
+.ノートブックの実行結果を可視化する例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+   |Datasource & Chart Type  |Visualization Type |`Distribution - Bar Chart`
+.3+|Time                     |Time Column        |`timestamp`
+                             |Since              |`7 years ago`
+                             |Until              |`now`
+.2+|Query                    |Metric             |`COUNT(*)`
+                             |Series             |`object.id`
+|===
+
+image::superset/jupyter/visualize-jupyter-analysis-result.png[align=center, scaledwidth=90%]
