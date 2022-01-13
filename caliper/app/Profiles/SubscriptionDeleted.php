@@ -2,43 +2,54 @@
 
 namespace App\Profiles;
 
+use App\Profiles\Profiles;
 use App\Translator\SubscriptionDeleted as AppSubscriptionDeleted;
 use IMSGlobal\Caliper\actions\Action;
 use IMSGlobal\Caliper\entities\{
-        Forum,
-        agent\Person,
-        agent\SoftwareApplication,
-        lis\CourseSection,
-    };
+    Forum,
+    agent\Person,
+    agent\SoftwareApplication,
+    lis\CourseSection,
+};
 use IMSGlobal\Caliper\events\ForumEvent;
 
 final class SubscriptionDeleted extends ForumEvent
 {
-    public function __construct(AppSubscriptionDeleted $sc)
+    use Profiles;
+
+    public function __construct(AppSubscriptionDeleted $sd)
     {
         parent::__construct();
-        $actor = $sc->getActor();
-        $object = $sc->getObject();
-        $partOf = $sc->getPartOf();
+        $actor = $sd->getActor();
+        $object = $sd->getObject();
+        $partOf = $sd->getPartOf();
+        $edApp = $sd->getEdApp();
+
+        $actorId = $sd->getUserId($actor->id);
+        $objectId = $sd->getObjectId();
+        $partOfId = $sd->getCourseId($partOf->id);
+
+        $this->originalUsername = $actor->username;
 
         $this
             ->setAction(new Action(Action::UNSUBSCRIBED))
             ->setActor(
-                (new Person((string) $actor->id))
-                    ->setName($actor->username)
-                    ->setDescription($actor->description)
+                (new Person((string) $actorId))
+                    ->setName($sd->getAnonymizedUsername($actor->username))
+                    ->setDescription($actor->description ?? '')
             )
             ->setObject(
-                (new Forum((string) $object->id))
+                (new Forum((string) $objectId))
                     ->setName($object->name)
                     ->setIsPartOf(
-                        (new CourseSection((string) $partOf->id))
+                        (new CourseSection((string) $partOfId))
                             ->setName($partOf->fullname)
                     )
             )
-            ->setEventTime($sc->getEventTime())
+            ->setEventTime($sd->getEventTime())
             ->setEdApp(
-                (new SoftwareApplication($sc->getEdApp()))//->makeReference()
+                (new SoftwareApplication((string) $edApp->id))
+                    ->setName($edApp->name)
             );
     }
 }

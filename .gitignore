@@ -7,7 +7,7 @@ moodle.sql
 caliper_log/data/*
 open_lrw/data/*
 xapi_stmt_gen/log/*
-elcampus_la/xapi_stmt_gen/log/*
-superset_db/data/*
+learning_analytics_db/data/*
+superset-db/data/*
 metabase/*
 **/.DS_Store

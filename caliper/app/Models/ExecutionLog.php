@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -12,9 +13,9 @@ final class ExecutionLog extends Model
      * @property integer $failed
      * @property string $date
      */
-    const CREATED_AT = 'date';
-    const UPDATED_AT = null;
-    
+    public const CREATED_AT = 'date';
+    public const UPDATED_AT = null;
+
     protected $connection = 'log';
     protected $dateFormat = 'c';
     protected $prefix = null;

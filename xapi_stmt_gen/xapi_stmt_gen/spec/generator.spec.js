@@ -1,6 +1,15 @@
 /* eslint max-len: 0, max-statements: 0 */
 const config = require('../config/app');
 const rewire = require('rewire');
+const userAttrs = {
+  2: {
+    hash: 'g323jbfsakj35hjkegjfdsnklkjehrjthekthsk95c3ac5ceeacd69595c861c27',
+    scope: 'default'
+  }
+};
+const courseNames = {
+  3: 'course_name'
+};
 
 describe('Test generator', () => {
   describe('translate', () => {
@@ -9,7 +18,8 @@ describe('Test generator', () => {
     describe('course_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_viewed',
@@ -20,13 +30,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -35,7 +43,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -72,7 +80,8 @@ describe('Test generator', () => {
     describe('user_loggedin', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_loggedin',
@@ -83,13 +92,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -98,7 +105,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -135,7 +142,8 @@ describe('Test generator', () => {
     describe('user_loggedout', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_loggedout',
@@ -146,13 +154,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -161,7 +167,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -198,7 +204,8 @@ describe('Test generator', () => {
     describe('user_login_failed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_login_failed',
@@ -209,13 +216,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -224,7 +229,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -261,7 +266,8 @@ describe('Test generator', () => {
     describe('user_password_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_password_updated',
@@ -272,13 +278,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -287,7 +291,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -324,7 +328,8 @@ describe('Test generator', () => {
     describe('quiz_course_module_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\course_module_viewed',
@@ -335,13 +340,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -350,7 +353,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -391,7 +394,8 @@ describe('Test generator', () => {
     describe('forum_course_module_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\course_module_viewed',
@@ -402,13 +406,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -417,7 +419,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -458,7 +460,8 @@ describe('Test generator', () => {
     describe('book_course_module_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_book\\event\\course_module_viewed',
@@ -469,13 +472,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -484,7 +485,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -525,7 +526,8 @@ describe('Test generator', () => {
     describe('resource_course_module_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_resource\\event\\course_module_viewed',
@@ -536,13 +538,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -551,7 +551,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -592,7 +592,14 @@ describe('Test generator', () => {
     describe('scorm_course_module_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
+        server.__set__('findScormBy', function() {
+          return {
+            name: 'scormname',
+            course: 3,
+          }
+        });
         const log = {
           id: 1,
           eventname: '\\mod_scorm\\event\\course_module_viewed',
@@ -603,13 +610,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -618,7 +623,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -649,9 +654,9 @@ describe('Test generator', () => {
           const object = xapi.object;
           expect(object.objectType).toBeUndefined();
           expect(object.id).toBe(`${xapi.actor.account.homePage}/mod/scorm/view.php?id=${log.contextinstanceid}`);
-          expect(object.definition.type).toBe('http://adlnet.gov/expapi/activities/module');
-          expect(object.definition.name.en).toBe('scorm_course_module_viewed');
-          expect(object.definition.description.en).toBe('scorm_course_module_viewed');
+          expect(object.definition.type).toBe('http://id.tincanapi.com/activitytype/legacy-learning-standard');
+          expect(object.definition.name.en).toBe('scormname');
+          expect(object.definition.description.en).toBe('scormname');
           done();
         });
       });
@@ -659,7 +664,8 @@ describe('Test generator', () => {
     describe('workshop_course_module_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\course_module_viewed',
@@ -670,13 +676,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -685,7 +689,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -726,7 +730,8 @@ describe('Test generator', () => {
     describe('attempt_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\attempt_viewed',
@@ -737,13 +742,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -752,7 +755,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -793,7 +796,8 @@ describe('Test generator', () => {
     describe('attempt_summary_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\attempt_summary_viewed',
@@ -804,13 +808,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -819,7 +821,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -860,7 +862,8 @@ describe('Test generator', () => {
     describe('attempt_reviewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\attempt_reviewed',
@@ -871,13 +874,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -886,7 +887,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -927,7 +928,8 @@ describe('Test generator', () => {
     describe('attempt_started', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\attempt_started',
@@ -938,13 +940,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -953,7 +953,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -994,7 +994,37 @@ describe('Test generator', () => {
     describe('attempt_submitted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
+        const timefinish = 1573188271;
+        const timestart = 1535691025;
+        server.__set__('findQuizAttemptBy', function() {
+          return {
+            quiz: 1,
+            state: 'finished',
+            timefinish: timefinish,
+            timestart: timestart,
+          }
+        });
+        server.__set__('findQuizBy', function() {
+          return {
+            id: 1,
+            name: 'quizname'
+          }
+        });
+        server.__set__('findGradeItemBy', function() {
+          return {
+            id: 1,
+            gradepass: 80.00000,
+          }
+        });
+        server.__set__('findGradeGradeBy', function() {
+          return {
+            rawgrade: 79.00000,
+            rawgrademin: 0.00000,
+            rawgrademax: 85.00000,
+          }
+        });
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\attempt_submitted',
@@ -1005,13 +1035,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1020,7 +1048,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1052,8 +1080,17 @@ describe('Test generator', () => {
           expect(object.objectType).toBeUndefined();
           expect(object.id).toBe(`${xapi.actor.account.homePage}/mod/quiz/view.php?id=${log.contextinstanceid}`);
           expect(object.definition.type).toBe('http://adlnet.gov/expapi/activities/assessment');
-          expect(object.definition.name.en).toBe('attempt_submitted');
-          expect(object.definition.description.en).toBe('attempt_submitted');
+          expect(object.definition.name.en).toBe('quizname');
+          expect(object.definition.description.en).toBe('quizname');
+
+          // Result
+          const result = xapi.result;
+          expect(result.score.raw).toBe(79);
+          expect(result.score.min).toBe(0);
+          expect(result.score.max).toBe(85);
+          expect(result.success).toBe(false);
+          expect(result.completion).toBe(true);
+          expect(result.duration).toBe(`PT${timefinish - timestart}S`);
           done();
         });
       });
@@ -1061,7 +1098,8 @@ describe('Test generator', () => {
     describe('attempt_preview_started', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\attempt_preview_started',
@@ -1072,13 +1110,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1087,7 +1123,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1128,7 +1164,8 @@ describe('Test generator', () => {
     describe('edit_page_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\edit_page_viewed',
@@ -1139,13 +1176,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1154,7 +1189,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1195,7 +1230,8 @@ describe('Test generator', () => {
     describe('quiz_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\report_viewed',
@@ -1206,13 +1242,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1221,7 +1255,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1262,7 +1296,8 @@ describe('Test generator', () => {
     describe('user_profile_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_profile_viewed',
@@ -1273,13 +1308,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1288,7 +1321,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1325,7 +1358,8 @@ describe('Test generator', () => {
     describe('chapter_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_book\\event\\chapter_viewed',
@@ -1336,13 +1370,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1351,7 +1383,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1392,7 +1424,8 @@ describe('Test generator', () => {
     describe('chapter_printed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\booktool_print\\event\\chapter_printed',
@@ -1403,13 +1436,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1418,7 +1449,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1459,7 +1490,8 @@ describe('Test generator', () => {
     describe('book_printed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\booktool_print\\event\\book_printed',
@@ -1470,13 +1502,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1485,7 +1515,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1526,7 +1556,8 @@ describe('Test generator', () => {
     describe('submission_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\submission_viewed',
@@ -1537,13 +1568,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1552,7 +1581,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1593,7 +1622,8 @@ describe('Test generator', () => {
     describe('submission_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\submission_created',
@@ -1604,13 +1634,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1619,7 +1647,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1660,7 +1688,8 @@ describe('Test generator', () => {
     describe('submission_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\submission_updated',
@@ -1671,13 +1700,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1686,7 +1713,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1727,7 +1754,8 @@ describe('Test generator', () => {
     describe('phase_switched', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\phase_switched',
@@ -1738,13 +1766,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1753,7 +1779,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1794,7 +1820,8 @@ describe('Test generator', () => {
     describe('workshop_assessable_uploaded', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\assessable_uploaded',
@@ -1805,13 +1832,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1820,7 +1845,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1861,7 +1886,8 @@ describe('Test generator', () => {
     describe('submission_assessed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\submission_assessed',
@@ -1872,13 +1898,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1887,7 +1911,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1928,7 +1952,8 @@ describe('Test generator', () => {
     describe('subscription_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\subscription_deleted',
@@ -1939,13 +1964,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -1954,7 +1977,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -1995,7 +2018,8 @@ describe('Test generator', () => {
     describe('subscription_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\subscription_created',
@@ -2006,13 +2030,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2021,7 +2043,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2062,7 +2084,8 @@ describe('Test generator', () => {
     describe('forum_assessable_uploaded', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\assessable_uploaded',
@@ -2073,13 +2096,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2088,7 +2109,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2129,7 +2150,8 @@ describe('Test generator', () => {
     describe('discussion_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\discussion_created',
@@ -2140,13 +2162,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2155,7 +2175,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2196,7 +2216,8 @@ describe('Test generator', () => {
     describe('discussion_subscription_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\discussion_subscription_created',
@@ -2207,13 +2228,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2222,7 +2241,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2263,7 +2282,8 @@ describe('Test generator', () => {
     describe('subscribers_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\subscribers_viewed',
@@ -2274,13 +2294,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2289,7 +2307,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2330,7 +2348,8 @@ describe('Test generator', () => {
     describe('discussion_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\discussion_viewed',
@@ -2341,13 +2360,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2356,7 +2373,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2397,7 +2414,8 @@ describe('Test generator', () => {
     describe('post_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\post_updated',
@@ -2408,13 +2426,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2423,7 +2439,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2464,7 +2480,8 @@ describe('Test generator', () => {
     describe('post_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\post_deleted',
@@ -2475,13 +2492,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2490,7 +2505,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2531,7 +2546,8 @@ describe('Test generator', () => {
     describe('discussion_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\discussion_deleted',
@@ -2542,13 +2558,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2557,7 +2571,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2598,7 +2612,8 @@ describe('Test generator', () => {
     describe('course_searched', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\course_searched',
@@ -2609,13 +2624,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2624,7 +2637,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2665,7 +2678,8 @@ describe('Test generator', () => {
     describe('post_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\post_created',
@@ -2676,13 +2690,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2691,7 +2703,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2732,7 +2744,8 @@ describe('Test generator', () => {
     describe('discussion_subscription_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\discussion_subscription_deleted',
@@ -2743,13 +2756,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2758,7 +2769,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2799,7 +2810,8 @@ describe('Test generator', () => {
     describe('all_submissions_downloaded', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\all_submissions_downloaded',
@@ -2810,13 +2822,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2825,7 +2835,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2866,7 +2876,8 @@ describe('Test generator', () => {
     describe('assign_assessable_submitted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\assessable_submitted',
@@ -2877,13 +2888,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2892,7 +2901,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -2933,7 +2942,8 @@ describe('Test generator', () => {
     describe('grading_table_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\grading_table_viewed',
@@ -2944,13 +2954,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -2959,7 +2967,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3000,7 +3008,8 @@ describe('Test generator', () => {
     describe('assign_submission_status_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\submission_status_viewed',
@@ -3011,13 +3020,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3026,7 +3033,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3067,7 +3074,8 @@ describe('Test generator', () => {
     describe('grading_form_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\grading_form_viewed',
@@ -3078,13 +3086,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3093,7 +3099,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3134,7 +3140,8 @@ describe('Test generator', () => {
     describe('assign_submission_graded', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\submission_graded',
@@ -3145,13 +3152,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3160,7 +3165,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3201,7 +3206,8 @@ describe('Test generator', () => {
     describe('submission_locked', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\submission_locked',
@@ -3212,13 +3218,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3227,7 +3231,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3268,7 +3272,8 @@ describe('Test generator', () => {
     describe('extension_granted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\extension_granted',
@@ -3279,13 +3284,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3294,7 +3297,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3335,7 +3338,8 @@ describe('Test generator', () => {
     describe('assign_submission_form_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\submission_form_viewed',
@@ -3346,13 +3350,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3361,7 +3363,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3402,7 +3404,22 @@ describe('Test generator', () => {
     describe('user_graded', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
+        server.__set__('findGradeGradeBy', function() {
+          return {
+            rawgrade: 79.00000,
+            rawgrademin: 0.00000,
+            rawgrademax: 85.00000,
+          }
+        });
+        server.__set__('findGradeItemBy', function() {
+          return {
+            id: 1,
+            gradepass: 80.00000,
+            itemname: 'itemname'
+          }
+        });
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_graded',
@@ -3413,13 +3430,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3428,7 +3443,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3460,8 +3475,15 @@ describe('Test generator', () => {
           expect(object.objectType).toBeUndefined();
           expect(object.id).toBe(`${xapi.actor.account.homePage}/grade/edit/tree/index.php?id=${log.contextinstanceid}`);
           expect(object.definition.type).toBe('http://adlnet.gov/expapi/activities/grade');
-          expect(object.definition.name.en).toBe('user_graded');
-          expect(object.definition.description.en).toBe('user_graded');
+          expect(object.definition.name.en).toBe('itemname');
+          expect(object.definition.description.en).toBe('itemname');
+
+          // Result
+          const result = xapi.result;
+          expect(result.score.raw).toBe(79);
+          expect(result.score.min).toBe(0);
+          expect(result.score.max).toBe(85);
+          expect(result.success).toBe(false);
           done();
         });
       });
@@ -3469,7 +3491,8 @@ describe('Test generator', () => {
     describe('comment_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\assignsubmission_comments\\event\\comment_created',
@@ -3480,13 +3503,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3495,7 +3516,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3536,7 +3557,8 @@ describe('Test generator', () => {
     describe('comment_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\assignsubmission_comments\\event\\comment_deleted',
@@ -3547,13 +3569,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3562,7 +3582,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3603,7 +3623,8 @@ describe('Test generator', () => {
     describe('grader_grade_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\gradereport_grader\\event\\grade_report_viewed',
@@ -3614,13 +3635,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3629,7 +3648,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3670,7 +3689,8 @@ describe('Test generator', () => {
     describe('history_grade_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\gradereport_history\\event\\grade_report_viewed',
@@ -3681,13 +3701,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3696,7 +3714,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3737,7 +3755,8 @@ describe('Test generator', () => {
     describe('outcome_grade_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\gradereport_outcomes\\event\\grade_report_viewed',
@@ -3748,13 +3767,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3763,7 +3780,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3804,7 +3821,8 @@ describe('Test generator', () => {
     describe('overview_grade_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\gradereport_overview\\event\\grade_report_viewed',
@@ -3815,13 +3833,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3830,7 +3846,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3871,7 +3887,8 @@ describe('Test generator', () => {
     describe('singleview_grade_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\gradereport_singleview\\event\\grade_report_viewed',
@@ -3882,13 +3899,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3897,7 +3912,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -3938,7 +3953,8 @@ describe('Test generator', () => {
     describe('user_grade_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\gradereport_user\\event\\grade_report_viewed',
@@ -3949,13 +3965,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -3964,7 +3978,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4005,7 +4019,8 @@ describe('Test generator', () => {
     describe('log_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\report_log\\event\\report_viewed',
@@ -4016,13 +4031,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4031,7 +4044,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4072,7 +4085,8 @@ describe('Test generator', () => {
     describe('outline_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\report_outline\\event\\report_viewed',
@@ -4083,13 +4097,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4098,7 +4110,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4139,7 +4151,8 @@ describe('Test generator', () => {
     describe('loglive_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\report_loglive\\event\\report_viewed',
@@ -4150,13 +4163,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4165,7 +4176,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4206,7 +4217,8 @@ describe('Test generator', () => {
     describe('user_list_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_list_viewed',
@@ -4217,13 +4229,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4232,7 +4242,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4273,7 +4283,14 @@ describe('Test generator', () => {
     describe('scorm_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
+        server.__set__('findScormBy', function() {
+          return {
+            name: 'scormname',
+            course: 3,
+          }
+        });
         const log = {
           id: 1,
           eventname: '\\mod_scorm\\event\\report_viewed',
@@ -4282,15 +4299,14 @@ describe('Test generator', () => {
           courseid: 3,
           objectid: 4,
           timecreated: 1188244893,
-          contextinstanceid: 5
+          contextinstanceid: 5,
+          other: 'a:2:{s:7:"scormid";s:2:"31";s:4:"mode";s:5:"basic";}'
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4299,7 +4315,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4330,9 +4346,9 @@ describe('Test generator', () => {
           const object = xapi.object;
           expect(object.objectType).toBeUndefined();
           expect(object.id).toBe(`${xapi.actor.account.homePage}/mod/scorm/report.php?id=${log.contextinstanceid}`);
-          expect(object.definition.type).toBe('http://adlnet.gov/expapi/activities/scorm');
-          expect(object.definition.name.en).toBe('scorm_report_viewed');
-          expect(object.definition.description.en).toBe('scorm_report_viewed');
+          expect(object.definition.type).toBe('http://id.tincanapi.com/activitytype/legacy-learning-standard');
+          expect(object.definition.name.en).toBe('scormname');
+          expect(object.definition.description.en).toBe('scormname');
           done();
         });
       });
@@ -4340,7 +4356,14 @@ describe('Test generator', () => {
     describe('sco_launched', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
+        server.__set__('findScormScoBy', function() {
+          return {
+            launch: 'launch',
+            title: 'title',
+          }
+        });
         const log = {
           id: 1,
           eventname: '\\mod_scorm\\event\\sco_launched',
@@ -4349,15 +4372,14 @@ describe('Test generator', () => {
           courseid: 3,
           objectid: 4,
           timecreated: 1188244893,
-          contextinstanceid: 5
+          contextinstanceid: 5,
+          other: 'a:2:{s:10:"instanceid";s:2:"17";s:13:"loadedcontent";s:71:"https://example.com/pluginfile.php/3878/mod_scorm/content/14/2_1_1.html";}'
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4366,7 +4388,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4396,18 +4418,25 @@ describe('Test generator', () => {
           // Object
           const object = xapi.object;
           expect(object.objectType).toBeUndefined();
-          expect(object.id).toBe(`${xapi.actor.account.homePage}/mod/scorm/view.php?id=${log.contextinstanceid}`);
-          expect(object.definition.type).toBe('http://adlnet.gov/expapi/activities/scorm');
-          expect(object.definition.name.en).toBe('sco_launched');
-          expect(object.definition.description.en).toBe('sco_launched');
+          expect(object.id).toBe('https://example.com/pluginfile.php/3878/mod_scorm/content/14/2_1_1.html');
+          expect(object.definition.type).toBe('http://id.tincanapi.com/activitytype/legacy-learning-standard');
+          expect(object.definition.name.en).toBe('launch');
+          expect(object.definition.description.en).toBe('title');
           done();
         });
       });
     });
-    describe('scorm_status_submitted', () => {
+    describe('scorm_status_submitted with cmivalue failed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
+        server.__set__('findScormBy', function() {
+          return {
+            name: 'scormname',
+            course: 3,
+          }
+        });
         const log = {
           id: 1,
           eventname: '\\mod_scorm\\event\\status_submitted',
@@ -4416,15 +4445,14 @@ describe('Test generator', () => {
           courseid: 3,
           objectid: 4,
           timecreated: 1188244893,
-          contextinstanceid: 5
+          contextinstanceid: 5,
+          other: 'a:3:{s:9:"attemptid";i:2;s:10:"cmielement";s:22:"cmi.core.lesson_status";s:8:"cmivalue";s:6:"failed";}'
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4433,7 +4461,226 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
+          expect(actor.account.name).toBe(2);
+          expect(actor.account.homePage).toBe(config.homepage);
+
+          // Context
+          const context = xapi.context;
+          const category = context.contextActivities.category[0];
+          expect(category.objectType).toBe('Activity');
+          expect(category.id).toBe(config.category.id);
+          expect(category.definition.type).toBe(config.category.definition.type);
+          expect(category.definition.name.en).toBe(config.category.definition.name);
+          expect(category.definition.description.en).toBe(config.category.definition.description);
+
+          const grouping = context.contextActivities.grouping[0];
+          expect(grouping.objectType).toBe('Activity');
+          expect(grouping.id).toBe(`${xapi.actor.account.homePage}/course/view.php?id=${log.courseid}`);
+          expect(grouping.definition.type).toBe(`${xapi.actor.account.homePage}/activitytype/course`);
+          expect(grouping.definition.name.en).toBe('course_name');
+
+          expect(context.platform).toBe(config.platform);
+          expect(context.language).toBe(config.language);
+
+          // Verb
+          const verb = xapi.verb;
+          expect(verb.display.en).toBe('failed');
+          expect(verb.id).toBe('urn:x-moodle-event-action:failed');
+
+          // Object
+          const object = xapi.object;
+          expect(object.objectType).toBeUndefined();
+          expect(object.id).toBe(`${xapi.actor.account.homePage}/mod/scorm/view.php?id=${log.contextinstanceid}`);
+          expect(object.definition.type).toBe('http://id.tincanapi.com/activitytype/legacy-learning-standard');
+          expect(object.definition.name.en).toBe('scormname');
+          expect(object.definition.description.en).toBe('scormname');
+          done();
+        });
+      });
+    });
+    describe('scorm_status_submitted with cmivalue passed', () => {
+      it('returns xapi statement', (done) => {
+        const server = rewire('../generator');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
+        server.__set__('findScormBy', function() {
+          return {
+            name: 'scormname',
+            course: 3,
+          }
+        });
+        const log = {
+          id: 1,
+          eventname: '\\mod_scorm\\event\\status_submitted',
+          userid: 2,
+          action: 'action',
+          courseid: 3,
+          objectid: 4,
+          timecreated: 1188244893,
+          contextinstanceid: 5,
+          other: 'a:3:{s:9:"attemptid";i:2;s:10:"cmielement";s:22:"cmi.core.lesson_status";s:8:"cmivalue";s:6:"passed";}'
+        };
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
+          expect(xapi.id).toBeDefined();
+
+          // Timestamp
+          expect(xapi.timestamp).toBe('2007-08-28T05:01:33+09:00');
+
+          // Actor
+          const actor = xapi.actor;
+          expect(actor.objectType).toBe('Agent');
+          expect(actor.name).toBe(userAttrs[2].hash);
+          expect(actor.account.name).toBe(2);
+          expect(actor.account.homePage).toBe(config.homepage);
+
+          // Context
+          const context = xapi.context;
+          const category = context.contextActivities.category[0];
+          expect(category.objectType).toBe('Activity');
+          expect(category.id).toBe(config.category.id);
+          expect(category.definition.type).toBe(config.category.definition.type);
+          expect(category.definition.name.en).toBe(config.category.definition.name);
+          expect(category.definition.description.en).toBe(config.category.definition.description);
+
+          const grouping = context.contextActivities.grouping[0];
+          expect(grouping.objectType).toBe('Activity');
+          expect(grouping.id).toBe(`${xapi.actor.account.homePage}/course/view.php?id=${log.courseid}`);
+          expect(grouping.definition.type).toBe(`${xapi.actor.account.homePage}/activitytype/course`);
+          expect(grouping.definition.name.en).toBe('course_name');
+
+          expect(context.platform).toBe(config.platform);
+          expect(context.language).toBe(config.language);
+
+          // Verb
+          const verb = xapi.verb;
+          expect(verb.display.en).toBe('passed');
+          expect(verb.id).toBe('urn:x-moodle-event-action:passed');
+
+          // Object
+          const object = xapi.object;
+          expect(object.objectType).toBeUndefined();
+          expect(object.id).toBe(`${xapi.actor.account.homePage}/mod/scorm/view.php?id=${log.contextinstanceid}`);
+          expect(object.definition.type).toBe('http://id.tincanapi.com/activitytype/legacy-learning-standard');
+          expect(object.definition.name.en).toBe('scormname');
+          expect(object.definition.description.en).toBe('scormname');
+          done();
+        });
+      });
+    });
+    describe('scorm_status_submitted with cmivalue completed', () => {
+      it('returns xapi statement', (done) => {
+        const server = rewire('../generator');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
+        server.__set__('findScormBy', function() {
+          return {
+            name: 'scormname',
+            course: 3,
+          }
+        });
+        const log = {
+          id: 1,
+          eventname: '\\mod_scorm\\event\\status_submitted',
+          userid: 2,
+          action: 'action',
+          courseid: 3,
+          objectid: 4,
+          timecreated: 1188244893,
+          contextinstanceid: 5,
+          other: 'a:3:{s:9:"attemptid";i:4;s:10:"cmielement";s:22:"cmi.core.lesson_status";s:8:"cmivalue";s:9:"completed";}'
+        };
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
+          expect(xapi.id).toBeDefined();
+
+          // Timestamp
+          expect(xapi.timestamp).toBe('2007-08-28T05:01:33+09:00');
+
+          // Actor
+          const actor = xapi.actor;
+          expect(actor.objectType).toBe('Agent');
+          expect(actor.name).toBe(userAttrs[2].hash);
+          expect(actor.account.name).toBe(2);
+          expect(actor.account.homePage).toBe(config.homepage);
+
+          // Context
+          const context = xapi.context;
+          const category = context.contextActivities.category[0];
+          expect(category.objectType).toBe('Activity');
+          expect(category.id).toBe(config.category.id);
+          expect(category.definition.type).toBe(config.category.definition.type);
+          expect(category.definition.name.en).toBe(config.category.definition.name);
+          expect(category.definition.description.en).toBe(config.category.definition.description);
+
+          const grouping = context.contextActivities.grouping[0];
+          expect(grouping.objectType).toBe('Activity');
+          expect(grouping.id).toBe(`${xapi.actor.account.homePage}/course/view.php?id=${log.courseid}`);
+          expect(grouping.definition.type).toBe(`${xapi.actor.account.homePage}/activitytype/course`);
+          expect(grouping.definition.name.en).toBe('course_name');
+
+          expect(context.platform).toBe(config.platform);
+          expect(context.language).toBe(config.language);
+
+          // Verb
+          const verb = xapi.verb;
+          expect(verb.display.en).toBe('completed');
+          expect(verb.id).toBe('urn:x-moodle-event-action:completed');
+
+          // Object
+          const object = xapi.object;
+          expect(object.objectType).toBeUndefined();
+          expect(object.id).toBe(`${xapi.actor.account.homePage}/mod/scorm/view.php?id=${log.contextinstanceid}`);
+          expect(object.definition.type).toBe('http://id.tincanapi.com/activitytype/legacy-learning-standard');
+          expect(object.definition.name.en).toBe('scormname');
+          expect(object.definition.description.en).toBe('scormname');
+          done();
+        });
+      });
+    });
+    describe('scorm_scoreraw_submitted', () => {
+      it('returns xapi statement', (done) => {
+        const server = rewire('../generator');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
+        server.__set__('findScormBy', function() {
+          return {
+            name: 'scormname',
+            course: 3,
+          }
+        });
+        const log = {
+          id: 1,
+          eventname: '\\mod_scorm\\event\\scoreraw_submitted',
+          userid: 2,
+          action: 'action',
+          courseid: 3,
+          objectid: 4,
+          timecreated: 1188244893,
+          contextinstanceid: 5,
+          other: 'a:3:{s:9:"attemptid";i:1;s:10:"cmielement";s:18:"cmi.core.score.raw";s:8:"cmivalue";s:3:"100";}'
+        };
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
+          expect(xapi.id).toBeDefined();
+
+          // Timestamp
+          expect(xapi.timestamp).toBe('2007-08-28T05:01:33+09:00');
+
+          // Actor
+          const actor = xapi.actor;
+          expect(actor.objectType).toBe('Agent');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4464,9 +4711,13 @@ describe('Test generator', () => {
           const object = xapi.object;
           expect(object.objectType).toBeUndefined();
           expect(object.id).toBe(`${xapi.actor.account.homePage}/mod/scorm/view.php?id=${log.contextinstanceid}`);
-          expect(object.definition.type).toBe('http://adlnet.gov/expapi/activities/scorm');
-          expect(object.definition.name.en).toBe('scorm_status_submitted');
-          expect(object.definition.description.en).toBe('scorm_status_submitted');
+          expect(object.definition.type).toBe('http://id.tincanapi.com/activitytype/legacy-learning-standard');
+          expect(object.definition.name.en).toBe('scormname');
+          expect(object.definition.description.en).toBe('scormname');
+
+          // Result
+          const result = xapi.result;
+          expect(result.score.raw).toBe(100);
           done();
         });
       });
@@ -4474,7 +4725,8 @@ describe('Test generator', () => {
     describe('outline_activity_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\report_outline\\event\\activity_report_viewed',
@@ -4485,13 +4737,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4500,7 +4750,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4541,7 +4791,8 @@ describe('Test generator', () => {
     describe('log_user_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\report_log\\event\\user_report_viewed',
@@ -4552,13 +4803,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4567,7 +4816,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4608,7 +4857,8 @@ describe('Test generator', () => {
     describe('participation_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\report_participation\\event\\report_viewed',
@@ -4619,13 +4869,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4634,7 +4882,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4675,7 +4923,8 @@ describe('Test generator', () => {
     describe('workshop_assessment_evaluated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\assessment_evaluated',
@@ -4686,13 +4935,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4701,7 +4948,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4742,7 +4989,8 @@ describe('Test generator', () => {
     describe('workshop_assessment_reevaluated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\assessment_reevaluated',
@@ -4753,13 +5001,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4768,7 +5014,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4809,7 +5055,8 @@ describe('Test generator', () => {
     describe('workshop_submission_reassessed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_workshop\\event\\submission_reassessed',
@@ -4820,13 +5067,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4835,7 +5080,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4876,7 +5121,8 @@ describe('Test generator', () => {
     describe('user_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_updated',
@@ -4887,13 +5133,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4902,7 +5146,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -4939,7 +5183,8 @@ describe('Test generator', () => {
     describe('user_loggedinas', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_loggedinas',
@@ -4950,13 +5195,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -4965,7 +5208,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5002,7 +5245,8 @@ describe('Test generator', () => {
     describe('user_enrolment_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_enrolment_updated',
@@ -5013,13 +5257,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5028,7 +5270,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5065,7 +5307,8 @@ describe('Test generator', () => {
     describe('user_enrolment_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_enrolment_deleted',
@@ -5076,13 +5319,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5091,7 +5332,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5128,7 +5369,8 @@ describe('Test generator', () => {
     describe('user_enrolment_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_enrolment_created',
@@ -5139,13 +5381,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5154,7 +5394,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5191,7 +5431,8 @@ describe('Test generator', () => {
     describe('user_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_deleted',
@@ -5202,13 +5443,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5217,7 +5456,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5254,7 +5493,8 @@ describe('Test generator', () => {
     describe('user_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\user_created',
@@ -5265,13 +5505,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5280,7 +5518,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5317,7 +5555,8 @@ describe('Test generator', () => {
     describe('dashboard_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\dashboard_viewed',
@@ -5328,13 +5567,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5343,7 +5580,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5380,7 +5617,8 @@ describe('Test generator', () => {
     describe('course_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_updated',
@@ -5391,13 +5629,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5406,7 +5642,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5443,7 +5679,8 @@ describe('Test generator', () => {
     describe('course_module_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_module_updated',
@@ -5454,13 +5691,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5469,7 +5704,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5506,7 +5741,8 @@ describe('Test generator', () => {
     describe('course_module_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_module_created',
@@ -5517,13 +5753,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5532,7 +5766,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5569,7 +5803,8 @@ describe('Test generator', () => {
     describe('course_category_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_category_created',
@@ -5580,13 +5815,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5595,7 +5828,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5632,7 +5865,8 @@ describe('Test generator', () => {
     describe('cohort_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\cohort_updated',
@@ -5643,13 +5877,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5658,7 +5890,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5695,7 +5927,8 @@ describe('Test generator', () => {
     describe('cohort_member_removed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\cohort_member_removed',
@@ -5706,13 +5939,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5721,7 +5952,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5758,7 +5989,8 @@ describe('Test generator', () => {
     describe('cohort_member_added', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\cohort_member_added',
@@ -5769,13 +6001,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5784,7 +6014,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5821,7 +6051,8 @@ describe('Test generator', () => {
     describe('cohort_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\cohort_deleted',
@@ -5832,13 +6063,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5847,7 +6076,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5884,7 +6113,8 @@ describe('Test generator', () => {
     describe('cohort_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\cohort_created',
@@ -5895,13 +6125,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5910,7 +6138,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -5947,7 +6175,8 @@ describe('Test generator', () => {
     describe('calendar_event_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\calendar_event_created',
@@ -5958,13 +6187,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -5973,7 +6200,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6010,7 +6237,8 @@ describe('Test generator', () => {
     describe('calendar_event_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\calendar_event_deleted',
@@ -6021,13 +6249,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6036,7 +6262,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6073,7 +6299,8 @@ describe('Test generator', () => {
     describe('calendar_event_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\calendar_event_updated',
@@ -6084,13 +6311,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6099,7 +6324,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6136,7 +6361,8 @@ describe('Test generator', () => {
     describe('enrol_instance_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\enrol_instance_deleted',
@@ -6147,13 +6373,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6162,7 +6386,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6199,7 +6423,8 @@ describe('Test generator', () => {
     describe('role_assigned', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\role_assigned',
@@ -6210,13 +6435,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6225,7 +6448,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6262,7 +6485,8 @@ describe('Test generator', () => {
     describe('role_capabilities_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\role_capabilities_updated',
@@ -6273,13 +6497,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6288,7 +6510,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6325,7 +6547,8 @@ describe('Test generator', () => {
     describe('role_unassigned', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\role_unassigned',
@@ -6336,13 +6559,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6351,7 +6572,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6388,7 +6609,8 @@ describe('Test generator', () => {
     describe('tool_capability_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\tool_capability\\event\\report_viewed',
@@ -6399,13 +6621,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6414,7 +6634,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6451,7 +6671,8 @@ describe('Test generator', () => {
     describe('course_content_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_content_deleted',
@@ -6462,13 +6683,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6477,7 +6696,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6514,7 +6733,8 @@ describe('Test generator', () => {
     describe('course_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_deleted',
@@ -6525,13 +6745,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6540,7 +6758,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6577,7 +6795,8 @@ describe('Test generator', () => {
     describe('course_module_completion_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_module_completion_updated',
@@ -6588,13 +6807,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6603,7 +6820,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6640,7 +6857,8 @@ describe('Test generator', () => {
     describe('course_section_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_section_updated',
@@ -6651,13 +6869,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6666,7 +6882,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6703,7 +6919,8 @@ describe('Test generator', () => {
     describe('email_failed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\email_failed',
@@ -6714,13 +6931,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6729,7 +6944,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6766,7 +6981,8 @@ describe('Test generator', () => {
     describe('enrol_instance_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\enrol_instance_created',
@@ -6777,13 +6993,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6792,7 +7006,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6829,7 +7043,8 @@ describe('Test generator', () => {
     describe('message_sent', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\message_sent',
@@ -6840,13 +7055,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6855,7 +7068,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6892,7 +7105,8 @@ describe('Test generator', () => {
     describe('assign_file_assessable_uploaded', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\assignsubmission_file\\event\\assessable_uploaded',
@@ -6903,13 +7117,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6918,7 +7130,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -6959,7 +7171,8 @@ describe('Test generator', () => {
     describe('assignsubmission_file_submission_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\assignsubmission_file\\event\\submission_created',
@@ -6970,13 +7183,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -6985,7 +7196,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7026,7 +7237,8 @@ describe('Test generator', () => {
     describe('assignsubmission_file_submission_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\assignsubmission_file\\event\\submission_updated',
@@ -7037,13 +7249,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7052,7 +7262,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7093,7 +7303,8 @@ describe('Test generator', () => {
     describe('onlinetext_assign_assessable_uploaded', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\assignsubmission_onlinetext\\event\\assessable_uploaded',
@@ -7104,13 +7315,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7119,7 +7328,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7160,7 +7369,8 @@ describe('Test generator', () => {
     describe('onlinetext_assign_submission_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\assignsubmission_onlinetext\\event\\submission_created',
@@ -7171,13 +7381,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7186,7 +7394,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7227,7 +7435,8 @@ describe('Test generator', () => {
     describe('onlinetext_assign_submission_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\assignsubmission_onlinetext\\event\\submission_updated',
@@ -7238,13 +7447,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7253,7 +7460,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7294,7 +7501,8 @@ describe('Test generator', () => {
     describe('course_restored', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_restored',
@@ -7305,13 +7513,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7320,7 +7526,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7357,7 +7563,8 @@ describe('Test generator', () => {
     describe('course_user_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_user_report_viewed',
@@ -7368,13 +7575,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7383,7 +7588,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7424,7 +7629,8 @@ describe('Test generator', () => {
     describe('group_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\group_created',
@@ -7435,13 +7641,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7450,7 +7654,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7487,7 +7691,8 @@ describe('Test generator', () => {
     describe('group_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\group_deleted',
@@ -7498,13 +7703,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7513,7 +7716,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7550,7 +7753,8 @@ describe('Test generator', () => {
     describe('group_member_added', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\group_member_added',
@@ -7561,13 +7765,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7576,7 +7778,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7613,7 +7815,8 @@ describe('Test generator', () => {
     describe('message_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\message_viewed',
@@ -7624,13 +7827,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7639,7 +7840,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7676,7 +7877,8 @@ describe('Test generator', () => {
     describe('category_bin_item_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\tool_recyclebin\\event\\category_bin_item_created',
@@ -7687,13 +7889,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7702,7 +7902,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7739,7 +7939,8 @@ describe('Test generator', () => {
     describe('course_category_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_category_updated',
@@ -7750,13 +7951,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7765,7 +7964,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7802,7 +8001,8 @@ describe('Test generator', () => {
     describe('feedback_course_module_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_feedback\\event\\course_module_viewed',
@@ -7813,13 +8013,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7828,7 +8026,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7869,7 +8067,8 @@ describe('Test generator', () => {
     describe('page_course_module_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_page\\event\\course_module_viewed',
@@ -7880,13 +8079,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7895,7 +8092,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -7936,7 +8133,8 @@ describe('Test generator', () => {
     describe('url_course_module_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_url\\event\\course_module_viewed',
@@ -7947,13 +8145,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -7962,7 +8158,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8003,7 +8199,8 @@ describe('Test generator', () => {
     describe('hsvideo_play_sent', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_hsvideo\\event\\hsvideo_play_sent',
@@ -8014,13 +8211,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8029,7 +8224,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8066,7 +8261,8 @@ describe('Test generator', () => {
     describe('hsvideo_progress_end_sent', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_hsvideo\\event\\hsvideo_progress_end_sent',
@@ -8077,13 +8273,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8092,7 +8286,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8129,7 +8323,8 @@ describe('Test generator', () => {
     describe('hsvideo_progress_start_sent', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_hsvideo\\event\\hsvideo_progress_start_sent',
@@ -8140,13 +8335,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8155,7 +8348,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8192,7 +8385,8 @@ describe('Test generator', () => {
     describe('hsvideo_replay_sent', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_hsvideo\\event\\hsvideo_replay_sent',
@@ -8203,13 +8397,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8218,7 +8410,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8255,7 +8447,8 @@ describe('Test generator', () => {
     describe('hsvideo_pause_sent', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_hsvideo\\event\\hsvideo_pause_sent',
@@ -8266,13 +8459,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8281,7 +8472,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8318,7 +8509,8 @@ describe('Test generator', () => {
     describe('hsvideo_stop_sent', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_hsvideo\\event\\hsvideo_stop_sent',
@@ -8329,13 +8521,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8344,7 +8534,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8381,7 +8571,8 @@ describe('Test generator', () => {
     describe('hsvideo_view', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_hsvideo\\event\\hsvideo_view',
@@ -8392,13 +8583,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8407,7 +8596,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8444,7 +8633,8 @@ describe('Test generator', () => {
     describe('batch_set_workflow_state_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\batch_set_workflow_state_viewed',
@@ -8455,13 +8645,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8470,7 +8658,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8507,7 +8695,8 @@ describe('Test generator', () => {
     describe('course_module_instance_list_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\course_module_instance_list_viewed',
@@ -8518,13 +8707,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8533,7 +8720,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8570,7 +8757,8 @@ describe('Test generator', () => {
     describe('feedback_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\feedback_viewed',
@@ -8581,13 +8769,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8596,7 +8782,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8633,7 +8819,8 @@ describe('Test generator', () => {
     describe('assign_submission_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\submission_viewed',
@@ -8644,13 +8831,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8659,7 +8844,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8696,7 +8881,8 @@ describe('Test generator', () => {
     describe('workflow_state_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_assign\\event\\workflow_state_updated',
@@ -8707,13 +8893,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8722,7 +8906,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8759,7 +8943,8 @@ describe('Test generator', () => {
     describe('report_stats_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\report_stats\\event\\report_viewed',
@@ -8770,13 +8955,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8785,7 +8968,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8822,7 +9005,8 @@ describe('Test generator', () => {
     describe('report_stats_user_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\report_stats\\event\\user_report_viewed',
@@ -8833,13 +9017,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8848,7 +9030,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8885,7 +9067,8 @@ describe('Test generator', () => {
     describe('langpack_updated', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\tool_langimport\\event\\langpack_updated',
@@ -8896,13 +9079,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8911,7 +9092,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -8948,7 +9129,8 @@ describe('Test generator', () => {
     describe('category_bin_item_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\tool_recyclebin\\event\\category_bin_item_deleted',
@@ -8959,13 +9141,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -8974,7 +9154,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9011,7 +9191,8 @@ describe('Test generator', () => {
     describe('course_bin_item_created', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\tool_recyclebin\\event\\course_bin_item_created',
@@ -9022,13 +9203,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -9037,7 +9216,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9074,7 +9253,8 @@ describe('Test generator', () => {
     describe('course_bin_item_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\tool_recyclebin\\event\\course_bin_item_deleted',
@@ -9085,13 +9265,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -9100,7 +9278,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9137,7 +9315,8 @@ describe('Test generator', () => {
     describe('browser_agent_view', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\browser_agent_view',
@@ -9148,13 +9327,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -9163,7 +9340,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9200,7 +9377,8 @@ describe('Test generator', () => {
     describe('course_module_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\course_module_deleted',
@@ -9211,13 +9389,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -9226,7 +9402,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9263,7 +9439,8 @@ describe('Test generator', () => {
     describe('grade_deleted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\core\\event\\grade_deleted',
@@ -9274,13 +9451,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -9289,7 +9464,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9330,7 +9505,8 @@ describe('Test generator', () => {
     describe('response_submitted', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_feedback\\event\\response_submitted',
@@ -9341,13 +9517,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -9356,7 +9530,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9397,7 +9571,8 @@ describe('Test generator', () => {
     describe('forum_user_report_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\user_report_viewed',
@@ -9408,13 +9583,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -9423,7 +9596,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9464,7 +9637,8 @@ describe('Test generator', () => {
     describe('attempt_abandoned', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_quiz\\event\\attempt_abandoned',
@@ -9475,13 +9649,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -9490,7 +9662,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9531,7 +9703,8 @@ describe('Test generator', () => {
     describe('course_module_list_viewed', () => {
       it('returns xapi statement', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: '\\mod_forum\\event\\course_module_instance_list_viewed',
@@ -9542,13 +9715,11 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
-          expect(xapis.length).toBe(1);
-          expect(translatedLogIds.length).toBe(1);
-          expect(translatedLogIds).toContain(1);
-          expect(skippedLogIds.length).toBe(0);
-
-          const xapi = xapis[0];
+        translate([log], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
           expect(xapi.id).toBeDefined();
 
           // Timestamp
@@ -9557,7 +9728,7 @@ describe('Test generator', () => {
           // Actor
           const actor = xapi.actor;
           expect(actor.objectType).toBe('Agent');
-          expect(actor.name).toBe('');
+          expect(actor.name).toBe(userAttrs[2].hash);
           expect(actor.account.name).toBe(2);
           expect(actor.account.homePage).toBe(config.homepage);
 
@@ -9598,7 +9769,8 @@ describe('Test generator', () => {
     describe('unknown event log', () => {
       it('skips translation', (done) => {
         const server = rewire('../generator');
-        const translate = server.__get__('translate');
+        const translate = server.__get__('translateStandardLogs');
+        server.__set__('createProcessedRecords', () => {});
         const log = {
           id: 1,
           eventname: 'unknown',
@@ -9609,11 +9781,94 @@ describe('Test generator', () => {
           timecreated: 1188244893,
           contextinstanceid: 5
         };
-        translate([log], {3: 'course_name'}).then(([xapis, translatedLogIds, skippedLogIds]) => {
+        translate([log], userAttrs, courseNames).then((xapis) => {
           expect(xapis.length).toBe(0);
-          expect(translatedLogIds.length).toBe(0);
-          expect(skippedLogIds.length).toBe(1);
-          expect(skippedLogIds).toContain(1);
+          done();
+        });
+      });
+    });
+    describe('scorm_scoes_track cmi.core.total_time', () => {
+      it('returns xapi statement', (done) => {
+        const server = rewire('../generator');
+        const translate = server.__get__('translateScoTracks');
+        server.__set__('findScormBy', function() {
+          return {
+            name: 'scormname',
+            course: 3,
+          }
+        });
+        server.__set__('findScormScoBy', function() {
+          return {
+            launch: 'launch',
+            title: 'title',
+          }
+        });
+        server.__set__('findLatestLogBy', function() {
+          return {
+            id: 1,
+            other: 'a:2:{s:10:"instanceid";s:2:"17";s:13:"loadedcontent";s:71:"https://example.com/pluginfile.php/3878/mod_scorm/content/14/2_1_1.html";}',
+          }
+        });
+        const track = {
+          id: 1,
+          userid: 2,
+          scormid: 3,
+          scoid: 4,
+          element: 'cmi.core.total_time',
+          value: '05:10:33.03',
+          timemodified: 1188244893,
+        };
+        translate([track], userAttrs, courseNames).then((xapis) => {
+          expect(xapis.default).toBeDefined();
+          expect(xapis.default.length).toBe(1);
+          expect(xapis.default[0].objectid).toBe(1);
+          const xapi = xapis.default[0].statement;
+          expect(xapi.id).toBeDefined();
+
+          // Timestamp
+          expect(xapi.timestamp).toBe('2007-08-28T05:01:33+09:00');
+
+          // Actor
+          const actor = xapi.actor;
+          expect(actor.objectType).toBe('Agent');
+          expect(actor.name).toBe(userAttrs[2].hash);
+          expect(actor.account.name).toBe(2);
+          expect(actor.account.homePage).toBe(config.homepage);
+
+          // Context
+          const context = xapi.context;
+          const category = context.contextActivities.category[0];
+          expect(category.objectType).toBe('Activity');
+          expect(category.id).toBe(config.category.id);
+          expect(category.definition.type).toBe(config.category.definition.type);
+          expect(category.definition.name.en).toBe(config.category.definition.name);
+          expect(category.definition.description.en).toBe(config.category.definition.description);
+
+          const grouping = context.contextActivities.grouping[0];
+          expect(grouping.objectType).toBe('Activity');
+          expect(grouping.id).toBe(`${xapi.actor.account.homePage}/course/view.php?id=3`);
+          expect(grouping.definition.type).toBe(`${xapi.actor.account.homePage}/activitytype/course`);
+          expect(grouping.definition.name.en).toBe('course_name');
+
+          expect(context.platform).toBe(config.platform);
+          expect(context.language).toBe(config.language);
+
+          // Verb
+          const verb = xapi.verb;
+          expect(verb.display.en).toBe('attended');
+          expect(verb.id).toBe('urn:x-moodle-event-action:attended');
+
+          // Object
+          const object = xapi.object;
+          expect(object.objectType).toBeUndefined();
+          expect(object.id).toBe('https://example.com/pluginfile.php/3878/mod_scorm/content/14/2_1_1.html');
+          expect(object.definition.type).toBe('http://id.tincanapi.com/activitytype/legacy-learning-standard');
+          expect(object.definition.name.en).toBe('launch');
+          expect(object.definition.description.en).toBe('title');
+
+          // Result
+          const result = xapi.result;
+          expect(result.duration).toBe('PT18633.03S');
           done();
         });
       });

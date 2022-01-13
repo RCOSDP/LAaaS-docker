@@ -1,12 +1,15 @@
 'use strict';
-const db = require('./db-config');
 const generator = require('./generator');
+const laDB = require('./la-db-config');
+const lmsDB = require('./lms-db-config');
 const log4js = require('log4js');
 const logger = log4js.getLogger();
 
 generator().then(() => {
-  db.close();
+  laDB.close();
+  lmsDB.close();
 }).catch((err) => {
   logger.error(err);
-  db.close();
+  laDB.close();
+  lmsDB.close();
 });

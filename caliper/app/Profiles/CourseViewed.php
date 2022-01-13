@@ -2,37 +2,47 @@
 
 namespace App\Profiles;
 
+use App\Profiles\Profiles;
 use App\Translator\CourseViewed as AppCourseViewed;
 use IMSGlobal\Caliper\actions\Action;
 use IMSGlobal\Caliper\entities\{
-       agent\Person,
-       agent\SoftwareApplication,
-       reading\WebPage,
-    };
+    agent\Person,
+    agent\SoftwareApplication,
+    reading\WebPage,
+};
 use IMSGlobal\Caliper\events\ViewEvent;
 
 final class CourseViewed extends ViewEvent
 {
-    public function __construct(AppCourseViewed $courseViewed)
+    use Profiles;
+
+    public function __construct(AppCourseViewed $cv)
     {
         parent::__construct();
-        $actor = $courseViewed->getActor();
-        $object = $courseViewed->getObject();
+        $actor = $cv->getActor();
+        $object = $cv->getObject();
+        $edApp = $cv->getEdApp();
+
+        $actorId = $cv->getUserId($actor->id);
+        $objectId = $cv->getCourseId($object->id);
+
+        $this->originalUsername = $actor->username;
 
         $this
             ->setAction(new Action(Action::VIEWED))
             ->setActor(
-                (new Person((string) $actor->id))
-                    ->setName($actor->username)
-                    ->setDescription($actor->description)
+                (new Person((string) $actorId))
+                    ->setName($cv->getAnonymizedUsername($actor->username))
+                    ->setDescription($actor->description ?? '')
             )
             ->setObject(
-                (new WebPage((string) $object->id))
+                (new WebPage((string) $objectId))
                     ->setName($object->fullname)
             )
-            ->setEventTime($courseViewed->getEventTime())
+            ->setEventTime($cv->getEventTime())
             ->setEdApp(
-                new SoftwareApplication($courseViewed->getEdApp())
+                (new SoftwareApplication((string) $edApp->id))
+                    ->setName($edApp->name)
             );
     }
 }

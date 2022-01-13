@@ -29,17 +29,17 @@ use App\Models\Moodle\MoodleBase;
  */
 class Event extends MoodleBase
 {
-    const UPDATED_AT = null;
+    public const UPDATED_AT = null;
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'logstore_standard_log';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -86,6 +86,7 @@ class Event extends MoodleBase
             'userid',
             'courseid',
             'relateduserid',
+            'other',
             'timecreated'
         ]);
     }

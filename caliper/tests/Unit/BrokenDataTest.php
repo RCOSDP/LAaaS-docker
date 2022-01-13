@@ -19,7 +19,7 @@ final class BrokenDataTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        
+
         $this->app = $this->createApplication();
         $dummyOutput = new ConsoleOutput();
         $dummyProgress = new ProgressBar($dummyOutput);

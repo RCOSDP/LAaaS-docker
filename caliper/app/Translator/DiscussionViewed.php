@@ -2,7 +2,13 @@
 
 namespace App\Translator;
 
-use App\Models\Moodle\{Event, User, Forum};
+use App\Models\Moodle\{
+    Course,
+    Event,
+    Forum,
+    ForumDiscussions,
+    User,
+};
 
 final class DiscussionViewed extends Translator
 {
@@ -14,7 +20,6 @@ final class DiscussionViewed extends Translator
         $this->object = $this->getModule($event->objecttable, $event->objectid);
         $this->partOf = $this->getModule('forum', $this->object->forum);
         $this->course = $this->getCourse($this->object->course);
-        $this->courseCategory = $this->getCourseCategory($this->course->category ?? 'null');
         $this->eventTime = $event->timecreated->timestamp;
     }
 
@@ -23,7 +28,7 @@ final class DiscussionViewed extends Translator
         return $this->actor;
     }
 
-    public function getObject()
+    public function getObject(): ForumDiscussions
     {
         return $this->object;
     }
@@ -33,13 +38,22 @@ final class DiscussionViewed extends Translator
         return $this->partOf;
     }
 
-    public function getIsPartOfCourse()
+    public function getIsPartOfCourse(): Course
     {
         return $this->course;
     }
 
-    public function getCategory(): string
+    public function getObjectId(): string
     {
-        return $this->courseCategory;
+        return env('APP_URL')
+               . '/mod/forum/discuss.php?d='
+               . $this->object->id;
+    }
+
+    public function getPartOfId(): string
+    {
+        return env('APP_URL')
+               . '/mod/forum/view.php?f='
+               . $this->partOf->id;
     }
 }

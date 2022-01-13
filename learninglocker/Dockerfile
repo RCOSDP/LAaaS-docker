@@ -1,5 +1,8 @@
 # Consult http://docs.learninglocker.net/guides-custom-installation/
 FROM centos:centos7
+
+LABEL version="2.0.0"
+
 SHELL ["/bin/bash", "-c"]
 RUN yum update -y && \
     yum -y install curl git python make automake gcc gcc-c++ kernel-devel xorg-x11-server-Xvfb git-core

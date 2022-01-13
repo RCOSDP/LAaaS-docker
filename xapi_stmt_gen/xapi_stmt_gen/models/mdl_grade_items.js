@@ -3,7 +3,7 @@
 const config = require('../config/app');
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define(config.db.prefix + 'grade_items', {
+  return sequelize.define(config.db.lms.prefix + 'grade_items', {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
@@ -147,7 +147,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: config.db.prefix + 'grade_items',
+    tableName: config.db.lms.prefix + 'grade_items',
     timestamps: false
   });
 };

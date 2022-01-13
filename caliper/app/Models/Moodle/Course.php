@@ -15,7 +15,7 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $summaryformat
  * @property string $format
  * @property integer $showgrades
- * @property int $newsitems
+ * @property integer $newsitems
  * @property integer $startdate
  * @property integer $enddate
  * @property integer $marker
@@ -36,19 +36,20 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $enablecompletion
  * @property integer $completionnotify
  * @property integer $cacherev
+ * @property integer $relativedatesmode
  */
 class Course extends MoodleBase
 {
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'course';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -86,7 +87,8 @@ class Course extends MoodleBase
         'requested',
         'enablecompletion',
         'completionnotify',
-        'cacherev'
+        'cacherev',
+        'relativedatesmode'
     ];
 
     /**

@@ -1,19 +1,31 @@
 const config = {
+  limit: 500,
+  chunkSize: 100,
   db:{
-    host:'moodle-docker_db_1',
-    port:5432,
-    database:'moodle',
-    username:'moodleuser',
-    password:'m@0dl3ing',
-    prefix:'mdl_'
+    // LMS database connection settings
+    lms:{
+      host:'moodle-docker_db_1',
+      port:5432,
+      database:'moodle',
+      username:'moodleuser',
+      password:'m@0dl3ing',
+      prefix:'mdl_'
+    },
+    la:{
+      host:'learning_analytics_db',
+      port:5432,
+      database:'learning_analytics',
+      username:'learning_analytics',
+      password:'learning_analytics',
+    }
   },
   LRS:{
-    url:'http://172.18.0.6:8081/data/xAPI/',
+    url:'http://172.18.0.9:8081/data/xAPI/',
     clients:{
       // LRS client
       'default':{
-        user:'c08425cf11e029dfa39fd0a4b82b5a7fc11c946c',
-        pass:'9740982b01ca69caf61e218a261c56d94e6eddba'
+        user:'031eb8dccd9729d6a8a16d245b4d1dddf1e2ded7',
+        pass:'a94fd8e44662fe7cd50cd53812dad84a4a81ab9b'
       },
       /**
        * This 'scoped' setting can be used to send

@@ -6,7 +6,7 @@
     "require": {
         "php": "^7.3",
         "illuminate/database": "6.4.*",
-        "imsglobal/caliper": "dev-develop",
+        "imsglobal/caliper": "1.2.0-beta",
         "laravel-zero/framework": "6.4.*"
     },
     "require-dev": {
@@ -47,8 +47,7 @@
         "sniff": "vendor/bin/phpcs --standard=phpcs.xml ./",
         "sniff-fix": "vendor/bin/phpcbf --standard=phpcs.xml ./",
         "build": [
-            "Composer\\Config::disableProcessTimeout",
-            "php caliper-cli app:build"
+            "Composer\\Config::disableProcessTimeout"
         ],
         "run-code" : "php caliper-cli generate",
         "box-info": "vendor/laravel-zero/framework/bin/box info --list"

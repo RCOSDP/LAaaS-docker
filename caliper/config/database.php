@@ -55,5 +55,16 @@ return [
             'sslmode' => 'prefer'
         ],
 
+        'eppn' => [
+            'driver' => 'pgsql',
+            'host' => env('DB_EPPN_HOST', '127.0.0.1'),
+            'port' => env('DB_EPPN_PORT', '5432'),
+            'database' => env('DB_EPPN_DATABASE', 'eppn'),
+            'username' => env('DB_EPPN_USERNAME', 'eppnuser'),
+            'password' => env('DB_EPPN_PASSWORD', ''),
+            'charset' => 'utf8',
+            'schema' => 'public',
+            'sslmode' => 'prefer'
+        ],
     ],
 ];

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Functions;
 
 use Illuminate\Support\Facades\Config;
@@ -18,7 +19,7 @@ if (!function_exists('get_lrs')) {
         $scope = 'default';
         if (strpos($username, '@')) {
             $eppn = explode('@', $username)[1];
-            if(array_key_exists($eppn, $tenants)){
+            if (array_key_exists($eppn, $tenants)) {
                 $scope = $eppn;
             }
         }

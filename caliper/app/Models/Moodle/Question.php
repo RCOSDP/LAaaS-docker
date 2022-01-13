@@ -24,19 +24,20 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $timemodified
  * @property integer $createdby
  * @property integer $modifiedby
+ * @property string $idnumber
  */
 class Question extends MoodleBase
 {
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'question';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -62,7 +63,8 @@ class Question extends MoodleBase
         'timecreated',
         'timemodified',
         'createdby',
-        'modifiedby'
+        'modifiedby',
+        'idnumber'
     ];
 
     /**

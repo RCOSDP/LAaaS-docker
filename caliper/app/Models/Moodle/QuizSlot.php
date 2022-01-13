@@ -12,12 +12,16 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $requireprevious
  * @property integer $questionid
  * @property float $maxmark
+ * @property integer $questioncategoryid
+ * @property integer $includingsubcategories
  */
 class QuizSlot extends MoodleBase
 {
+    public const CREATED_AT = null;
+    public const UPDATED_AT = null;
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -31,7 +35,9 @@ class QuizSlot extends MoodleBase
         'page',
         'requireprevious',
         'questionid',
-        'maxmark'
+        'maxmark',
+        'questioncategoryid',
+        'includingsubcategories'
     ];
 
     /**

@@ -3,19 +3,21 @@
 namespace App\Translator;
 
 use App\Models\Moodle\{
-        Assign,
-        AssignSubmission,
-        Course,
-        Event,
-        User,
+    Assign,
+    AssignSubmission,
+    Course,
+    Event,
+    User,
 };
 
 final class AssessableSubmitted extends Translator
 {
     private $assign;
+    private $event;
 
     public function __construct(Event $event)
     {
+        $this->event = $event;
         $this->actor = $this->getUser($event->userid);
         $this->object = $this->getModule($event->objecttable, $event->objectid);
         $this->assign = $this->getModule('assign', $this->object->assignment);
@@ -41,5 +43,12 @@ final class AssessableSubmitted extends Translator
     public function getIsPartOf(): Course
     {
         return $this->course;
+    }
+
+    public function getObjectId(): string
+    {
+        return env('APP_URL')
+               . '/mod/assign/view.php?id='
+               . $this->event->contextinstanceid;
     }
 }

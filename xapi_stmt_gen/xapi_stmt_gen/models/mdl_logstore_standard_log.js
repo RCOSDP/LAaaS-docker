@@ -3,7 +3,7 @@
 const config = require('../config/app');
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define(config.db.prefix + 'logstore_standard_log', {
+  return sequelize.define(config.db.lms.prefix + 'logstore_standard_log', {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
@@ -97,6 +97,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: config.db.prefix + 'logstore_standard_log'
+    tableName: config.db.lms.prefix + 'logstore_standard_log',
+    timestamps: false
   });
 };

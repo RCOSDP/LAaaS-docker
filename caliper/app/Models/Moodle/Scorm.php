@@ -50,16 +50,17 @@ use App\Models\Moodle\MoodleBase;
  */
 class Scorm extends MoodleBase
 {
+    public const CREATED_AT = null;
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'scorm';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

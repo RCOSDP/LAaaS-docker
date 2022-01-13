@@ -29,25 +29,26 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $blindmarking
  * @property integer $revealidentities
  * @property string $attemptreopenmethod
- * @property int $maxattempts
+ * @property integer $maxattempts
  * @property integer $markingworkflow
  * @property integer $markingallocation
  * @property integer $sendstudentnotifications
  * @property integer $preventsubmissionnotingroup
+ * @property integer $hidegrader
  */
 class Assign extends MoodleBase
 {
-    const CREATED_AT = null;
+    public const CREATED_AT = null;
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'assign';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -83,7 +84,8 @@ class Assign extends MoodleBase
         'markingworkflow',
         'markingallocation',
         'sendstudentnotifications',
-        'preventsubmissionnotingroup'
+        'preventsubmissionnotingroup',
+        'hidegrader'
     ];
 
     /**

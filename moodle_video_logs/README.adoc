@@ -2,8 +2,8 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2020年10月12日
-:revnumber: 2.0.0版
+:revdate: 2021年7月29日
+:revnumber: 3.0.0版
 :doctype: book
 :version-label:
 :chapter-label:
@@ -124,10 +124,10 @@ $ docker-compose up -d caliper_stmt_gen
 
 == Videojsログのステートメント変換
 === ステートメント変換スクリプトの実行
-Videojsのログを引数に `run.sh` を実行する。
+VideojsのログファイルとLMSのFQDNを引数に `run.sh` を実行する。
 
 ----
-$ sh run.sh /path/to/videojs.log
+$ sh run.sh /path/to/videojs.log <lms-domain>
 ----
 
 === xAPIステートメントの確認
@@ -150,7 +150,7 @@ $ mongo caliper -u <caliper-username> -p <caliper-password>
   "tenantId" : "5e65e8d3b23e0b450a0b668f",
   "event" : {
     "_id" : "urn:uuid:a8d0ac3a-5dab-44fe-b1f2-80e45212a241",
-    "context" : "http://purl.imsglobal.org/ctx/caliper/v1p1",
+    "context" : "http://purl.imsglobal.org/ctx/caliper/v1p2",
     "type" : "MediaEvent",
     "agent" : {
       "_id" : "716",
@@ -226,13 +226,13 @@ image::superset_caliper.png[align=center]
 <<<
 === JupyterHubを用いたxAPIステートメントの可視化例
 
-link:../../jupyterhub/notebooks/get_statements_from_learninglocker.ipynb[xAPIステートメントを取得するノートブック]でユーザが行った行動（英語表記）を棒グラフで可視化する例を以下に示す。
+link:../jupyterhub/notebooks/get_statements_from_learninglocker.ipynb[xAPIステートメントを取得するノートブック]でユーザが行った行動（英語表記）を棒グラフで可視化する例を以下に示す。
 
 image::jupyterhub.png[align=center]
 
 <<<
 === JupyterHubを用いたCaliperステートメントの可視化例
 
-link:../../jupyterhub/notebooks/get_statements_from_openlrw.ipynb[Caliperステートメントを取得するノートブック]でユーザが行った行動を棒グラフで可視化する例を以下に示す。
+link:../jupyterhub/notebooks/get_statements_from_openlrw.ipynb[Caliperステートメントを取得するノートブック]でユーザが行った行動を棒グラフで可視化する例を以下に示す。
 
 image::jupyterhub_caliper.png[align=center]

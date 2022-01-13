@@ -13,6 +13,3 @@ sed -i.org -e "s/MOODLE_DOCKER_DBUSER: moodle/MOODLE_DOCKER_DBUSER: moodleuser/"
 sed -i.org -e "s/$CFG->prefix    = 'm_';/$CFG->prefix    = 'mdl_';/" moodle/config.php
 
 $BIN_DIR/moodle_start
-
-docker cp $REPO_DIR/xapi_stmt_gen/create_xapi_records_processed.sql moodle-docker_db_1:/
-docker exec -it moodle-docker_db_1 psql -f create_xapi_records_processed.sql -U moodleuser moodle
