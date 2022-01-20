@@ -2,7 +2,7 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2022年1月1日
+:revdate: 2022年1月20日
 :revnumber: 3.0.0版
 :doctype: book
 :version-label:
@@ -151,31 +151,16 @@ image::learninglocker/new-xapi-store-client.png[align=center]
 const config = {
 …
   LRS:{
-    url:'http://<learning-locker-container-ip-address>:8081/data/xAPI/', // <1>
+    ...
     clients:{
       // LRS client
       'default':{
-        user:'<xapi-store-client-key>', // <2>
-        pass:'<xapi-store-client-secret>' // <2>
+        user:'<xapi-store-client-key>', // <1>
+        pass:'<xapi-store-client-secret>' // <1>
       },
 …
 ----
-<1> `LRS.url` はLearning Lockerのクライアント情報として表示される `xAPI Endpoint` とは異なる
-<2> <<learninglocker_client_settings>>で確認したLRSのクライアント情報を設定
-
-なお、 `<learning-locker-container-ip-address>` は以下の方法で確認することができる。
-
-----
-$ docker inspect learninglocker
-...
-        "NetworkSettings": {
-...
-            "Networks": {
-                "moodle-docker_default": {
-...
-                    "IPAddress": "xxx.xxx.xxx.xxx",
-...
-----
+<1> <<learninglocker_client_settings>>で確認したLRSのクライアント情報を設定
 
 設定ファイルの変更を `xapi_stmt_gen` コンテナに反映する。
 
