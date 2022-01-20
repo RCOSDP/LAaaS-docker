@@ -20,7 +20,7 @@ const config = {
     }
   },
   LRS:{
-    url:'http://172.18.0.9:8081/data/xAPI/',
+    url:'http://learninglocker:8081/data/xAPI/',
     clients:{
       // LRS client
       'default':{
