@@ -2,7 +2,7 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2022年1月20日
+:revdate: 2022年1月31日
 :revnumber: 3.1-SNAPSHOT版
 :doctype: book
 :version-label:
@@ -150,14 +150,12 @@ image::learninglocker/new-xapi-store-client.png[align=center]
 ----
 const config = {
 …
-  LRS:{
+  LRS: {
     ...
-    clients:{
-      // LRS client
-      'default':{
-        user:'<xapi-store-client-key>', // <1>
-        pass:'<xapi-store-client-secret>' // <1>
-      },
+    client: {
+      key: '<xapi-store-client-key>', // <1>
+      secret: '<xapi-store-client-secret>' // <1>
+    },
 …
 ----
 <1> <<learninglocker_client_settings>>で確認したLRSのクライアント情報を設定
