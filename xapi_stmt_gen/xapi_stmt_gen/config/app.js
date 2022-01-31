@@ -21,29 +21,13 @@ const config = {
     }
   },
   LRS:{
-    clients:{
-      // LRS client
-      'default':{
-        user:'031eb8dccd9729d6a8a16d245b4d1dddf1e2ded7',
-        pass:'a94fd8e44662fe7cd50cd53812dad84a4a81ab9b'
-      },
-      /**
-       * This 'scoped' setting can be used to send
-       * statements to separated LRSes based on ePPN in GakuNin.
-       */
-      //'scoped':[
-      //  {
-      //    scope:'foo.co.jp',
-      //    user:'dc052567a686bb93a7e2fb9547ed6f6974171e8b',
-      //    pass:'b0a3f0e04294c258cb3ce8bdbb55d24c6bad15f8'
-      //  },
-      //  {
-      //    scope:'bar.ac.jp',
-      //    user:'74abe7278e28aef9b5548d90700ee423e36c1fbb',
-      //    pass:'8a34c7f8433d51ede87f533afe672d6e357c8d37'
-      //  }
-      //]
-    }
+    // LRS client with 'Overall Scopes: API All' checked
+    client:{
+      key:'',
+      secret:''
+    },
+    // Store statements in each LRS with title matching actor's ePPN scope
+    ePPNScoped:false,
   },
   category:{
     id:'http://moodle.org',

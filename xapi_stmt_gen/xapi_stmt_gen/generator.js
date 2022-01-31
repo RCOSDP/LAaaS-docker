@@ -1017,40 +1017,48 @@ async function sendStatements(statements, lrs) {
   });
 }
 
-/**
- * Checks if LRSes are scoped.
- */
-function isScoped() {
-  if ('scoped' in config.LRS.clients) {
-    return true;
-  }
-  return false;
-}
+let LRS_CLIENTS;
 
 /**
- * Returns LRS settings found by scope.
+ * Returns LRS clients.
  */
-function getLRS(scope) {
-  let lrses = {};
-  if ('default' in config.LRS.clients) {
-    lrses['default'] = {
-      'auth':{
-        'username':config.LRS.clients.default.user,
-        'password':config.LRS.clients.default.pass
-      },
+async function getLRSClients() {
+  if (!(config.LRS.client.key && config.LRS.client.secret)) {
+    process.exitCode = 1;
+    throw new Error('Specify LRS client in config/app.js');
+  }
+  const clientResponse = await axios.get(`${config.url}:3000/api/v2/client`, {
+    'auth': {
+      'username':config.LRS.client.key,
+      'password':config.LRS.client.secret
+    }
+  }).catch(err => {
+    process.exitCode = 1;
+    throw new Error(`Failed to get LRS clients - ${err}`);
+  });
+  const lrsResponse = await axios.get(`${config.url}:3000/api/v2/lrs`, {
+    'auth': {
+      'username':config.LRS.client.key,
+      'password':config.LRS.client.secret
+    }
+  }).catch(err => {
+    process.exitCode = 1;
+    throw new Error(`Failed to get LRSes - ${err}`);
+  });
+  let clients = {}
+  lrsResponse.data.forEach((lrs) => {
+    const client = clientResponse.data.find(c => c.lrs_id === lrs._id)
+    const key = client.api.basic_key
+    const secret = client.api.basic_secret
+    const scope = (key === config.LRS.client.key && secret === config.LRS.client.secret) ? 'default' : lrs.title
+    clients[scope] = {
+      'auth': {
+        'username': key,
+        'password': secret
+      }
     };
-  }
-  if ('scoped' in config.LRS.clients) {
-    config.LRS.clients.scoped.forEach(client => {
-      lrses[client.scope] = {
-        'auth':{
-          'username':client.user,
-          'password':client.pass
-        },
-      };
-    });
-  }
-  return lrses[scope];
+  });
+  return clients;
 }
 
 /**
@@ -1067,7 +1075,7 @@ async function routeStatements(objecttable, xapis){
     const statements = xapis[scope].map((value, index, array) => {
       return value.statement;
     });
-    const lrs = getLRS(scope);
+    const lrs = LRS_CLIENTS[scope];
     const seq = objectids[0];
     logger.info(
       `[SEQ:${seq}][SCOPE:${scope}] Sending ${statements.length} statements...`
@@ -1109,7 +1117,7 @@ function getScopeFromEppn(username) {
  */
 function getLRSScope(userAttrs, userid) {
   let scope = 'default';
-  if (isScoped()) {
+  if (config.LRS.ePPNScoped) {
     scope = userid in userAttrs ? userAttrs[userid].scope : null;
     if (!scope) {
       logger.trace(
@@ -1117,7 +1125,7 @@ function getLRSScope(userAttrs, userid) {
         'an ePPN scope, sending the statement to the default LRS.'
       );
       scope = 'default';
-    } else if (!getLRS(scope)) {
+    } else if (!LRS_CLIENTS[scope]) {
       logger.trace(
         `LRS for ${scope} not found, ` +
         'sending the statement to the default LRS.'
@@ -3417,6 +3425,7 @@ async function translateStandardLogs(logs, userAttrs, courseNames){ // eslint-di
         );
         continue;
     }
+
     const scope = getLRSScope(userAttrs, log.userid);
     if (!(scope in xapis)) {
       xapis[scope] = [];
@@ -3683,10 +3692,7 @@ const waitForInterval = () => {
  * Processes logs until no more data exists.
  */
 module.exports = async function main() { // eslint-disable-line max-statements
-  if (!('default' in config.LRS.clients) && !('scoped' in config.LRS.clients)) {
-    process.exitCode = 1;
-    throw new Error('Specify LRS clients in config/app.js');
-  }
+  LRS_CLIENTS = await getLRSClients();
 
   // Retrieve all users
   const users = await USER.findAll({
