@@ -1007,7 +1007,7 @@ axios.defaults.httpAgent = new http.Agent({
 async function sendStatements(statements, lrs) {
   return axios({
     'method': 'POST',
-    'url': lrs.url + 'statements',
+    'url': `${config.url}:8081/data/xAPI/statements`,
     'auth': lrs.auth,
     'headers': {
       'Content-Type': 'application/json',
@@ -1034,7 +1034,6 @@ function getLRS(scope) {
   let lrses = {};
   if ('default' in config.LRS.clients) {
     lrses['default'] = {
-      'url':config.LRS.url,
       'auth':{
         'username':config.LRS.clients.default.user,
         'password':config.LRS.clients.default.pass
@@ -1044,7 +1043,6 @@ function getLRS(scope) {
   if ('scoped' in config.LRS.clients) {
     config.LRS.clients.scoped.forEach(client => {
       lrses[client.scope] = {
-        'url':config.LRS.url,
         'auth':{
           'username':client.user,
           'password':client.pass
@@ -1072,8 +1070,7 @@ async function routeStatements(objecttable, xapis){
     const lrs = getLRS(scope);
     const seq = objectids[0];
     logger.info(
-      `[SEQ:${seq}][SCOPE:${scope}] Sending ${statements.length} statements ` +
-      `to ${config.LRS.url}statements...`
+      `[SEQ:${seq}][SCOPE:${scope}] Sending ${statements.length} statements...`
     );
     const promise = sendStatements(statements, lrs).then(() => {
       logger.info(`[SEQ:${seq}][SCOPE:${scope}] ${statements.length} statements added.`);

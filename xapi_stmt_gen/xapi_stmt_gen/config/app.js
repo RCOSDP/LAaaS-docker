@@ -1,4 +1,5 @@
 const config = {
+  url: 'http://learninglocker',
   limit: 500,
   chunkSize: 100,
   db:{
@@ -20,7 +21,6 @@ const config = {
     }
   },
   LRS:{
-    url:'http://learninglocker:8081/data/xAPI/',
     clients:{
       // LRS client
       'default':{
