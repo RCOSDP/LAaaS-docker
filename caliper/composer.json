@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.3",
-        "illuminate/database": "6.4.*",
+        "illuminate/database": "6.20.*",
         "imsglobal/caliper": "1.2.0-beta",
         "laravel-zero/framework": "6.4.*"
     },
