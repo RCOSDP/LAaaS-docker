@@ -676,16 +676,16 @@
         },
         {
             "name": "imsglobal/caliper",
-            "version": "dev-develop",
+            "version": "1.2.0-beta",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IMSGlobal/caliper-php.git",
-                "reference": "05f5eab0fc7fd14af44a410f0b65aff1d0e02d0a"
+                "reference": "c7e34e230abc7bbb647f8f94245cb649f6191bcd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IMSGlobal/caliper-php/zipball/05f5eab0fc7fd14af44a410f0b65aff1d0e02d0a",
-                "reference": "05f5eab0fc7fd14af44a410f0b65aff1d0e02d0a",
+                "url": "https://api.github.com/repos/IMSGlobal/caliper-php/zipball/c7e34e230abc7bbb647f8f94245cb649f6191bcd",
+                "reference": "c7e34e230abc7bbb647f8f94245cb649f6191bcd",
                 "shasum": ""
             },
             "require": {
@@ -718,10 +718,10 @@
                 "caliper"
             ],
             "support": {
-                "source": "https://github.com/IMSGlobal/caliper-php/tree/develop",
+                "source": "https://github.com/IMSGlobal/caliper-php/tree/1.2.0-beta",
                 "issues": "https://github.com/IMSGlobal/caliper-php/issues"
             },
-            "time": "2019-02-12T20:33:46+00:00"
+            "time": "2020-01-22T19:01:21+00:00"
         },
         {
             "name": "jakub-onderka/php-console-color",

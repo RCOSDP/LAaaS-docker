@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Moodle\Event;
 use App\Sender;
-use Tests\TestCase as TestCase;
+use Tests\TestCase;
 
 use function App\Functions\compile;
 use function App\Functions\expand;
@@ -15,7 +15,7 @@ final class UserLoggedinTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        
+
         $this->app = $this->createApplication();
     }
 
@@ -60,14 +60,18 @@ final class UserLoggedinTest extends TestCase
         $product = compile($interProd);
         $this->assertEquals('App\Profiles\UserLoggedin', get_class($product));
 
-        return $product;
+        return [
+            $interProd,
+            $product
+        ];
     }
 
     /**
      * @depends testCanGetCompiler
      */
-    public function testShouldSetEventTimeAtCompiler($product)
+    public function testShouldSetEventTimeAtCompiler($dependValues)
     {
+        $product = $dependValues[1];
         $badTime = (new \DateTime())->setTimestamp(null);
 
         $this->assertNotEquals(
@@ -79,16 +83,111 @@ final class UserLoggedinTest extends TestCase
     /**
      * @depends testCanGetCompiler
      */
-    public function testEdappShouldNotBeNull($product)
+    public function testActionValues($dependValues)
     {
-        $this->assertNotNull($product->getEdApp());
+        $product = $dependValues[1];
+
+        $this->assertEquals(
+            $product->getAction()->getValue(),
+            'LoggedIn'
+        );
     }
 
     /**
      * @depends testCanGetCompiler
      */
-    public function testShouldBeRegistable($product)
+    public function testActorValues($dependValues)
     {
+        $interProd = $dependValues[0];
+        $product = $dependValues[1];
+
+        $this->assertEquals(
+            env('APP_URL')
+            . '/user/profile.php?id='
+            . $interProd->getActor()->id,
+            $product->getActor()->getId()
+        );
+        $this->assertEquals(
+            hash('sha256', $interProd->getActor()->username),
+            $product->getActor()->getName()
+        );
+        $this->assertEquals(
+            $interProd->getActor()->description,
+            $product->getActor()->getDescription()
+        );
+    }
+
+    /**
+     * @depends testCanGetCompiler
+     */
+    public function testObjectValues($dependValues)
+    {
+        $interProd = $dependValues[0];
+        $product = $dependValues[1];
+
+        $this->assertEquals(
+            env('APP_URL'),
+            $product->getObject()->getId()
+        );
+        $this->assertEquals(
+            $product->getObject()->getType(),
+            'SoftwareApplication'
+        );
+    }
+
+    /**
+     * @depends testCanGetCompiler
+     */
+    public function testEventTimeValues($dependValues)
+    {
+        $interProd = $dependValues[0];
+        $product = $dependValues[1];
+
+        $this->assertEquals(
+            date_format($interProd->getEventTime(), 'd/m/Y'),
+            date_format($product->getEventTime(), 'd/m/Y')
+        );
+    }
+
+    /**
+     * @depends testCanGetCompiler
+     */
+    public function testEdappValues($dependValues)
+    {
+        $interProd = $dependValues[0];
+        $product = $dependValues[1];
+
+        $this->assertNotNull($product->getEdApp());
+        $this->assertEquals(
+            $interProd->getEdapp()->id,
+            $product->getEdapp()->getId()
+        );
+        $this->assertEquals(
+            $interProd->getEdapp()->name,
+            $product->getEdapp()->getName()
+        );
+    }
+
+    /**
+     * @depends testCanGetCompiler
+     */
+    public function testGetOriginalUsername($dependValues)
+    {
+        $interProd = $dependValues[0];
+        $product = $dependValues[1];
+
+        $this->assertEquals(
+            $interProd->getActor()->username,
+            $product->getOriginalUsername()
+        );
+    }
+
+    /**
+     * @depends testCanGetCompiler
+     */
+    public function testShouldBeRegistable($dependValues)
+    {
+        $product = $dependValues[1];
         $sender = new Sender();
         try {
             $sender->send($product);

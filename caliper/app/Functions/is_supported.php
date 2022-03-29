@@ -18,7 +18,6 @@ if (!function_exists('is_supported')) {
             '\mod_chat\event\course_module_viewed',
             '\mod_choice\event\course_module_viewed',
             '\mod_data\event\course_module_viewed',
-            '\mod_facetoface\event\course_module_viewed',
             '\mod_feedback\event\course_module_viewed',
             '\mod_folder\event\course_module_viewed',
             '\mod_forum\event\subscription_created',
@@ -34,11 +33,13 @@ if (!function_exists('is_supported')) {
             '\mod_quiz\event\attempt_submitted',
             '\mod_quiz\event\course_module_viewed',
             '\mod_resource\event\course_module_viewed',
+            '\mod_scorm\event\scoreraw_submitted',
             '\mod_scorm\event\course_module_viewed',
             '\mod_survey\event\course_module_viewed',
             '\mod_url\event\course_module_viewed',
             '\mod_wiki\event\course_module_viewed',
             '\mod_workshop\event\course_module_viewed',
+            'cmi.core.total_time',
             ],
             true
         );

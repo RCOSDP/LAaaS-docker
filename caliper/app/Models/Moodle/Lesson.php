@@ -50,16 +50,17 @@ use App\Models\Moodle\MoodleBase;
  */
 class Lesson extends MoodleBase
 {
+    public const CREATED_AT = null;
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'lesson';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

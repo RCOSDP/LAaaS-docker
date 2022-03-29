@@ -21,16 +21,17 @@ use App\Models\Moodle\MoodleBase;
  */
 class Resource extends MoodleBase
 {
+    public const CREATED_AT = null;
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'resource';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

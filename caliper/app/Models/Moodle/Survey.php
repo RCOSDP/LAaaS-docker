@@ -8,7 +8,7 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $id
  * @property integer $course
  * @property integer $template
- * @property int $days
+ * @property integer $days
  * @property integer $timecreated
  * @property integer $timemodified
  * @property string $name
@@ -21,14 +21,14 @@ class Survey extends MoodleBase
 {
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'survey';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

@@ -17,18 +17,18 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $graceperiod
  * @property string $preferredbehaviour
  * @property integer $canredoquestions
- * @property int $attempts
+ * @property integer $attempts
  * @property integer $attemptonlast
  * @property integer $grademethod
  * @property integer $decimalpoints
  * @property integer $questiondecimalpoints
- * @property int $reviewattempt
- * @property int $reviewcorrectness
- * @property int $reviewmarks
- * @property int $reviewspecificfeedback
- * @property int $reviewgeneralfeedback
- * @property int $reviewrightanswer
- * @property int $reviewoverallfeedback
+ * @property integer $reviewattempt
+ * @property integer $reviewcorrectness
+ * @property integer $reviewmarks
+ * @property integer $reviewspecificfeedback
+ * @property integer $reviewgeneralfeedback
+ * @property integer $reviewrightanswer
+ * @property integer $reviewoverallfeedback
  * @property integer $questionsperpage
  * @property string $navmethod
  * @property integer $shuffleanswers
@@ -51,14 +51,14 @@ class Quiz extends MoodleBase
 {
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'quiz';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

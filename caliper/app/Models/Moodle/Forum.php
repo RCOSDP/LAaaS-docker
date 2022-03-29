@@ -25,25 +25,29 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $warnafter
  * @property integer $blockafter
  * @property integer $blockperiod
- * @property int $completiondiscussions
- * @property int $completionreplies
- * @property int $completionposts
+ * @property integer $completiondiscussions
+ * @property integer $completionreplies
+ * @property integer $completionposts
  * @property integer $displaywordcount
  * @property integer $lockdiscussionafter
+ * @property integer $duedate
+ * @property integer $cutoffdate
+ * @property integer $grade_forum
+ * @property integer $grade_forum_notify
  */
 class Forum extends MoodleBase
 {
-    const CREATED_AT = null;
+    public const CREATED_AT = null;
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'forum';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -75,7 +79,11 @@ class Forum extends MoodleBase
         'completionreplies',
         'completionposts',
         'displaywordcount',
-        'lockdiscussionafter'
+        'lockdiscussionafter',
+        'duedate',
+        'cutoffdate',
+        'grade_forum',
+        'grade_forum_notify'
     ];
 
     /**

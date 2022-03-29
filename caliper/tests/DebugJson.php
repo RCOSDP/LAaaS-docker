@@ -16,7 +16,7 @@ trait DebugJson
             ->setJsonEncodeOptions(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $dummySensor = (new Sensor('test'))
             ->registerClient('http', new Client('test', $option));
-        
+
         $http = new HttpRequestor($option);
         $envelope = $http->createEnvelope($dummySensor, $data);
         $json = $http->serializeData($envelope);

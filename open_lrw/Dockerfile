@@ -1,7 +1,17 @@
 FROM alpine/git AS src
 
+LABEL version="2.2.0"
+
 WORKDIR /app
-RUN git clone https://github.com/Apereo-Learning-Analytics-Initiative/OpenLRW.git
+RUN git clone -b develop https://github.com/udzuki/OpenLRW.git
+WORKDIR OpenLRW
+RUN git checkout 07d409d8b0803e0a29ab26014fb1676a4f446461
+WORKDIR /app
+RUN git clone -b develop https://github.com/udzuki/lai-event.git
+WORKDIR lai-event
+RUN git checkout 8b421d446a74cc186086d4a71a68481f65ae2452
+WORKDIR /app/OpenLRW
+RUN cp -r ../lai-event/src/main/java/org/apereo/openlrw/ src/main/java/org/apereo/openlrw/
 
 ### BUILD image
 # Modified from https://blog.pavelsklenar.com/spring-boot-run-and-build-in-docker/

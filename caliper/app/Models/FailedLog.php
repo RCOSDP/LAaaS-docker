@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -11,9 +12,9 @@ final class FailedLog extends Model
      * @property string $model
      * @property string $model_id
      */
-    const CREATED_AT = null;
-    const UPDATED_AT = null;
-    
+    public const CREATED_AT = null;
+    public const UPDATED_AT = null;
+
     protected $connection = 'log';
     protected $prefix = null;
 

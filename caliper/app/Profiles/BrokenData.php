@@ -24,7 +24,7 @@ final class BrokenData
 
     public function getMissingId(): string
     {
-        if ($this->missingId == []){
+        if ($this->missingId == []) {
             return 'null';
         } else {
             return $this->missingId[0];

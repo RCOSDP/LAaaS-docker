@@ -2,8 +2,8 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2020年10月12日
-:revnumber: 2.0.0版
+:revdate: 2021年7月29日
+:revnumber: 3.0.0版
 :doctype: book
 :version-label:
 :chapter-label:
@@ -41,8 +41,8 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 |8     |`v-current`       | ビデオの現在位置                  |○                      |
 |9     |`u-ip`            | ユーザーのIP                      |×                      |
 |10    |`u-user-agent`    | ユーザーのUser Agent              |×                      |
-|11    |`m-referrer`      | Moodleのどこからアクセスしてきたか|○                      |LTI対応マイクロコンテンツの場合はURL形式でないため、 `https://lms.nii.ac.jp/{m-course-id}/{m-referrer}` の形式に変換する。なお、URLに含む `m-course-id` および `m-referrer` からは `lms.nii.ac.jp:` を除外する。
-|12    |`m-user-id`       | MoodleのユーザID                  |○                      |LTI対応マイクロコンテンツの場合は文字列 `lms.nii.ac.jp:` を除去する。
+|11    |`m-referrer`      | Moodleのどこからアクセスしてきたか|○                      |LTI対応マイクロコンテンツの場合はURL形式でないため、 `https://{lms-domain}/{m-course-id}/{m-referrer}` の形式に変換する。なお、URLに含む `m-course-id` および `m-referrer` からは `{lms-domain}:` を除外する。
+|12    |`m-user-id`       | MoodleのユーザID                  |○                      |LTI対応マイクロコンテンツの場合は文字列 `{lms-domain}:` を除去する。
 |13    |`m-course-id`     | MoodleのコースID                  |○                   .3+|LTI対応マイクロコンテンツの場合のみ有意な値を含む
 |14    |`nonce`           | Nonce                             |×
 |15    |`videoplayerlog`  | 'videoplayerlog'                  |×
@@ -111,7 +111,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 },
 "object": {
   "objectType": "Activity",
-  "id": "https://lms.nii.ac.jp/pluginfile.php/1439/mod_resource/content/6/index.html",
+  "id": "https://example.com/pluginfile.php/1439/mod_resource/content/6/index.html",
   "definition": {
     "type": "http://adlnet.gov/expapi/activities/media",
     "name": {
@@ -217,8 +217,8 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 |8     |`v-current`       | ビデオの現在位置                  |○                      |
 |9     |`u-ip`            | ユーザーのIP                      |×                      |
 |10    |`u-user-agent`    | ユーザーのUser Agent              |×                      |
-|11    |`m-referrer`      | Moodleのどこからアクセスしてきたか|○                      |LTI対応マイクロコンテンツの場合はURL形式でないため、 `https://lms.nii.ac.jp/{m-course-id}/{m-referrer}` の形式に変換する。なお、URLに含む `m-course-id` および `m-referrer` からは `lms.nii.ac.jp:` を除外する。
-|12    |`m-user-id`       | MoodleのユーザID                  |○                      |LTI対応マイクロコンテンツの場合は文字列 `lms.nii.ac.jp:` を除去する。
+|11    |`m-referrer`      | Moodleのどこからアクセスしてきたか|○                      |LTI対応マイクロコンテンツの場合はURL形式でないため、 `https://{lms-domain}/{m-course-id}/{m-referrer}` の形式に変換する。なお、URLに含む `m-course-id` および `m-referrer` からは `{lms-domain}:` を除外する。
+|12    |`m-user-id`       | MoodleのユーザID                  |○                      |LTI対応マイクロコンテンツの場合は文字列 `{lms-domain}:` を除去する。
 |13    |`m-course-id`     | MoodleのコースID                  |○                   .3+|LTI対応マイクロコンテンツの場合のみ有意な値を含む
 |14    |`nonce`           | Nonce                             |○
 |15    |`videoplayerlog`  | 'videoplayerlog'                  |○
@@ -239,7 +239,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 ----
 {
   "_id" : "urn:uuid:a8d0ac3a-5dab-44fe-b1f2-80e45212a241",
-  "context" : "http://purl.imsglobal.org/ctx/caliper/v1p1",
+  "context" : "http://purl.imsglobal.org/ctx/caliper/v1p2",
   "type" : "MediaEvent",
   "agent" : {
     "_id" : "716",
@@ -249,7 +249,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
   },
   "action" : "Started",
   "object" : {
-    "_id" : "https://lms.nii.ac.jp/51/2",
+    "_id" : "https://example.com/51/2",
     "type" : "VideoObject",
     "name" : "sample.mp4",
     "extensions" : {
@@ -259,7 +259,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
     }
   },
   "target" : {
-    "_id" : "https://lms.nii.ac.jp/51/2",
+    "_id" : "https://example.com/51/2",
     "type" : "MediaLocation",
     "currentTime" : "PT0.0S"
   },

@@ -25,9 +25,10 @@ use App\Models\Moodle\MoodleBase;
  */
 class Feedback extends MoodleBase
 {
+    public const CREATED_AT = null;
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

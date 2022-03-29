@@ -15,9 +15,9 @@ use App\Models\Moodle\MoodleBase;
  * @property integer $timeavailableto
  * @property integer $timeviewfrom
  * @property integer $timeviewto
- * @property int $requiredentries
- * @property int $requiredentriestoview
- * @property int $maxentries
+ * @property integer $requiredentries
+ * @property integer $requiredentriestoview
+ * @property integer $maxentries
  * @property integer $rssarticles
  * @property string $singletemplate
  * @property string $listtemplate
@@ -45,9 +45,10 @@ use App\Models\Moodle\MoodleBase;
  */
 class Data extends MoodleBase
 {
+    public const CREATED_AT = null;
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

@@ -2,30 +2,28 @@
 
 namespace App\Translator;
 
-use App\Models\Moodle;
+use App\Models\Moodle\{
+    Course,
+    Event,
+    User,
+};
 
 final class CourseViewed extends Translator
 {
-    public function __construct(Moodle\Event $event)
+    public function __construct(Event $event)
     {
         $this->actor = $this->getUser($event->userid);
         $this->object = $this->getCourse($event->courseid);
-        $this->courseCategory = $this->getCourseCategory($this->object->category ?? 'null');
         $this->eventTime = $event->timecreated->timestamp;
     }
 
-    public function getActor(): Moodle\User
+    public function getActor(): User
     {
         return $this->actor;
     }
 
-    public function getObject(): Moodle\Course
+    public function getObject(): Course
     {
         return $this->object;
-    }
-
-    public function getCategory(): string
-    {
-        return $this->courseCategory;
     }
 }

@@ -3,19 +3,18 @@
 namespace App\Translator;
 
 use App\Models\Moodle\{
-        Event,
-        Forum,
-        User,
-        Course,
-    };
+    Course,
+    Event,
+    Forum,
+    User,
+};
 
 final class SubscriptionCreated extends Translator
 {
     public function __construct(Event $event)
     {
-        $this->object = $this->getModule($event->objecttable, $event->objectid);
-        $this->actor = $this->getUser($this->object->userid);
-        $this->forum = $this->getModule('forum', $this->object->forum);
+        $this->actor = $this->getUser($event->userid);
+        $this->object = $this->getModule('forum', intval(unserialize($event->other)['forumid']));
         $this->eventTime = $event->timecreated->timestamp;
         $this->course = $this->getCourse($event->courseid);
     }
@@ -27,11 +26,19 @@ final class SubscriptionCreated extends Translator
 
     public function getObject(): Forum
     {
-        return $this->forum;
+        return $this->object;
     }
 
-    public function getPartOf(): course
+    public function getPartOf(): Course
     {
         return $this->course;
+    }
+
+    public function getObjectId(): string
+    {
+        return env('APP_URL')
+               . '/mod/forum/subscribers.php?id='
+               . $this->object->id
+               . '&edit=on';
     }
 }

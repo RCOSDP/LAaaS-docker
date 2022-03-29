@@ -2,8 +2,8 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2020年10月12日
-:revnumber: 2.0.0版
+:revdate: 2022年1月20日
+:revnumber: 3.0.0版
 :doctype: book
 :version-label:
 :chapter-label:
@@ -39,7 +39,6 @@ $ git clone https://github.com/RCOSDP/LAaaS-docker.git
 * `moodle-docker` の設定で `MOODLE_DOCKER_DBUSER` および `POSTGRES_USER` を `moodleuser` に変更( `moodle-docker/base.yml` )
 * Moodleの設定でMoodleデータベースのテーブル名に付与する接頭辞を `mdl_` に変更( `moodle-docker/moodle/config.php` )
 * Moodleのコンテナ群を起動
-* xAPIステートメント変換スクリプトでイベントの処理状況を管理するためのテーブル( `xapi_records_processed` )を作成
 
 ----
 $ cd LAaaS-docker
@@ -69,18 +68,19 @@ image::moodle.png[align=center]
 次のコンテナを起動する。
 
 |===
-   |項目                  |名称                     |コンテナ名
-.5+|学習活動のデータストア|Learning Locker(Web)     |learninglocker
-                       .2+|Learning Locker(DB)      |learninglocker_mongo
-                                                    |learninglocker_redis
-                          |OpenLRW(Web)             |openlrw_web
-                          |OpenLRW(DB)              |openlrw_mongo
-.3+|ステートメント変換     |xAPIステートメント変換   |xapi_stmt_gen
-                          |Caliperステートメント変換          |caliper_stmt_gen
-                          |Caliperステートメント変換(db)   |caliper_log_db
-.4+|分析システム          |Superset(Web)              |superset
-                          |Superset(DB)             |superset_db
-                          |JupyterHub(Web/DB)       |jupyterhub
+   |項目                  |名称                          |コンテナ名
+.5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
+                       .2+|Learning Locker(DB)           |learninglocker_mongo
+                                                         |learninglocker_redis
+                          |OpenLRW(Web)                  |openlrw_web
+                          |OpenLRW(DB)                   |openlrw_mongo
+.4+|ステートメント変換    |xAPIステートメント変換        |xapi_stmt_gen
+                          |Caliperステートメント変換     |caliper_stmt_gen
+                          |Caliperステートメント変換(db) |caliper_log_db
+                          |Learning Analytics DB         |learning_analytics_db
+.3+|分析システム          |Superset(Web)                 |superset
+                          |Superset(DB)                  |superset-db
+                          |JupyterHub(Web/DB)            |jupyterhub
 |===
 
 ----
@@ -137,50 +137,36 @@ image::learninglocker/add-new-lrs.png[align=center]
 [[learninglocker_client_settings]]
 ==== クライアント情報の設定
 サイドメニューの `Settings>Clients` から `New xAPI store client` を選択する。
-`Overall Scopes` の `All` にチェックを入れ、LRSとして事前に作成したLRSを指定する。
+`Overall Scopes` の `API All` にチェックを入れ、 `LRS (optional)` に上記で作成したLRSを指定する。
 
 image::learninglocker/new-xapi-store-client.png[align=center]
 
 <<<
 === xAPIステートメント変換スクリプトの設定
-`xapi_stmt_gen` コンテナに接続する。
-
-----
-$ docker exec -it xapi_stmt_gen bash
-----
-
 スクリプトの設定ファイルを編集する。
 
-./usr/local/src/xapi_stmt_gen/config/app.js
+.xapi_stmt_gen/xapi_stmt_gen/config/app.js
 [source, javascript]
 ----
 const config = {
 …
   LRS:{
-    url:'http://<learning-locker-container-ip-address>:8081/data/xAPI/', // <1>
+    ...
     clients:{
       // LRS client
       'default':{
-        user:'<xapi-store-client-key>', // <2>
-        pass:'<xapi-store-client-secret>' // <2>
+        user:'<xapi-store-client-key>', // <1>
+        pass:'<xapi-store-client-secret>' // <1>
       },
 …
 ----
-<1> `LRS.url` はLearning Lockerのクライアント情報として表示される `xAPI Endpoint` とは異なる
-<2> <<learninglocker_client_settings>>で確認したLRSのクライアント情報を設定
+<1> <<learninglocker_client_settings>>で確認したLRSのクライアント情報を設定
 
-なお、 `<learning-locker-container-ip-address>` は以下の方法で確認することができる。
+設定ファイルの変更を `xapi_stmt_gen` コンテナに反映する。
 
 ----
-$ docker inspect learninglocker
-...
-        "NetworkSettings": {
-...
-            "Networks": {
-                "moodle-docker_default": {
-...
-                    "IPAddress": "xxx.xxx.xxx.xxx",
-...
+$ docker-compose build xapi_stmt_gen
+$ docker-compose up -d xapi_stmt_gen
 ----
 
 <<<
@@ -198,13 +184,13 @@ image::learninglocker/source.png[align=center]
 なお、Moodleログの処理済み件数を算出する場合は以下のコマンドを実行する。
 
 ----
-$ docker exec -it moodle-docker_db_1 psql -U moodleuser moodle -c "SELECT count(*) FROM xapi_records_processed;"
+$ docker exec -it learning_analytics_db psql -U learning_analytics learning_analytics -c "SELECT count(*) FROM xapi_records_processed;"
 ----
 
 また、スクリプトのバージョンアップ等に伴い処理済みのMoodleログを再度処理したい場合は、以下のコマンドで変換処理の実行履歴を削除する。
 
 ----
-$ docker exec -it moodle-docker_db_1 psql -U moodleuser moodle -c "DELETE FROM xapi_records_processed;"
+$ docker exec -it learning_analytics_db psql -U learning_analytics learning_analytics -c "DELETE FROM xapi_records_processed;"
 ----
 
 <<<
@@ -328,6 +314,13 @@ $ docker-compose exec openlrw_mongo bash
 
 <<<
 === Supersetの設定
+==== データベースの初期設定
+以下のコマンドを実行し、データベースの初期設定を行う。
+
+----
+$ docker-compose exec superset /init.sh
+----
+
 ==== ログイン
 Superset( http://localhost:8088 )にアクセスし、Adminユーザでログインする（Username: `admin` 、Password: `admin` ）。
 
@@ -353,7 +346,7 @@ image::superset/xapi/list-databases.png[align=center]
 [%noheader, cols="1,3"]
 |===
 |Databases        |learninglocker
-|SQLAlchemy URI   |postgresql://postgres@superset_db:5432/learninglocker
+|SQLAlchemy URI   |postgresql://postgres@superset-db:5432/learninglocker
 |Expose in SQL Lab|チェック
 |===
 
@@ -395,6 +388,17 @@ image::superset/xapi/added-xapi-statements.png[align=center]
 <<<
 `xapi_statements` テーブルを選択し、Learning Lockerに登録済みのステートメント件数が取得できることを確認する。
 
+.xAPIステートメントの件数をカウントする例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+   |Datasource & Chart Type  |Visualization Type |`Table View`
+.3+|Time                     |Time Column        |`stored`
+                             |Since              |`∞` (指定なし)
+                             |Until              |`∞` (指定なし)
+   |GROUP BY                 |Metric             |`COUNT(*)`
+|===
+
 image::superset/xapi/count-xapi-statements.png[align=center]
 
 <<<
@@ -412,7 +416,7 @@ image::superset/caliper/list-databases.png[align=center]
 [%noheader, cols="1,3"]
 |===
 |Database         |openlrw
-|SQLAlchemy URI   |postgresql://postgres@superset_db:5432/openlrw
+|SQLAlchemy URI   |postgresql://postgres@superset-db:5432/openlrw
 |Expose in SQL Lab|チェック
 |===
 
@@ -453,6 +457,17 @@ image::superset/caliper/added-caliper-statements.png[align=center]
 
 <<<
 `caliper_statements` テーブルを選択し、OpenLRWに登録済みのステートメント件数が取得できることを確認する。
+
+.Caliperステートメントの件数をカウントする例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+   |Datasource & Chart Type  |Visualization Type |`Table View`
+.3+|Time                     |Time Column        |`event.eventTime`
+                             |Since              |`∞` (指定なし)
+                             |Until              |`∞` (指定なし)
+   |GROUP BY                 |Metric             |`COUNT(*)`
+|===
 
 image::superset/caliper/count-caliper-statements.png[align=center]
 
@@ -505,10 +520,10 @@ JupyterHubにログインし、ノートブック「link:jupyterhub/notebooks/im
 image::jupyterhub/import-analysis-result-to-superset.png[align=center]
 
 <<<
-`superset_db` コンテナ上に登録された分析結果は以下のコマンドで参照することができる。
+`superset-db` コンテナ上に登録された分析結果は以下のコマンドで参照することができる。
 
 ----
-$ docker exec -it superset_db psql jupyter -c "SELECT * FROM <tablename>;"
+$ docker exec -it superset-db psql jupyter -c "SELECT * FROM <tablename>;"
 
 index | object.definition.description.en |object.id            | timestamp
 --------+--------------------------------------------+------------------------------+---------------------------
@@ -523,7 +538,7 @@ Superset上で上記テーブルが格納されたjupyterデータベースを�
 [%noheader, cols="1,3"]
 |===
 |Database         |jupyter
-|SQLAlchemy URI   |postgresql://postgres@superset_db:5432/jupyter
+|SQLAlchemy URI   |postgresql://postgres@superset-db:5432/jupyter
 |Expose in SQL Lab|チェック
 |===
 
@@ -541,11 +556,23 @@ image::superset/jupyter/add-jupyter-analysis-result.png[align=center]
 
 image::superset/jupyter/added-jupyter-analysis-result.png[align=center]
 
-グループ列、フィルター列、時刻列の指定などはテーブルの設定から必要に応じて行うこと。
+グループ列、フィルター列、時刻列の指定などはテーブルの設定(テーブル名左横の `Edit record` から `List Columns` タブを選択)から必要に応じて行うこと。
 
 image::superset/jupyter/edit-jupyter-analysis-result.png[align=center]
 
 <<<
 JupyterHubで加工したステートメントが可視化できることを確認すること。
 
-image::superset/jupyter/visualize-jupyter-analysis-result.png[align=center]
+.ノートブックの実行結果を可視化する例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+   |Datasource & Chart Type  |Visualization Type |`Distribution - Bar Chart`
+.3+|Time                     |Time Column        |`timestamp`
+                             |Since              |`∞` (指定なし)
+                             |Until              |`∞` (指定なし)
+.2+|Query                    |Metric             |`COUNT(*)`
+                             |Series             |`object.id`
+|===
+
+image::superset/jupyter/visualize-jupyter-analysis-result.png[align=center, scaledwidth=90%]

@@ -3,7 +3,7 @@
 const config = require('../config/app');
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define(config.db.prefix + 'quiz_attempts', {
+  return sequelize.define(config.db.lms.prefix + 'quiz_attempts', {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
@@ -79,7 +79,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: config.db.prefix + 'quiz_attempts',
+    tableName: config.db.lms.prefix + 'quiz_attempts',
     timestamps: false
   });
 };

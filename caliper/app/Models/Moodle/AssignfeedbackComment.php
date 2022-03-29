@@ -13,11 +13,11 @@ use App\Models\Moodle\MoodleBase;
  */
 class AssignfeedbackComment extends MoodleBase
 {
-    const CREATED_AT = null;
-    const UPDATED_AT = null;
+    public const CREATED_AT = null;
+    public const UPDATED_AT = null;
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';

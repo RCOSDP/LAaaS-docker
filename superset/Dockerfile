@@ -1,5 +1,7 @@
 FROM centos:centos7
 
+LABEL version="2.1.1"
+
 RUN yum update -y && \
     yum install -y https://repo.ius.io/ius-release-el7.rpm && \
     yum install -y \
@@ -21,10 +23,19 @@ RUN yum update -y && \
 
 COPY requirements.txt .
 RUN . venv/bin/activate && \
-    pip install --upgrade setuptools pip && \
-    pip install -r requirements.txt && \
-    export LANG=en_US.utf-8 && \
-    fabmanager create-admin --app superset --username admin --firstname admin --lastname user --email admin@fab.org --password admin && \
-    superset db upgrade && \
-    superset load_examples && \
-    superset init
+    # TODO: Dependency issues exist. Use pip 19 to ignore them for now.
+    pip install --upgrade setuptools==57.5.0 pip==19.3.1 && \
+    pip install -r requirements.txt
+
+ENV LANG en_US.utf-8
+ENV PATH /venv/bin/:$PATH
+ENV PYTHONPATH /root/.superset
+COPY superset_config.py /root/.superset/
+
+COPY wait-for-it.sh /wait-for-it.sh
+COPY entrypoint.sh /entrypoint.sh
+COPY init.sh /init.sh
+
+RUN chmod +x /wait-for-it.sh /entrypoint.sh /init.sh
+
+ENTRYPOINT ["/wait-for-it.sh", "-t", "0", "superset-db:5432", "--", "/entrypoint.sh"]

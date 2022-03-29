@@ -1,17 +1,12 @@
-FROM continuumio/anaconda3
+# See https://docs.anaconda.com/anaconda/reference/release-notes/#anaconda-2019-10-october-15-2019
+FROM continuumio/anaconda3:2019.10
 
+LABEL version="2.2.0"
 
-# Install R
-RUN apt-get update && \
-    apt-get install -y r-base
-
-# Install JupyterHub with Python 2, 3, and R
-RUN conda create -y -n py3 python=3 anaconda && \
-    conda create -y -n py2 python=2 anaconda && \
-    /bin/bash -c "source activate py2 && ipython kernel install && pip install pymongo" && \
-    /bin/bash -c "source activate py3 && ipython kernel install && conda install -y -c conda-forge jupyterhub && conda install -c r r-irkernel && conda install -c anaconda psycopg2 && pip install pymongo" && \
-    # Create the first jupyterhub user
-    useradd -m -p $(echo "jupyter" | openssl passwd -1 -stdin) -s /bin/bash jupyter
+RUN conda install -y -c conda-forge jupyterhub=0.9.6
+RUN conda install -y -c r r-irkernel=0.8.15  # Install R
+RUN conda install -y psycopg2=2.8.4
+RUN useradd -m -p $(echo "jupyter" | openssl passwd -1 -stdin) -s /bin/bash jupyter
 
 # Copy sample notebooks
 COPY notebooks/*.ipynb /home/jupyter/
@@ -19,4 +14,4 @@ RUN chown jupyter:jupyter /home/jupyter/*.ipynb
 
 EXPOSE 8000
 
-CMD /bin/bash -c "source activate py3 && jupyterhub --no-ssl --Spawner.args=\"['--NotebookApp.iopub_data_rate_limit=1.0e10']\""
+CMD jupyterhub --no-ssl --Spawner.args="['--NotebookApp.iopub_data_rate_limit=1.0e10']"

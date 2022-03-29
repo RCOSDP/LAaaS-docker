@@ -3,21 +3,20 @@
 namespace App;
 
 use IMSGlobal\Caliper\{
-        Client,
-        Options,
-        Sensor,
+    Client,
+    Options,
+    Sensor,
 };
-use IMSGlobal\Caliper\events\Event;
 
 use function App\Functions\get_lrs;
 
 final class Sender
 {
-    public static function send(Event $event): void
+    public static function send($event): void
     {
         $option = (new Options())
                     ->setDebug(!config('production'))
-                    ->setApiKey(get_lrs($event->getActor()->getName()))
+                    ->setApiKey(get_lrs($event->getOriginalUsername()))
                     ->setHost(env('OPENLRW_HOST'))
                     ->setJsonEncodeOptions(JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $sensor = (new Sensor('NII-RCOS'))
