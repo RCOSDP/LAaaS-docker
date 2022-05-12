@@ -1,6 +1,6 @@
 FROM centos:centos7
 
-LABEL version="2.3.1"
+LABEL version="2.3.2"
 
 # Install dependencies
 RUN yum update -y && \
@@ -17,8 +17,8 @@ RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py -o get-pip.py && \
     python get-pip.py
 
 # Install PostgreSQL 9.6
-RUN yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
-    yum install -y \
+COPY pgdg-96.repo /etc/yum.repos.d/
+RUN yum install -y \
       postgresql96-contrib \
       postgresql96-devel \
       postgresql96-server
