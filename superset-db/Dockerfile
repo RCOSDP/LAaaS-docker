@@ -1,6 +1,6 @@
 FROM centos:centos7
 
-LABEL version="2.3.2"
+LABEL version="2.3.3"
 
 # Install dependencies
 RUN yum update -y && \

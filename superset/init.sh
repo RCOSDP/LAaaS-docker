@@ -15,5 +15,4 @@ fabmanager create-admin \
   --email $EMAIL \
   --password $PASSWORD
 superset db upgrade
-superset load_examples
 superset init
