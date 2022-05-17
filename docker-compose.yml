@@ -130,6 +130,8 @@ services:
     container_name: jupyterhub
     ports:
       - "8001:8000"
+    volumes:
+      - ./jupyterhub/notebooks:/home/jupyter
 networks:
   default:
     external:
