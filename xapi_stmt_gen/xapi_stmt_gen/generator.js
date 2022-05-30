@@ -3546,6 +3546,9 @@ async function findLogs(limit){
     where: {
       id: {
         [Op.gt]: lastLogProcessed ? lastLogProcessed.objectid : -1
+      },
+      origin: {
+        [Op.notIn]: config.filter.logstoreStandardLog.origin.exclude
       }
     },
     order: [['id', 'ASC']],
