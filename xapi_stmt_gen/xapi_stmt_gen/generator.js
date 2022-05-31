@@ -3530,8 +3530,9 @@ async function translateScoTracks(tracks, userAttrs, courseNames){ // eslint-dis
 /**
  * Selects limited number of standard logs.
  * @param {number} limit - limit value
+ * @param {Array.<string>} originNotIn - origins to be excluded
  */
-async function findLogs(limit){
+async function findLogs(limit, originNotIn = []){
   const lastLogProcessed = await XAPI_RECORDS_PROCESSED.findOne({
     where: {objecttable: 'logstore_standard_log'},
     attributes: ['objectid'],
@@ -3546,6 +3547,9 @@ async function findLogs(limit){
     where: {
       id: {
         [Op.gt]: lastLogProcessed ? lastLogProcessed.objectid : -1
+      },
+      origin: {
+        [Op.notIn]: originNotIn
       }
     },
     order: [['id', 'ASC']],
@@ -3764,8 +3768,9 @@ module.exports = async function main() { // eslint-disable-line max-statements
   // Iterate logstore_standard_logs to be processed
   const limit = 'limit' in config ? config.limit : 500;
   const chunkSize = 'chunkSize' in config ? config.chunkSize : 100;
+  const originNotIn = config.filter.logstoreStandardLog.origin.exclude;
   while (true){
-    let logs = await findLogs(limit);
+    let logs = await findLogs(limit, originNotIn);
     if (logs.length === 0) {
       logger.info(
         'Finished logstore_standard_logs translation.'

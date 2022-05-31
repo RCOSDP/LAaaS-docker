@@ -2,6 +2,14 @@ const config = {
   url: 'http://learninglocker',
   limit: 500,
   chunkSize: 100,
+  filter: {
+    logstoreStandardLog: {
+      origin: {
+        // Specify origins(e.g. 'cli') to be excluded
+        exclude: []
+      }
+    }
+  },
   db: {
     // LMS database connection settings
     lms: {
