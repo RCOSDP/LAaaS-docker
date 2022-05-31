@@ -5,6 +5,7 @@ const config = {
   filter: {
     logstoreStandardLog: {
       origin: {
+        // Specify origins(e.g. 'cli') to be excluded
         exclude: []
       }
     }
