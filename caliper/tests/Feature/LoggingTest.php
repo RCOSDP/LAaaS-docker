@@ -23,7 +23,7 @@ final class LoggingTest extends TestCase
                 'id' => 1,
                 'translated' => 13,
                 'failed' => 1,
-                'last_id' => 15,
+                'last_id' => 17,
             ],
             'log'
         );

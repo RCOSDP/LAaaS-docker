@@ -10,7 +10,8 @@ class EventSeeder extends Seeder
         int $uid = 1,
         string $oTable = null,
         int $oId = null,
-        string $other = null
+        string $other = null,
+        string $origin = null
     ): array {
         return [
             'eventname' => $eventname,
@@ -29,7 +30,8 @@ class EventSeeder extends Seeder
             'relateduserid' => 1,
             'other' => $other,
             'timecreated' => time(),
-            'ip' => '127.0.0.1'
+            'ip' => '127.0.0.1',
+            'origin' => $origin
         ];
     }
 
@@ -76,5 +78,7 @@ class EventSeeder extends Seeder
         Event::create($this->event_factory('\core\event\dashboard_viewed'));
         Event::create($this->event_factory('\core\event\user_loggedin', 1, 'user', 1));
         Event::create($this->event_factory('\core\event\user_loggedout', 1, 'user', 1));
+        Event::create($this->event_factory('\core\event\course_viewed', 1, 'user', 1, null, 'origin1'));
+        Event::create($this->event_factory('\core\event\course_viewed', 1, 'user', 1, null, 'origin2'));
     }
 }
