@@ -87,7 +87,8 @@ class Event extends MoodleBase
             'courseid',
             'relateduserid',
             'other',
-            'timecreated'
+            'timecreated',
+            'origin'
         ]);
     }
 }

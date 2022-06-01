@@ -37,6 +37,8 @@ final class Generate extends Command
     private function translateEvent()
     {
         $eventCount = env('EVENT_COUNT', 10000);
+        $excludedOriginsStr = env('EXCLUDED_ORIGINS', '');
+        $excludedOrigins = $excludedOriginsStr === '' ? [] : explode(',', $excludedOriginsStr);
 
         $executionLog = new ExecutionLog();
         $failedLog = new FailedLog();
@@ -67,6 +69,9 @@ final class Generate extends Command
             $target = $all
                         ->reject(function ($event) {
                             return $event->userid === 0;
+                        })
+                        ->filter(function ($event) use ($excludedOrigins) {
+                            return !in_array($event->origin, $excludedOrigins);
                         })
                         ->filter(function ($event) {
                             return is_supported($event->eventname);
