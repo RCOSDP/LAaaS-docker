@@ -37,7 +37,7 @@ COPY --from=src /app/OpenLRW/src /build/src
 # Build application
 RUN mvn package
 
-FROM openjdk:8-slim as runtime
+FROM openjdk:8-slim-buster as runtime
 EXPOSE 9966
 
 ENV APP_HOME /app
