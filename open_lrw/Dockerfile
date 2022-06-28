@@ -42,6 +42,7 @@ EXPOSE 9966
 
 ENV APP_HOME /app
 
+RUN apt-get update && apt-get -y upgrade
 # Create base app folder
 RUN mkdir $APP_HOME
 # Create folder to save configuration files
