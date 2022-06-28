@@ -1,6 +1,6 @@
 FROM alpine/git AS src
 
-LABEL version="2.2.0"
+LABEL version="2.3.0"
 
 WORKDIR /app
 RUN git clone -b develop https://github.com/udzuki/OpenLRW.git
