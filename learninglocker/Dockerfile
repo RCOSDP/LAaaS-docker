@@ -1,7 +1,7 @@
 # Consult http://docs.learninglocker.net/guides-custom-installation/
 FROM centos:centos7
 
-LABEL version="2.0.0"
+LABEL version="2.0.1"
 
 SHELL ["/bin/bash", "-c"]
 RUN yum update -y && \
@@ -11,7 +11,7 @@ RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh
     source ~/.bashrc && \
     nvm install 8.15.1 && \
     npm install -g yarn && \
-    npm install -g pm2 && \
+    npm install -g pm2@4 && \
     pm2 install pm2-logrotate && \
     pm2 set pm2-logrotate:compress true
 
