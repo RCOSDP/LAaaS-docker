@@ -2,7 +2,7 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2022年1月31日
+:revdate: 2022年7月27日
 :revnumber: 3.1-SNAPSHOT版
 :doctype: book
 :version-label:
@@ -22,8 +22,8 @@
 = ラーニングアナリティクス基盤システム Docker 環境構築手順書
 
 == 前提
-* Docker version 18.09.2
-* Docker compose version 1.23.2
+* Docker
+* Docker Compose
 
 == LAaaS-dockerのインストール
 
