@@ -1,13 +1,5 @@
 **/.idea/*
 **/vendor/*
-moodle.sql
 **/.vscode/*
-/learninglocker/mongo_data/*
-/learninglocker/redis_data/*
-caliper_log/data/*
-open_lrw/data/*
 xapi_stmt_gen/log/*
-learning_analytics_db/data/*
-superset-db/data/*
-metabase/*
 **/.DS_Store
