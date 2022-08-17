@@ -2,7 +2,7 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2022年7月27日
+:revdate: 2022年8月17日
 :revnumber: 3.1-SNAPSHOT版
 :doctype: book
 :version-label:
@@ -18,6 +18,13 @@
 :sectnums:
 :imagesdir: images
 :icons: font
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
 = ラーニングアナリティクス基盤システム Docker 環境構築手順書
 
@@ -479,6 +486,27 @@ image::jupyterhub/signin.png[align=center, scaledwidth=50%]
 ノートブック一覧が表示されることを確認する。
 
 image::jupyterhub/notebooks.png[align=center]
+
+[WARNING]
+====
+Linux環境において、マウントしたホームディレクトリ（ `/home/jupyter` ）の所有者が適切に設定されず、権限エラーが発生する場合がある。
+
+----
+PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
+----
+
+本問題が生じた場合には、実行ユーザのUID/GIDを以下の環境変数で指定し、コンテナを再起動すること。
+
+.docker-compose.yml
+[source, diff]
+----
+  jupyterhub:
+    ...
+    environment:
+      - LOCAL_UID=<uid> # id -u
+      - LOCAL_GID=<gid> # id -g
+----
+====
 
 <<<
 ==== Learning Lockerからステートメントを取得
