@@ -128,6 +128,9 @@ services:
   jupyterhub:
     build: jupyterhub
     container_name: jupyterhub
+    #environment:
+    #  - LOCAL_UID=9001
+    #  - LOCAL_GID=9001
     ports:
       - "8001:8000"
     volumes:
