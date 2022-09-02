@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-psql << EOF
+psql -p $1 << EOF
 /* Create database used to store Superset users, etc. */
 CREATE DATABASE superset;
 

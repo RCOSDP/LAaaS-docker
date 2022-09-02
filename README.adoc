@@ -2,8 +2,8 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2022年1月20日
-:revnumber: 3.0.0版
+:revdate: 2022年8月17日
+:revnumber: 3.1.0版
 :doctype: book
 :version-label:
 :chapter-label:
@@ -18,12 +18,19 @@
 :sectnums:
 :imagesdir: images
 :icons: font
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
 = ラーニングアナリティクス基盤システム Docker 環境構築手順書
 
 == 前提
-* Docker version 18.09.2
-* Docker compose version 1.23.2
+* Docker
+* Docker Compose
 
 == LAaaS-dockerのインストール
 
@@ -150,14 +157,12 @@ image::learninglocker/new-xapi-store-client.png[align=center]
 ----
 const config = {
 …
-  LRS:{
+  LRS: {
     ...
-    clients:{
-      // LRS client
-      'default':{
-        user:'<xapi-store-client-key>', // <1>
-        pass:'<xapi-store-client-secret>' // <1>
-      },
+    client: {
+      key: '<xapi-store-client-key>', // <1>
+      secret: '<xapi-store-client-secret>' // <1>
+    },
 …
 ----
 <1> <<learninglocker_client_settings>>で確認したLRSのクライアント情報を設定
@@ -481,6 +486,27 @@ image::jupyterhub/signin.png[align=center, scaledwidth=50%]
 ノートブック一覧が表示されることを確認する。
 
 image::jupyterhub/notebooks.png[align=center]
+
+[WARNING]
+====
+Linux環境において、マウントしたホームディレクトリ（ `/home/jupyter` ）の所有者が適切に設定されず、権限エラーが発生する場合がある。
+
+----
+PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
+----
+
+本問題が生じた場合には、実行ユーザのUID/GIDを以下の環境変数で指定し、コンテナを再起動すること。
+
+.docker-compose.yml
+[source, diff]
+----
+  jupyterhub:
+    ...
+    environment:
+      - LOCAL_UID=<uid> # id -u
+      - LOCAL_GID=<gid> # id -g
+----
+====
 
 <<<
 ==== Learning Lockerからステートメントを取得

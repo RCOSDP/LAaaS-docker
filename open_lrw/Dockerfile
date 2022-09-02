@@ -1,6 +1,6 @@
 FROM alpine/git AS src
 
-LABEL version="2.2.0"
+LABEL version="2.3.0"
 
 WORKDIR /app
 RUN git clone -b develop https://github.com/udzuki/OpenLRW.git
@@ -37,11 +37,12 @@ COPY --from=src /app/OpenLRW/src /build/src
 # Build application
 RUN mvn package
 
-FROM openjdk:8-slim as runtime
+FROM openjdk:8-slim-buster as runtime
 EXPOSE 9966
 
 ENV APP_HOME /app
 
+RUN apt-get update && apt-get -y upgrade
 # Create base app folder
 RUN mkdir $APP_HOME
 # Create folder to save configuration files

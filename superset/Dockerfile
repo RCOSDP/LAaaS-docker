@@ -1,6 +1,6 @@
 FROM centos:centos7
 
-LABEL version="2.1.1"
+LABEL version="2.2.0"
 
 RUN yum update -y && \
     yum install -y https://repo.ius.io/ius-release-el7.rpm && \

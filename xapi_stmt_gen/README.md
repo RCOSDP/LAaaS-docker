@@ -1063,6 +1063,8 @@ If not specified, the following properties will be applied.
 * \core\event\calendar_event_created
   - verb.id = urn:x-moodle-event-action:created
   - object.id = <Moodle_URL>
+  - object.definition.name['en'] = calendar_event_created
+  - object.definition.description['en'] = calendar_event_created
 
 * \core\event\calendar_event_deleted
   - verb.id = urn:x-moodle-event-action:deleted
@@ -1234,8 +1236,8 @@ If not specified, the following properties will be applied.
     - grouping.definition.type = <Moodle_URL>/activitytype/course
     - grouping.definition.name['en'] = <mdl_course.fullname> found by <mdl_logstore_standard_log.courseid>
   - object.id = <Moodle_URL>/mod/url/view.php?id=<mdl_logstore_standard_log.contextinstanceid>
-  - object.definition.name['en'] =
-  - object.definition.description['en'] =
+  - object.definition.name['en'] = url_course_module_viewed
+  - object.definition.description['en'] = url_course_module_viewed
   - object.definition.type = http://adlnet.gov/expapi/activities/module
 
 * \mod_hsvideo\event\hsvideo_play_sent

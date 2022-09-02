@@ -21,9 +21,9 @@ final class LoggingTest extends TestCase
             'execution_logs',
             [
                 'id' => 1,
-                'translated' => 13,
+                'translated' => 15,
                 'failed' => 1,
-                'last_id' => 15,
+                'last_id' => 17,
             ],
             'log'
         );

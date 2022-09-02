@@ -7,6 +7,9 @@ REPO_DIR=$(dirname $BIN_DIR)
 cd $REPO_DIR
 git clone https://github.com/moodlehq/moodle-docker
 cd moodle-docker
+# Avoid using postgres:12
+git checkout 2e82e11d98
+
 git clone -b MOODLE_34_STABLE git://git.moodle.org/moodle.git
 cp config.docker-template.php ./moodle/config.php
 sed -i.org -e "s/MOODLE_DOCKER_DBUSER: moodle/MOODLE_DOCKER_DBUSER: moodleuser/" -e "s/POSTGRES_USER: moodle/POSTGRES_USER: moodleuser/" base.yml
