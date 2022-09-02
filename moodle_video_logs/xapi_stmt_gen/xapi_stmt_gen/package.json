@@ -12,7 +12,7 @@
     "adl-xapiwrapper": "^0.2.3",
     "ajv": "^5.0.0",
     "array-foreach-async": "^1.0.1",
-    "async": "^3.1.0",
+    "async": "^3.2.2",
     "csvtojson": "^2.0.10",
     "log4js": "^4.5.1",
     "node-uuid": "^1.4.8",
