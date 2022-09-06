@@ -3719,8 +3719,13 @@ module.exports = async function main() { // eslint-disable-line max-statements
   let userAttrs = [];
   let newEppns = [];
   for (const user of users) {
-    // Use alternatename as username if authenticated using GakuNinLMS's LTI plugin
-    const username = (user.auth === 'lti' && config.LRS.ePPNScoped) ? user.alternatename : user.username;
+    // Use alternatename as username
+    // if authenticated using GakuNinLMS's LTI plugin
+    const username = (
+      (user.auth === 'lti' && config.LRS.ePPNScoped)
+      ? user.alternatename
+      : user.username
+    );
     const eppn = eppns.find((eppn) => {
       if (eppn['username'] === username) {
         return eppn;
