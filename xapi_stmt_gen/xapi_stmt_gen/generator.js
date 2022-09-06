@@ -3700,7 +3700,7 @@ module.exports = async function main() { // eslint-disable-line max-statements
 
   // Retrieve all users
   const users = await USER.findAll({
-    attributes: ['id', 'username'],
+    attributes: ['id', 'auth', 'username', 'alternatename'],
     raw: true
   }).catch(err => {
     process.exitCode = 1;
@@ -3719,18 +3719,20 @@ module.exports = async function main() { // eslint-disable-line max-statements
   let userAttrs = [];
   let newEppns = [];
   for (const user of users) {
+    // Use alternatename as username if authenticated using GakuNinLMS's LTI plugin
+    const username = (user.auth = 'lti' && config.LRS.ePPNScoped) ? user.alternatename : user.username;
     const eppn = eppns.find((eppn) => {
-      if (eppn['username'] === user.username) {
+      if (eppn['username'] === username) {
         return eppn;
       }
     });
     if (eppn) {
       userAttrs[user.id] = eppn;
     } else {
-      const hash = crypto.createHash('sha256').update(user.username).digest('hex');
-      const scope = getScopeFromEppn(user.username);
+      const hash = crypto.createHash('sha256').update(username).digest('hex');
+      const scope = getScopeFromEppn(username);
       userAttrs[user.id] = {
-        username: user.username, // may not be ePPN format
+        username: username, // may not be ePPN format
         hash: hash,
         scope: scope, // nullable
         acl: scope ? scope.replace(/[.-]/g, '_') : null // used for RLS
