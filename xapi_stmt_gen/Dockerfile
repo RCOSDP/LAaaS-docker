@@ -1,6 +1,6 @@
 FROM node:12.22.0
 
-LABEL version="2.8.0"
+LABEL version="2.9.0"
 
 WORKDIR /usr/local/src
 RUN mkdir xapi_stmt_gen
