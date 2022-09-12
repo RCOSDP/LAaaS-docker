@@ -7,12 +7,11 @@ EMAIL="${ADMIN_EMAIL:-admin@fab.org}"
 PASSWORD="${ADMIN_PASSWORD:-admin}"
 
 . /venv/bin/activate
-fabmanager create-admin \
-  --app superset \
+superset db upgrade
+superset fab create-admin \
   --username $USERNAME \
   --firstname $FIRSTNAME \
   --lastname $LASTNAME \
   --email $EMAIL \
   --password $PASSWORD
-superset db upgrade
 superset init
