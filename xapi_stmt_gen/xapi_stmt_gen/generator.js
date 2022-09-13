@@ -3734,7 +3734,7 @@ module.exports = async function main() { // eslint-disable-line max-statements
     if (eppn) {
       userAttrs[user.id] = eppn;
     } else {
-      const hash = crypto.createHash('sha256').update(username).digest('hex');
+      const hash = username ? crypto.createHash('sha256').update(username).digest('hex') : '';
       const scope = getScopeFromEppn(username);
       userAttrs[user.id] = {
         username: username, // may not be ePPN format
