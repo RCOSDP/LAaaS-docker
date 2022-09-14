@@ -3723,7 +3723,7 @@ module.exports = async function main() { // eslint-disable-line max-statements
     // if authenticated using GakuNinLMS's LTI plugin
     const username = (
       (user.auth === 'lti' && config.LRS.ePPNScoped)
-      ? user.alternatename
+      ? user.alternatename // Can be null and not unique
       : user.username
     );
     const eppn = eppns.find((eppn) => {
@@ -3742,7 +3742,8 @@ module.exports = async function main() { // eslint-disable-line max-statements
         scope: scope, // nullable
         acl: scope ? scope.replace(/[.-]/g, '_') : null // used for RLS
       };
-      if (scope) {
+      // Exclude duplicates
+      if (scope && !newEppns.find(e => e.username === username)) {
         newEppns.push(userAttrs[user.id]);
       }
     }
