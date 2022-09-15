@@ -23,6 +23,7 @@ RUN . venv/bin/activate && \
         Flask==2.1.3 \
         Jinja2==3.0.1 \
         psycopg2-binary==2.9.3 \
+        requests==2.28.1 \
         Werkzeug==2.0.3 \
         WTForms==2.3.3
 
