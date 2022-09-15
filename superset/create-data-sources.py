@@ -23,7 +23,7 @@ def main(username, password):
     )
     headers['X-CSRFToken'] = r.json()['result']
     r = s.post(
-        'http://localhost:8088/api/v1/database/',
+        'http://localhost:8088/api/v1/database',
         headers=headers,
         json={
            'database_name': 'Learning Locker',
@@ -32,7 +32,7 @@ def main(username, password):
     )
     print(r.json())
     r = s.post(
-        'http://localhost:8088/api/v1/database/',
+        'http://localhost:8088/api/v1/database',
         headers=headers,
         json={
            'database_name': 'OpenLRW',
@@ -41,7 +41,7 @@ def main(username, password):
     )
     print(r.json())
     r = s.post(
-        'http://localhost:8088/api/v1/database/',
+        'http://localhost:8088/api/v1/database',
         headers=headers,
         json={
            'database_name': 'Jupyter',
