@@ -17,14 +17,14 @@ RUN dnf update -y && \
 
 RUN . venv/bin/activate && \
     pip install --upgrade setuptools pip && \
+    # See: https://github.com/apache/superset/issues/20942
     pip install \
         apache-superset==2.0.0 \
-        # See: https://github.com/apache/superset/issues/20942
         Flask==2.1.3 \
         Jinja2==3.0.1 \
+        psycopg2-binary==2.9.3 \
         Werkzeug==2.0.3 \
-        WTForms==2.3.3 \
-        psycopg2-binary
+        WTForms==2.3.3
 
 ENV LANG en_US.utf-8
 ENV PATH /venv/bin:$PATH
