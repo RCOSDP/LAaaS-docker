@@ -31,6 +31,7 @@ def main(username, password):
         }
     )
     print(r.json())
+    learninglocker_id = r.json()['id'] if 'id' in r.json() else None
     r = s.post(
         'http://localhost:8088/api/v1/database',
         headers=headers,
@@ -40,6 +41,7 @@ def main(username, password):
         }
     )
     print(r.json())
+    openlrw_id = r.json()['id'] if 'id' in r.json() else None
     r = s.post(
         'http://localhost:8088/api/v1/database',
         headers=headers,
@@ -49,6 +51,36 @@ def main(username, password):
         }
     )
     print(r.json())
+    if learninglocker_id:
+        r = s.post(
+            'http://localhost:8088/api/v1/dataset',
+            headers=headers,
+            json={
+                'database': learninglocker_id,
+                'is_managed_externally': True,
+                'owners': [
+                  1
+                ],
+                'schema': 'public',
+                'table_name': 'xapi_statements'
+            }
+        )
+        print(r.json())
+    if openlrw_id:
+        r = s.post(
+            'http://localhost:8088/api/v1/dataset',
+            headers=headers,
+            json={
+                'database': openlrw_id,
+                'is_managed_externally': True,
+                'owners': [
+                  1
+                ],
+                'schema': 'public',
+                'table_name': 'caliper_statements'
+            }
+        )
+        print(r.json())
 
 if __name__ == '__main__':
     args = sys.argv
