@@ -57,10 +57,6 @@ def main(username, password):
             headers=headers,
             json={
                 'database': learninglocker_id,
-                'is_managed_externally': True,
-                'owners': [
-                  1
-                ],
                 'schema': 'public',
                 'table_name': 'xapi_statements'
             }
@@ -72,10 +68,6 @@ def main(username, password):
             headers=headers,
             json={
                 'database': openlrw_id,
-                'is_managed_externally': True,
-                'owners': [
-                  1
-                ],
                 'schema': 'public',
                 'table_name': 'caliper_statements'
             }
