@@ -15,3 +15,4 @@ superset fab create-admin \
   --email $EMAIL \
   --password $PASSWORD
 superset init
+./create-data-sources.py $USERNAME $PASSWORD

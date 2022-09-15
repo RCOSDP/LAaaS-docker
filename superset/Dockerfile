@@ -33,10 +33,7 @@ ENV PYTHONPATH /root/.superset
 ENV FLASK_APP superset
 COPY superset_config.py /root/.superset/
 
-COPY wait-for-it.sh /wait-for-it.sh
-COPY entrypoint.sh /entrypoint.sh
-COPY init.sh /init.sh
-
-RUN chmod +x /wait-for-it.sh /entrypoint.sh /init.sh
+COPY wait-for-it.sh entrypoint.sh init.sh create-data-sources.py /
+RUN chmod +x /wait-for-it.sh /entrypoint.sh /init.sh /create-data-sources.py
 
 ENTRYPOINT ["/wait-for-it.sh", "-t", "0", "superset-db:5432", "--", "/entrypoint.sh"]
