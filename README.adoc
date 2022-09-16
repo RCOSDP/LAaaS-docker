@@ -199,30 +199,6 @@ $ docker exec learning_analytics_db psql -U learning_analytics learning_analytic
 ----
 
 <<<
-=== OpenLRWの設定
-`openlrw_mongo` の起動状況により、 `openlrw` が `openlrw_mongo` に接続できず終了している場合があるので確認する。
-
-----
-$ docker-compose ps
-----
-
-`openlrw` のステータスが `Exit 0` になっていた場合、起動に失敗しているので再起動する。
-
-----
-$ docker-compose up -d openlrw
-----
-
-ログを確認し、最終行に `Started OpenLRW` と表示されていることを確認する。
-
-----
-$ docker-compose logs -f openlrw
-
-(表示例)
-…
-openlrw_web | 2019-03-24 16:43:36.147  INFO 8 --- [           main] org.apereo.openlrw.OpenLRW               : Started OpenLRW in 20.922 seconds (JVM running for 23.221)
-----
-
-<<<
 === Caliperステートメント変換スクリプト実行ログの起動
 `docker-compose.yml` の `caliper_log_db` にデフォルトの設定が記載されている。変更する場合、`caliper/.env` 内の `DB_LOG_*` の項目も合わせて変更する。
 
