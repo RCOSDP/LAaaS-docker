@@ -179,7 +179,7 @@ $ docker-compose up -d xapi_stmt_gen
 Moodle上での学習活動を実施した後、以下のコマンドでMoodleログをxAPIステートメントに変換する。
 
 ----
-$ docker exec -it xapi_stmt_gen npm start
+$ docker exec xapi_stmt_gen npm start
 ----
 
 Learning Lockerにアクセスし、ステートメントが正常に登録されていることを確認する。
@@ -189,13 +189,13 @@ image::learninglocker/source.png[align=center]
 なお、Moodleログの処理済み件数を算出する場合は以下のコマンドを実行する。
 
 ----
-$ docker exec -it learning_analytics_db psql -U learning_analytics learning_analytics -c "SELECT count(*) FROM xapi_records_processed;"
+$ docker exec learning_analytics_db psql -U learning_analytics learning_analytics -c "SELECT count(*) FROM xapi_records_processed;"
 ----
 
 また、スクリプトのバージョンアップ等に伴い処理済みのMoodleログを再度処理したい場合は、以下のコマンドで変換処理の実行履歴を削除する。
 
 ----
-$ docker exec -it learning_analytics_db psql -U learning_analytics learning_analytics -c "DELETE FROM xapi_records_processed;"
+$ docker exec learning_analytics_db psql -U learning_analytics learning_analytics -c "DELETE FROM xapi_records_processed;"
 ----
 
 <<<
@@ -535,7 +535,7 @@ get_statements_from_learninglocker.ipynb  get_statements_from_openlrw.ipynb …
 以下のコマンドで `jupyterhub` コンテナ上にユーザを作成する。
 
 ----
-$ docker exec -it jupyterhub useradd -m -p $(echo "<password>" | openssl passwd -1 -stdin) -s /bin/bash <username>
+$ docker exec jupyterhub useradd -m -p $(echo "<password>" | openssl passwd -1 -stdin) -s /bin/bash <username>
 ----
 
 <<<
@@ -549,7 +549,7 @@ image::jupyterhub/import-analysis-result-to-superset.png[align=center]
 `superset-db` コンテナ上に登録された分析結果は以下のコマンドで参照することができる。
 
 ----
-$ docker exec -it superset-db psql jupyter -c "SELECT * FROM <tablename>;"
+$ docker exec superset-db psql jupyter -c "SELECT * FROM <tablename>;"
 
 index | object.definition.description.en |object.id            | timestamp
 --------+--------------------------------------------+------------------------------+---------------------------
