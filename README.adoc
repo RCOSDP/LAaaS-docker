@@ -523,14 +523,6 @@ image::jupyterhub/get-statements-from-learninglocker.png[align=center]
 
 image::jupyterhub/get-statements-from-openlrw.png[align=center]
 
-==== 作成したノートブックの取得
-作成したノートブックは `jupyterhub` コンテナの `/home/<username>` に保存される。
-
-----
-$ docker exec -it jupyterhub ls /home/jupyter
-get_statements_from_learninglocker.ipynb  get_statements_from_openlrw.ipynb …
-----
-
 ==== ユーザの作成
 以下のコマンドで `jupyterhub` コンテナ上にユーザを作成する。
 
