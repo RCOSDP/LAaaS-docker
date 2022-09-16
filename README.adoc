@@ -235,7 +235,7 @@ $ docker-compose up -d caliper_log_db
 `openlrw_mongo` のMongoDBに接続する。ログイン情報は `open_lrw/.env` に従う。
 
 ----
-$ docker-compose exec openlrw_mongo bash
+$ docker exec -it openlrw_mongo bash
 # mongo <openlrw-database> -u <openlrw-username> -p <openlrw-password>
 ----
 
@@ -288,7 +288,7 @@ $ docker-compose run --rm caliper_stmt_gen
 `openlrw_mongo` に接続し、データベースに送出したステートメントが登録されていることを確認する。
 
 ----
-$ docker-compose exec openlrw_mongo bash
+$ docker exec -it openlrw_mongo bash
 # mongo <openlrw-database> -u <openlrw-username> -p <openlrw-password>
 > db.mongoEvent.find().pretty()
 ----
@@ -299,7 +299,7 @@ $ docker-compose exec openlrw_mongo bash
 以下のコマンドを実行し、データベースの初期設定を行う。
 
 ----
-$ docker-compose exec superset /init.sh
+$ docker exec superset /init.sh
 ----
 
 ==== ログイン
