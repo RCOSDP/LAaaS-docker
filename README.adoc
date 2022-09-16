@@ -463,6 +463,17 @@ image::jupyterhub/signin.png[align=center, scaledwidth=50%]
 
 image::jupyterhub/notebooks.png[align=center]
 
+[TIP]
+====
+ユーザを追加する場合は以下のコマンドを実行する。
+
+----
+$ USERNAME=<username>
+$ PASSWORD=<password>
+$ docker exec jupyterhub useradd -m -p $(echo "$PASSWORD" | openssl passwd -1 -stdin) -s /bin/bash $USERNAME
+----
+====
+
 [WARNING]
 ====
 Linux環境において、マウントしたホームディレクトリ（ `/home/jupyter` ）の所有者が適切に設定されず、権限エラーが発生する場合がある。
@@ -498,13 +509,6 @@ image::jupyterhub/get-statements-from-learninglocker.png[align=center]
 その後、 `Authorization` ヘッダに取得したJWTトークンを設定し、 `url` のユーザーIDを変更することで任意のユーザーのイベントを取得する。
 
 image::jupyterhub/get-statements-from-openlrw.png[align=center]
-
-==== ユーザの作成
-以下のコマンドで `jupyterhub` コンテナ上にユーザを作成する。
-
-----
-$ docker exec jupyterhub useradd -m -p $(echo "<password>" | openssl passwd -1 -stdin) -s /bin/bash <username>
-----
 
 <<<
 === JupyterHubとSupersetの連携
