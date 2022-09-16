@@ -2,7 +2,7 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2022年8月17日
+:revdate: 2022年9月16日
 :revnumber: 3.2.0-SNAPSHOT版
 :doctype: book
 :version-label:
@@ -38,7 +38,8 @@ endif::[]
 $ git clone https://github.com/RCOSDP/LAaaS-docker.git
 ----
 
-== Moodleのインストール
+== LMS(学習管理システム) - Moodle
+=== インストール
 `bin/moodle_install` を実行してMoodleのDocker環境をインストールする。 +
 本スクリプトでは主に次の処理を行う。
 
@@ -66,12 +67,12 @@ $ bin/moodle_start
 
 <<<
 
-=== Moodleの初期設定
+=== 初期設定
 Moodle( http://localhost:8000 )にアクセスし、画面の指示に従って初期設定を行う。
 
 image::moodle.png[align=center]
 
-== ラーニングアナリティクス基盤の起動
+== LA(学習履歴分析)基盤
 次のコンテナを起動する。
 
 |===
@@ -109,7 +110,7 @@ image::xapi_analysis_using_jupyterhub_and_superset.png[align=center]
 image::caliper_analysis_using_jupyterhub.png[align=center]
 
 <<<
-=== Learning Lockerの設定
+=== Learning Locker
 ==== Adminユーザの作成
 `learninglocker` コンテナに接続し、Adminユーザを作成する。
 
@@ -149,7 +150,8 @@ image::learninglocker/add-new-lrs.png[align=center]
 image::learninglocker/new-xapi-store-client.png[align=center]
 
 <<<
-=== xAPIステートメント変換スクリプトの設定
+=== xAPIステートメント変換
+==== 初期設定
 スクリプトの設定ファイルを編集する。
 
 .xapi_stmt_gen/xapi_stmt_gen/config/app.js
@@ -175,7 +177,7 @@ $ docker-compose up -d xapi_stmt_gen
 ----
 
 <<<
-=== xAPIステートメントの生成
+==== ステートメント変換
 Moodle上での学習活動を実施した後、以下のコマンドでMoodleログをxAPIステートメントに変換する。
 
 ----
@@ -199,7 +201,8 @@ $ docker exec learning_analytics_db psql -U learning_analytics learning_analytic
 ----
 
 <<<
-=== Caliperステートメント変換スクリプト実行ログの起動
+=== Caliperステートメント変換
+==== ログデータベースの起動
 `docker-compose.yml` の `caliper_log_db` にデフォルトの設定が記載されている。変更する場合、`caliper/.env` 内の `DB_LOG_*` の項目も合わせて変更する。
 
 .caliper/.env
@@ -231,7 +234,7 @@ $ docker-compose up -d caliper_log_db
 
 <<<
 [[caliper_settings]]
-=== Caliperステートメント変換スクリプトの設定
+==== 初期設定
 `openlrw_mongo` のMongoDBに接続する。ログイン情報は `open_lrw/.env` に従う。
 
 ----
@@ -276,7 +279,7 @@ return [
 ----
 
 <<<
-=== Caliperステートメントの生成
+==== ステートメント変換
 Moodle上での学習活動を実施した後、以下のコマンドでMoodleログをCaliperステートメントに変換する。
 ApiKeyの設定を適用するため、コンテナをリビルドしてから行うこと。
 
@@ -294,8 +297,10 @@ $ docker exec -it openlrw_mongo bash
 ----
 
 <<<
-=== Supersetの設定
-==== データベースの初期設定
+=== Superset
+TIP: 操作方法の詳細は https://superset.apache.org/docs/creating-charts-dashboards/creating-your-first-dashboard[ユーザガイド - Creating Charts and Dashboards] を参照すること。
+
+==== 初期設定
 以下のコマンドを実行し、データベースの初期設定を行う。
 
 ----
@@ -307,153 +312,48 @@ Superset( http://localhost:8088 )にアクセスし、Adminユーザでログイ
 
 image::superset/signin.png[align=center]
 
-ダッシュボードの一覧が表示されることを確認する。
+image::superset/home.png[align=center]
 
-image::superset/dashboards.png[align=center]
+==== xAPIステートメントの可視化
+[Data] > [Datasets] から `xapi_statements` を選択する。
 
-<<<
-==== Learning Lockerデータベースの登録
-`Sources` メニューから `Databases` を選択する。
+image::superset/datasets.png[align=center]
 
-image::superset/databases-link.png[align=center]
+「DATA」および「CUSTOMIZE」タブからチャートの設定を行い、「CREATE CHART」でステートメントを可視化する。
 
-データベース一覧の右上にある `+` ボタンを押下する。
-
-image::superset/xapi/list-databases.png[align=center]
-
-<<<
-以下の通りにデータベースの設定を行う。
-
-[%noheader, cols="1,3"]
-|===
-|Databases        |learninglocker
-|SQLAlchemy URI   |postgresql://postgres@superset-db:5432/learninglocker
-|Expose in SQL Lab|チェック
-|===
-
-image::superset/xapi/add-learninglocker-database.png[align=center]
-
-<<<
-`Test Connection` ボタンを押下し、 `Seems OK!` と表示されることを確認する。
-
-image::superset/xapi/test-learninglocker-database-connection.png[align=center]
-
-`Save` ボタンを押下し、 `learninglocker` データベースが正常に追加されることを確認する。
-
-image::superset/xapi/added-learninglocker-database.png[align=center]
-
-<<<
-==== xAPIステートメントテーブルの作成
-`Sources` メニューから `Tables` を選択する。
-
-image::superset/xapi/tables-link.png[align=center]
-
-テーブル一覧の右上にある `+` ボタンを押下する。
-
-image::superset/xapi/list-tables.png[align=center]
-
-<<<
-以下の通りにテーブルの設定を行う。
-[%noheader, cols="1,3"]
-|===
-|Database  |learninglocker
-|Table Name|xapi_statements
-|===
-
-image::superset/xapi/add-xapi-statements.png[align=center]
-
-`Save` ボタンを押下し、 `xapi_statements` テーブルが正常に追加されることを確認する。
-
-image::superset/xapi/added-xapi-statements.png[align=center]
-
-<<<
-`xapi_statements` テーブルを選択し、Learning Lockerに登録済みのステートメント件数が取得できることを確認する。
-
-.xAPIステートメントの件数をカウントする例
+.ユーザの行動（ログイン、閲覧等）毎の件数を円グラフで可視化する例
 [cols="30%,30%,40%"]
 |===
    |大項目                   |小項目             |設定値
-   |Datasource & Chart Type  |Visualization Type |`Table View`
-.3+|Time                     |Time Column        |`stored`
-                             |Since              |`∞` (指定なし)
-                             |Until              |`∞` (指定なし)
-   |GROUP BY                 |Metric             |`COUNT(*)`
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`timestamp`
+.2+|Query                    |DIMENSIONS         |`statement.verb.display.en`
+                             |METRIC             |`COUNT(*)`
 |===
 
-image::superset/xapi/count-xapi-statements.png[align=center]
+image::superset/xapi-statements.png[align=center]
 
-<<<
-==== OpenLRWデータベースの登録
-`Sources` メニューから `Databases` を選択する。
+==== Caliperステートメントの可視化
+[Data] > [Datasets] から `caliper_statements` を選択する。
 
-image::superset/databases-link.png[align=center]
+image::superset/datasets.png[align=center]
 
-データベース一覧の右上にある `+` ボタンを押下する。
+「DATA」および「CUSTOMIZE」タブからチャートの設定を行い、「CREATE CHART」でステートメントを可視化する。
 
-image::superset/caliper/list-databases.png[align=center]
-
-<<<
-以下の通りにデータベースの設定を行う。
-[%noheader, cols="1,3"]
-|===
-|Database         |openlrw
-|SQLAlchemy URI   |postgresql://postgres@superset-db:5432/openlrw
-|Expose in SQL Lab|チェック
-|===
-
-image::superset/caliper/add-openlrw-database.png[align=center]
-
-<<<
-`Test Connection` ボタンを押下し、 `Seems OK!` と表示されることを確認する。
-
-image::superset/caliper/test-openlrw-database-connection.png[align=center]
-
-`Save` ボタンを押下し、 `openlrw` データベースが正常に追加されることを確認する。
-
-image::superset/caliper/added-openlrw-database.png[align=center]
-
-<<<
-==== Caliperステートメントテーブルの作成
-`Sources` メニューから `Tables` を選択する。
-
-image::superset/caliper/tables-link.png[align=center]
-
-テーブル一覧の右上にある `+` ボタンを押下する。
-
-image::superset/caliper/list-tables.png[align=center]
-
-<<<
-以下の通りにテーブルの設定を行う。
-[%noheader, cols="1,3"]
-|===
-|Database  |openlrw
-|Table Name|caliper_statements
-|===
-
-image::superset/caliper/add-caliper-statements.png[align=center]
-
-`Save` ボタンを押下し、 `caliper_statements` テーブルが正常に追加されることを確認する。
-
-image::superset/caliper/added-caliper-statements.png[align=center]
-
-<<<
-`caliper_statements` テーブルを選択し、OpenLRWに登録済みのステートメント件数が取得できることを確認する。
-
-.Caliperステートメントの件数をカウントする例
+.ユーザの行動（ログイン、閲覧等）毎の件数を円グラフで可視化する例
 [cols="30%,30%,40%"]
 |===
    |大項目                   |小項目             |設定値
-   |Datasource & Chart Type  |Visualization Type |`Table View`
-.3+|Time                     |Time Column        |`event.eventTime`
-                             |Since              |`∞` (指定なし)
-                             |Until              |`∞` (指定なし)
-   |GROUP BY                 |Metric             |`COUNT(*)`
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`event.eventTime`
+.2+|Query                    |DIMENSIONS         |`event.action`
+                             |METRIC             |`COUNT(*)`
 |===
 
-image::superset/caliper/count-caliper-statements.png[align=center]
+image::superset/caliper-statements.png[align=center]
 
 <<<
-=== JupyterHubの設定
+=== JupyterHub
 ==== ログイン
 JupyterHub( http://localhost:8001 )にアクセスし、 `jupyter` ユーザ（Username: `jupyter` 、Password: `jupyter` ）でログインする。
 
@@ -496,81 +396,41 @@ PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
 ====
 
 <<<
-==== Learning Lockerからステートメントを取得
-ノートブック「link:jupyterhub/notebooks/get_statements_from_learninglocker.ipynb[get_statements_from_learninglocker]」を活用し、Learning LockerのAPIを使用したステートメント取得が可能であることを確認する。 +
-`user` 、 `passwd` にLRSクライアントの `Key` 、 `Secret` をそれぞれ設定し、 `url` でフィルタ条件を変更することで任意のステートメントを取得する。
+==== xAPIステートメントの取得
+ノートブック「link:jupyterhub/notebooks/xAPI_statements.ipynb[xAPI_statements]」を活用し、Learning LockerからxAPIステートメントを取得する。
 
-image::jupyterhub/get-statements-from-learninglocker.png[align=center]
+image::jupyterhub/xapi-statements.png[align=center]
 
-<<<
-==== OpenLRWからステートメントを取得
-ノートブック「link:jupyterhub/notebooks/get_statements_from_openlrw.ipynb[get_statements_from_openlrw]」を活用し、OpenLRWのAPIを使用したステートメント取得が可能であることを確認する。 +
-まず `username` 、 `password` にそれぞれ<<caliper_settings>>で取得した `apiKey` と `apiSecret` を設定し、JWTトークンを取得する。 +
-その後、 `Authorization` ヘッダに取得したJWTトークンを設定し、 `url` のユーザーIDを変更することで任意のユーザーのイベントを取得する。
+==== Caliperステートメントの取得
+ノートブック「link:jupyterhub/notebooks/Caliper_statements.ipynb[Caliper_statements]」を活用し、OpenLRWからCaliperステートメントを取得する。
 
-image::jupyterhub/get-statements-from-openlrw.png[align=center]
+image::jupyterhub/caliper-statements.png[align=center]
 
-<<<
 === JupyterHubとSupersetの連携
 ==== Jupyterノートブック実行結果をSupersetデータベースに登録
-JupyterHubにログインし、ノートブック「link:jupyterhub/notebooks/import_analysis_result_to_superset.ipynb[import_analysis_result_to_superset]」を活用し、ステートメントの取得、分析、Supersetデータベースへの登録を行う。
+ノートブック「link:jupyterhub/notebooks/Import_to_Superset.ipynb[Import_to_Superset]」を活用し、ステートメントの取得、分析、Supersetへの登録を行う。
 
-image::jupyterhub/import-analysis-result-to-superset.png[align=center]
+image::jupyterhub/import-to-superset.png[align=center]
 
-<<<
-`superset-db` コンテナ上に登録された分析結果は以下のコマンドで参照することができる。
+==== Supersetで可視化
+[Data] > [Datasets] から登録したDataset（下図の `notebook_results` ）を確認する。
 
-----
-$ docker exec superset-db psql jupyter -c "SELECT * FROM <tablename>;"
+image::superset/jupyter/datasets.png[align=center]
 
-index | object.definition.description.en |object.id            | timestamp
---------+--------------------------------------------+------------------------------+---------------------------
-    0 | user_loggedin                | http://localhost:8000 | 2019-06-20T14:38:01+09:00
-    …
-    (4 rows)
-----
+必要に応じて、[Actions] > [Edit] からDatasetの設定を行う。
 
-<<<
-==== Supersetへの登録
-Superset上で上記テーブルが格納されたjupyterデータベースを以下の通り登録する。
-[%noheader, cols="1,3"]
-|===
-|Database         |jupyter
-|SQLAlchemy URI   |postgresql://postgres@superset-db:5432/jupyter
-|Expose in SQL Lab|チェック
-|===
+image::superset/jupyter/edit-notebook-results.png[align=center]
 
-image::superset/jupyter/add-jupyter-database.png[align=center]
-
-<<<
-`jupyter` データベースのテーブルを以下の通りに登録する。
-[%noheader, cols="1,3"]
-|===
-|Database  |jupyter
-|Table Name|Jupyterノートブックで指定したテーブル名
-|===
-
-image::superset/jupyter/add-jupyter-analysis-result.png[align=center]
-
-image::superset/jupyter/added-jupyter-analysis-result.png[align=center]
-
-グループ列、フィルター列、時刻列の指定などはテーブルの設定(テーブル名左横の `Edit record` から `List Columns` タブを選択)から必要に応じて行うこと。
-
-image::superset/jupyter/edit-jupyter-analysis-result.png[align=center]
-
-<<<
-JupyterHubで加工したステートメントが可視化できることを確認すること。
+チャートの設定を行い、ノートブックの実行結果を可視化する。
 
 .ノートブックの実行結果を可視化する例
 [cols="30%,30%,40%"]
 |===
    |大項目                   |小項目             |設定値
-   |Datasource & Chart Type  |Visualization Type |`Distribution - Bar Chart`
-.3+|Time                     |Time Column        |`timestamp`
-                             |Since              |`∞` (指定なし)
-                             |Until              |`∞` (指定なし)
-.2+|Query                    |Metric             |`COUNT(*)`
-                             |Series             |`object.id`
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`timestamp`
+.2+|Query                    |DIMENSIONS         |`object.definition.description.en`
+                             |METRIC             |`COUNT(*)`
 |===
 
-image::superset/jupyter/visualize-jupyter-analysis-result.png[align=center, scaledwidth=90%]
+image::superset/jupyter/visualize-notebook-results.png[align=center, scaledwidth=90%]
