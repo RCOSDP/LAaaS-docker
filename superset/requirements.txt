@@ -48,7 +48,7 @@ jsonlines==1.2.0
 jsonschema==3.2.0
 kombu==4.6.7
 linear-tsv==1.1.0
-Mako==1.1.0
+Mako==1.2.2
 Markdown==2.6.11
 MarkupSafe==1.1.1
 more-itertools==8.0.2
