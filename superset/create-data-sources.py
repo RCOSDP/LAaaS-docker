@@ -25,12 +25,17 @@ def main():
         headers=headers
     )
     headers['X-CSRFToken'] = r.json()['result']
+
+    db_user = os.getenv('SUPERSET_DBUSER', 'postgres')
+    db_pass = os.getenv('SUPERSET_DBPASS', '')
+    base_uri = f'postgresql://{db_user}:{db_pass}@superset-db:5432'
+
     r = s.post(
         'http://localhost:8088/api/v1/database',
         headers=headers,
         json={
            'database_name': 'Learning Locker',
-           'sqlalchemy_uri': 'postgresql://postgres@superset-db:5432/learninglocker'
+           'sqlalchemy_uri': f'{base_uri}/learninglocker'
         }
     )
     print(r.json())
@@ -40,7 +45,7 @@ def main():
         headers=headers,
         json={
            'database_name': 'OpenLRW',
-           'sqlalchemy_uri': 'postgresql://postgres@superset-db:5432/openlrw'
+           'sqlalchemy_uri': f'{base_uri}/openlrw'
         }
     )
     print(r.json())
@@ -50,7 +55,7 @@ def main():
         headers=headers,
         json={
            'database_name': 'Jupyter',
-           'sqlalchemy_uri': 'postgresql://postgres@superset-db:5432/jupyter'
+           'sqlalchemy_uri': f'{base_uri}/jupyter'
         }
     )
     print(r.json())

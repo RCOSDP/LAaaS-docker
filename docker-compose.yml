@@ -104,6 +104,8 @@ services:
     #  - ADMIN_LASTNAME=user
     #  - ADMIN_EMAIL=admin@fab.org
     #  - ADMIN_PASSWORD=admin
+      - SUPERSET_DBUSER=superset
+      - SUPERSET_DBPASS=superset
   superset-db:
     build: superset-db
     container_name: superset-db
