@@ -3,7 +3,6 @@
 :source-highlighter: rouge
 :author: 国立情報学研究所
 :revdate: 2022年9月16日
-:revnumber: 3.2.0-SNAPSHOT版
 :doctype: book
 :version-label:
 :chapter-label:
