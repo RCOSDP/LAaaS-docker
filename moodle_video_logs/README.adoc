@@ -2,7 +2,7 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2021年7月29日
+:revdate: 2022年9月22日
 :doctype: book
 :version-label:
 :chapter-label:
@@ -191,47 +191,43 @@ $ mongo caliper -u <caliper-username> -p <caliper-password>
 ユーザが行った行動（日本語表記）を円グラフで可視化する例を以下に示す。
 
 .検索条件
-[cols="20%,20%,60%"]
+[cols="30%,30%,40%"]
 |===
-   |大項目               |小項目             |設定値
-   |Visualization Type   |-                  |`Pie Chart`
-.3+|Time                 |Time Column        |`stored`
-                         |Since              |`∞`
-                         |Until              |`now`
-.2+|Query                |Metrics            |`COUNT(*)`
-                         |Group by           |`statement.verb.display.ja`
+   |大項目                   |小項目             |設定値
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`timestamp`
+.2+|Query                    |DIMENSIONS         |`statement.verb.display.ja`
+                             |METRIC             |`COUNT(*)`
 |===
 
-image::superset.png[align=center]
+image::superset-xapi.png[align=center]
 
 <<<
 === Supersetを用いたCaliperステートメントの可視化例
 ユーザが行った行動を円グラフで可視化する例を以下に示す。
 
 .検索条件
-[cols="20%,20%,60%"]
+[cols="30%,30%,40%"]
 |===
-   |大項目               |小項目             |設定値
-   |Visualization Type   |-                  |`Pie Chart`
-.3+|Time                 |Time Column        |`event.eventTime`
-                         |Since              |`∞`
-                         |Until              |`now`
-.2+|Query                |Metrics            |`COUNT(*)`
-                         |Group by           |`event.action`
+   |大項目                   |小項目             |設定値
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`event.eventTime`
+.2+|Query                    |DIMENSIONS         |`event.action`
+                             |METRIC             |`COUNT(*)`
 |===
 
-image::superset_caliper.png[align=center]
+image::superset-caliper.png[align=center]
 
 <<<
 === JupyterHubを用いたxAPIステートメントの可視化例
 
-link:../jupyterhub/notebooks/get_statements_from_learninglocker.ipynb[xAPIステートメントを取得するノートブック]でユーザが行った行動（英語表記）を棒グラフで可視化する例を以下に示す。
+link:../jupyterhub/notebooks/xAPI_statements.ipynb[xAPIステートメントを取得するノートブック]でユーザが行った行動（英語表記）を棒グラフで可視化する例を以下に示す。
 
-image::jupyterhub.png[align=center]
+image::jupyterhub-xapi.png[align=center]
 
 <<<
 === JupyterHubを用いたCaliperステートメントの可視化例
 
-link:../jupyterhub/notebooks/get_statements_from_openlrw.ipynb[Caliperステートメントを取得するノートブック]でユーザが行った行動を棒グラフで可視化する例を以下に示す。
+link:../jupyterhub/notebooks/Caliper_statements.ipynb[Caliperステートメントを取得するノートブック]でユーザが行った行動を棒グラフで可視化する例を以下に示す。
 
-image::jupyterhub_caliper.png[align=center]
+image::jupyterhub-caliper.png[align=center]
