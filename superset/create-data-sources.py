@@ -1,16 +1,19 @@
 #!/usr/bin/env python
+import os
 import sys
 
 import requests
 
 
-def main(username, password):
+def main():
+    admin_user = os.getenv('ADMIN_USERNAME', 'admin')
+    admin_pass = os.getenv('ADMIN_PASSWORD', 'admin')
     s = requests.Session()
     r = s.post(
         'http://localhost:8088/api/v1/security/login',
         json={
-            'username': username,
-            'password': password,
+            'username': admin_user,
+            'password': admin_pass,
             'provider': 'db',
         }
     )
@@ -75,9 +78,4 @@ def main(username, password):
         print(r.json())
 
 if __name__ == '__main__':
-    args = sys.argv
-    if len(args) == 3:
-        main(args[1], args[2])
-    else:
-        print('usage: create-data-sources.py <username> <password>')
-        sys.exit(2)
+    main()
