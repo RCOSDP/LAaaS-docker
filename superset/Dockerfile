@@ -1,41 +1,39 @@
-FROM centos:centos7
+FROM rockylinux:9.0
 
-LABEL version="2.2.0"
+LABEL version="3.0.0"
 
-RUN yum update -y && \
-    yum install -y https://repo.ius.io/ius-release-el7.rpm && \
-    yum install -y \
+RUN dnf update -y && \
+    dnf install -y \
         cyrus-sasl-devel \
         gcc \
         gcc-c++ \
-        git \
         libffi-devel \
         openldap-devel \
         openssl-devel \
-        python-devel \
-        python-pip \
-        python-wheel \
-        python36u \
-        python36u-devel \
-        python36u-libs \
-        python36u-pip && \
-    python3.6 -m venv venv
+        python3-devel \
+        python3-pip && \
+    pip install --upgrade pip && \
+    python3 -m venv venv
 
-COPY requirements.txt .
 RUN . venv/bin/activate && \
-    # TODO: Dependency issues exist. Use pip 19 to ignore them for now.
-    pip install --upgrade setuptools==57.5.0 pip==19.3.1 && \
-    pip install -r requirements.txt
+    pip install --upgrade setuptools pip && \
+    # See: https://github.com/apache/superset/issues/20942
+    pip install \
+        apache-superset==2.0.0 \
+        Flask==2.1.3 \
+        Jinja2==3.0.1 \
+        psycopg2-binary==2.9.3 \
+        requests==2.28.1 \
+        Werkzeug==2.0.3 \
+        WTForms==2.3.3
 
 ENV LANG en_US.utf-8
-ENV PATH /venv/bin/:$PATH
+ENV PATH /venv/bin:$PATH
 ENV PYTHONPATH /root/.superset
+ENV FLASK_APP superset
 COPY superset_config.py /root/.superset/
 
-COPY wait-for-it.sh /wait-for-it.sh
-COPY entrypoint.sh /entrypoint.sh
-COPY init.sh /init.sh
-
-RUN chmod +x /wait-for-it.sh /entrypoint.sh /init.sh
+COPY wait-for-it.sh entrypoint.sh init.sh create-data-sources.py /
+RUN chmod +x /wait-for-it.sh /entrypoint.sh /init.sh /create-data-sources.py
 
 ENTRYPOINT ["/wait-for-it.sh", "-t", "0", "superset-db:5432", "--", "/entrypoint.sh"]

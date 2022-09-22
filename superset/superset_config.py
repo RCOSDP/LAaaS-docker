@@ -20,7 +20,13 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # superset metadata (slices, connections, tables, dashboards, ...).
 # Note that the connection information to connect to the datasources
 # you want to explore are managed directly in the web UI
-SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres@superset-db:5432/superset'
+SUPERSET_DBUSER = os.getenv('SUPERSET_DBUSER', 'postgres')
+SUPERSET_DBPASS = os.getenv('SUPERSET_DBPASS', '')
+SQLALCHEMY_DATABASE_URI = (
+    'postgresql+psycopg2://'
+    f'{SUPERSET_DBUSER}:{SUPERSET_DBPASS}'
+    '@superset-db:5432/superset'
+)
 
 # Flask-WTF flag for CSRF
 WTF_CSRF_ENABLED = True
