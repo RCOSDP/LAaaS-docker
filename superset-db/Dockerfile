@@ -3,8 +3,8 @@ FROM postgres:12-bullseye
 LABEL version="3.0.0"
 
 # Install dependencies
-RUN apt update && \
-    apt install -y \
+RUN apt-get update && \
+    apt-get install -y \
       git \
       postgresql-12-python3-multicorn \
       python3-setuptools
