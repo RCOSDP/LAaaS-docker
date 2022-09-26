@@ -126,7 +126,6 @@ services:
       - LRW_DB_PASSWORD=caliper
       - LRW_COLLECTION=mongoEvent
     volumes:
-      - ./superset-db/init:/docker-entrypoint-initdb.d
       - superset-db:/var/lib/postgresql/data
   jupyterhub:
     build: jupyterhub
