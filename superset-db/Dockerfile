@@ -1,6 +1,6 @@
 FROM postgres:12-bullseye
 
-LABEL version="3.0.0"
+LABEL version="3.1.0"
 
 # Install dependencies
 RUN apt-get update && \
