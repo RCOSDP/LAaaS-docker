@@ -14,3 +14,5 @@ WORKDIR /usr/local/src
 RUN git clone https://github.com/udzuki/yam_fdw.git && \
     cd yam_fdw && \
     python3 setup.py install
+
+COPY setup.sh /docker-entrypoint-initdb.d/
