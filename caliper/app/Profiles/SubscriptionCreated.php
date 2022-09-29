@@ -35,7 +35,7 @@ final class SubscriptionCreated extends ForumEvent
             ->setAction(new Action(Action::SUBSCRIBED))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($sc->getAnonymizedUsername($actor->username))
+                    ->setName($sc->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

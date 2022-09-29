@@ -36,7 +36,7 @@ final class CourseModuleViewed extends NavigationEvent
             ->setAction(new Action(Action::NAVIGATED_TO))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($cmv->getAnonymizedUsername($actor->username))
+                    ->setName($cmv->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

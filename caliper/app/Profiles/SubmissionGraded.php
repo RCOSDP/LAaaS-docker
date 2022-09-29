@@ -39,7 +39,7 @@ final class SubmissionGraded extends GradeEvent
             ->setAction(new Action(Action::GRADED))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($sg->getAnonymizedUsername($actor->username))
+                    ->setName($sg->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(
@@ -55,7 +55,7 @@ final class SubmissionGraded extends GradeEvent
                     ->setComment($score->comment)
                     ->setScoredBy(
                         (new Person((string) $graderId))
-                            ->setName($sg->getAnonymizedUsername($grader->username))
+                            ->setName($sg->getAnonymizedUsername($grader))
                             ->setDescription($grader->description ?? '')
                     )
             )

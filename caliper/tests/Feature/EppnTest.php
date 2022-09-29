@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Caliper\Traits\Util;
 use App\Models\Eppn;
+use App\Models\Moodle\User;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
@@ -15,6 +16,7 @@ final class EppnTest extends TestCase
         $mockConfig = [
             "test.ac.jp" => "test.ac.jp key",
             "test-example.com" => "test-example.com key",
+            "example.com" => "example.com key",
         ];
         Config::set('lrw.tenants', $mockConfig);
     }
@@ -23,13 +25,16 @@ final class EppnTest extends TestCase
     {
         putenv('DB_EPPN="true"');
         $username = 'testuser@test.ac.jp';
+        $user = User::create([
+            'username' => $username,
+        ]);
         $util = new class {
             use Util;
         };
 
         $this->assertEquals(Eppn::all()->count(), 1);
 
-        $anonymizedUsername = $util->getAnonymizedUsername($username);
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
 
         $this->assertEquals($anonymizedUsername, Eppn::all()->first()->hash);
         $this->assertEquals(Eppn::all()->count(), 1);
@@ -39,13 +44,16 @@ final class EppnTest extends TestCase
     {
         putenv('DB_EPPN=true');
         $username = 'testuser@test.ac.jp';
+        $user = User::create([
+            'username' => $username,
+        ]);
         $util = new class {
             use Util;
         };
 
         $this->assertEquals(Eppn::all()->count(), 1);
 
-        $anonymizedUsername = $util->getAnonymizedUsername($username);
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
 
         $this->assertEquals($anonymizedUsername, Eppn::all()->first()->hash);
         $this->assertEquals(Eppn::all()->count(), 1);
@@ -55,13 +63,16 @@ final class EppnTest extends TestCase
     {
         putenv('DB_EPPN="true"');
         $username = 'testuser@test-example.com';
+        $user = User::create([
+            'username' => $username,
+        ]);
         $util = new class {
             use Util;
         };
 
         $this->assertEquals(Eppn::all()->count(), 1);
 
-        $anonymizedUsername = $util->getAnonymizedUsername($username);
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
 
         $this->assertEquals($anonymizedUsername, hash('sha256', $username));
         $this->assertEquals(Eppn::all()->count(), 2);
@@ -81,13 +92,16 @@ final class EppnTest extends TestCase
     {
         putenv('DB_EPPN="true"');
         $username = 'testuser@example.org';
+        $user = User::create([
+            'username' => $username,
+        ]);
         $util = new class {
             use Util;
         };
 
         $this->assertEquals(Eppn::all()->count(), 2);
 
-        $anonymizedUsername = $util->getAnonymizedUsername($username);
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
 
         $this->assertEquals($anonymizedUsername, hash('sha256', $username));
         $this->assertEquals(Eppn::all()->count(), 2);
@@ -97,13 +111,16 @@ final class EppnTest extends TestCase
     {
         putenv('DB_EPPN="false"');
         $username = 'testuser@test.ac.jp';
+        $user = User::create([
+            'username' => $username,
+        ]);
         $util = new class {
             use Util;
         };
 
         $this->assertEquals(Eppn::all()->count(), 2);
 
-        $anonymizedUsername = $util->getAnonymizedUsername($username);
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
 
         $this->assertEquals($anonymizedUsername, hash('sha256', $username));
         $this->assertEquals(Eppn::all()->count(), 2);
@@ -113,15 +130,92 @@ final class EppnTest extends TestCase
     {
         putenv('DB_EPPN=false');
         $username = 'testuser@test.ac.jp';
+        $user = User::create([
+            'username' => $username,
+        ]);
         $util = new class {
             use Util;
         };
 
         $this->assertEquals(Eppn::all()->count(), 2);
 
-        $anonymizedUsername = $util->getAnonymizedUsername($username);
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
 
         $this->assertEquals($anonymizedUsername, hash('sha256', $username));
         $this->assertEquals(Eppn::all()->count(), 2);
+    }
+
+    public function testGetFromEppnTableWithLTI()
+    {
+        putenv('DB_EPPN=true');
+        $username = 'testuser@test.ac.jp';
+        $user = User::create([
+            'auth' => 'lti',
+            'username' => 'test',
+            'alternatename' => $username,
+        ]);
+        $util = new class {
+            use Util;
+        };
+
+        $this->assertEquals(Eppn::all()->count(), 2);
+
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
+
+        $this->assertEquals(
+            $anonymizedUsername,
+            Eppn::where('username', $username)->first()->hash
+        );
+        $this->assertEquals(Eppn::all()->count(), 2);
+    }
+
+    public function testUpdateEppnTableWithLTI()
+    {
+        putenv('DB_EPPN=true');
+        $username = 'testuser@example.com';
+        $user = User::create([
+            'auth' => 'lti',
+            'username' => 'test',
+            'alternatename' => $username,
+        ]);
+        $util = new class {
+            use Util;
+        };
+
+        $this->assertEquals(Eppn::all()->count(), 2);
+
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
+
+        $this->assertEquals($anonymizedUsername, hash('sha256', $username));
+        $this->assertEquals(Eppn::all()->count(), 3);
+        $this->assertDatabaseHas(
+            'eppn',
+            [
+                'username' => $username,
+                'hash' => hash('sha256', $username),
+                'scope' => 'example.com',
+                'acl' => 'example_com',
+            ],
+            'eppn'
+        );
+    }
+
+    public function testNotUpdateEppnTableWhenAlternatenameIsNullWithLTI()
+    {
+        putenv('DB_EPPN=true');
+        $user = User::create([
+            'auth' => 'lti',
+            'username' => 'test',
+        ]);
+        $util = new class {
+            use Util;
+        };
+
+        $this->assertEquals(Eppn::all()->count(), 3);
+
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
+
+        $this->assertEquals($anonymizedUsername, '');
+        $this->assertEquals(Eppn::all()->count(), 3);
     }
 }

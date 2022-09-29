@@ -36,7 +36,7 @@ final class AssessableSubmitted extends AssignableEvent
             ->setEventTime($as->getEventTime())
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($as->getAnonymizedUsername($actor->username))
+                    ->setName($as->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

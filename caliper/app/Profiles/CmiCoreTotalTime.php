@@ -35,7 +35,7 @@ final class CmiCoreTotalTime extends AssessmentEvent
             ->setAction(new Action(Action::SUBMITTED))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($cctt->getAnonymizedUsername($actor->username))
+                    ->setName($cctt->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

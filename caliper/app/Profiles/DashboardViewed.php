@@ -32,7 +32,7 @@ final class DashboardViewed extends ViewEvent
             ->setAction(new Action(Action::VIEWED))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($dv->getAnonymizedUsername($actor->username))
+                    ->setName($dv->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

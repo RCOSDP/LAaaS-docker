@@ -35,7 +35,7 @@ final class ScorerawSubmitted extends GradeEvent
             ->setAction(new Action(Action::GRADED))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($ss->getAnonymizedUsername($actor->username))
+                    ->setName($ss->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

@@ -31,9 +31,8 @@ trait Util
         }
     }
 
-    public function getAnonymizedUsername(string $username): string
+    public function getAnonymizedUsername(User $actor): string
     {
-        $hash = hash('sha256', $username);
         $eppnValue = env('DB_EPPN');
         if (is_bool($eppnValue) && $eppnValue) {
             $enableEppn = true;
@@ -43,6 +42,10 @@ trait Util
             $enableEppn = false;
         }
         if ($enableEppn) {
+            $username = ($actor->auth === 'lti')
+                ? $actor->alternatename
+                : $actor->username;
+            $hash = $username ? hash('sha256', $username) : '';
             $eppn = Eppn::where('username', $username)->first();
             if (is_null($eppn)) {
                 if (strpos($username, '@')) {
@@ -62,7 +65,7 @@ trait Util
                 return $eppn->hash;
             }
         } else {
-            return $hash;
+            return hash('sha256', $actor->username);
         }
     }
 

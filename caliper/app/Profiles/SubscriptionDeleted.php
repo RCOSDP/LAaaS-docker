@@ -35,7 +35,7 @@ final class SubscriptionDeleted extends ForumEvent
             ->setAction(new Action(Action::UNSUBSCRIBED))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($sd->getAnonymizedUsername($actor->username))
+                    ->setName($sd->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

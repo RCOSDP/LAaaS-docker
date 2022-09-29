@@ -152,8 +152,10 @@ class User extends MoodleBase
     {
         return $query->select([
             'id',
+            'auth',
             'username',
-            'description'
+            'description',
+            'alternatename'
         ]);
     }
 }

@@ -32,7 +32,7 @@ final class CourseViewed extends ViewEvent
             ->setAction(new Action(Action::VIEWED))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($cv->getAnonymizedUsername($actor->username))
+                    ->setName($cv->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

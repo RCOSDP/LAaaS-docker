@@ -30,7 +30,7 @@ final class UserLoggedin extends SessionEvent
             ->setAction(new Action(Action::LOGGED_IN))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($ul->getAnonymizedUsername($actor->username))
+                    ->setName($ul->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(
