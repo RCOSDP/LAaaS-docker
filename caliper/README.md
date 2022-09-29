@@ -4,6 +4,7 @@
 #### Common definitions
 - agent.id = <MOODLE_URL>/user/profile.php?id=<mdl_logstore_standard_log.userid>
 - agent.name = <mdl_user.username> (Converted to SHA256 hash)
+  ※ Set to <mdl_user.alternatename> instead if `ePPNScoped` is enabled and <mdl_user.auth> is 'lti'
 - agent.description = <mdl_user.description>
 - agent.type = Person
 - eventTime = <mdl_logstore_standard_log.timecreated>(Converted)
@@ -372,6 +373,7 @@
 #### Common definitions
 - agent.id = <MOODLE_URL>/user/profile.php?id=<mdl_mdl_scorm_scoes_track.userid>
 - agent.name = <mdl_user.username> (Converted to SHA256 hash)
+  ※ Set to <mdl_user.alternatename> instead if `ePPNScoped` is enabled and <mdl_user.auth> is 'lti'
 - agent.description = <mdl_user.description>
 - agent.type = Person
 - eventTime = <mdl_scorm_scoes_track.timemodified>(Converted)
