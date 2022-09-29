@@ -218,4 +218,25 @@ final class EppnTest extends TestCase
         $this->assertEquals($anonymizedUsername, '');
         $this->assertEquals(Eppn::all()->count(), 3);
     }
+
+    public function testGetWithoutEppnTableWithLti()
+    {
+        putenv('DB_EPPN=false');
+        $username = 'testuser@test.ac.jp';
+        $user = User::create([
+            'auth' => 'lti',
+            'username' => $username,
+            'alternatename' => 'test',
+        ]);
+        $util = new class {
+            use Util;
+        };
+
+        $this->assertEquals(Eppn::all()->count(), 3);
+
+        $anonymizedUsername = $util->getAnonymizedUsername($user);
+
+        $this->assertEquals($anonymizedUsername, hash('sha256', $username));
+        $this->assertEquals(Eppn::all()->count(), 3);
+    }
 }
