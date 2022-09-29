@@ -145,7 +145,7 @@ final class EppnTest extends TestCase
         $this->assertEquals(Eppn::all()->count(), 2);
     }
 
-    public function testGetFromEppnTableWithLTI()
+    public function testGetFromEppnTableWithLti()
     {
         putenv('DB_EPPN=true');
         $username = 'testuser@test.ac.jp';
@@ -169,7 +169,7 @@ final class EppnTest extends TestCase
         $this->assertEquals(Eppn::all()->count(), 2);
     }
 
-    public function testUpdateEppnTableWithLTI()
+    public function testUpdateEppnTableWithLti()
     {
         putenv('DB_EPPN=true');
         $username = 'testuser@example.com';
@@ -200,7 +200,7 @@ final class EppnTest extends TestCase
         );
     }
 
-    public function testNotUpdateEppnTableWhenAlternatenameIsNullWithLTI()
+    public function testNotUpdateEppnTableWhenAlternatenameIsNullWithLti()
     {
         putenv('DB_EPPN=true');
         $user = User::create([
