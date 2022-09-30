@@ -31,12 +31,21 @@ trait Util
         }
     }
 
+    public function getUsername(User $actor): ?string
+    {
+        if ($this->isEnabledEppn()) {
+            return ($actor->auth === 'lti')
+                ? $actor->alternatename
+                : $actor->username;
+        } else {
+            return $actor->username;
+        }
+    }
+
     public function getAnonymizedUsername(User $actor): string
     {
         if ($this->isEnabledEppn()) {
-            $username = ($actor->auth === 'lti')
-                ? $actor->alternatename
-                : $actor->username;
+            $username = $this->getUsername($actor);
             $hash = $username ? hash('sha256', $username) : '';
             $eppn = Eppn::where('username', $username)->first();
             if (is_null($eppn)) {
