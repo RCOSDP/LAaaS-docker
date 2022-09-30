@@ -22,7 +22,17 @@ class UserSeeder extends Seeder
                 'lastname' => $faker->lastName,
                 'description' => $faker->sentence(),
                 'email' => $faker->unique()->safeEmail,
+                'alternatename' => $faker->name() . $users[$i % 3],
             ]);
         }
+        App\Models\Moodle\User::create([
+            'auth' => 'lti',
+            'username' => 'username@wellknown.ac.jp',
+            'alternatename' => 'alternatename@wellknown.ac.jp',
+        ]);
+        App\Models\Moodle\User::create([
+            'auth' => 'lti',
+            'username' => 'username@wellknown.ac.jp',
+        ]);
     }
 }

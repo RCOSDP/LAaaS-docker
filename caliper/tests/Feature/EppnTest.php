@@ -4,9 +4,17 @@ namespace Tests\Feature;
 
 use App\Caliper\Traits\Util;
 use App\Models\Eppn;
-use App\Models\Moodle\User;
+use App\Models\Moodle\{
+    Event,
+    User
+};
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
+
+use function App\Functions\{
+    compile,
+    expand,
+};
 
 final class EppnTest extends TestCase
 {
@@ -238,5 +246,56 @@ final class EppnTest extends TestCase
 
         $this->assertEquals($anonymizedUsername, hash('sha256', $username));
         $this->assertEquals(Eppn::all()->count(), 3);
+    }
+
+    public function testGetLtiUsernameWithEppn()
+    {
+        putenv('DB_EPPN=true');
+        $event = Event::where('userid', 11)->first();
+        $user = User::where('id', 11)->first();
+        $interProd = expand($event);
+        $product = compile($interProd);
+        $this->assertEquals(
+            hash('sha256', $user->alternatename),
+            $product->getActor()->getName()
+        );
+        $this->assertEquals(
+            $user->alternatename,
+            $product->getOriginalUsername()
+        );
+    }
+
+    public function testGetLtiUsernameWhenAlternatenameIsNullWithEppn()
+    {
+        putenv('DB_EPPN=true');
+        $event = Event::where('userid', 12)->first();
+        $user = User::where('id', 12)->first();
+        $interProd = expand($event);
+        $product = compile($interProd);
+        $this->assertEquals(
+            '',
+            $product->getActor()->getName()
+        );
+        $this->assertEquals(
+            '',
+            $product->getOriginalUsername()
+        );
+    }
+
+    public function testGetLtiUsernameWithoutEppn()
+    {
+        putenv('DB_EPPN=false');
+        $event = Event::where('userid', 11)->first();
+        $user = User::where('id', 11)->first();
+        $interProd = expand($event);
+        $product = compile($interProd);
+        $this->assertEquals(
+            hash('sha256', $user->username),
+            $product->getActor()->getName()
+        );
+        $this->assertEquals(
+            $user->username,
+            $product->getOriginalUsername()
+        );
     }
 }

@@ -80,5 +80,7 @@ class EventSeeder extends Seeder
         Event::create($this->event_factory('\core\event\user_loggedout', 1, 'user', 1));
         Event::create($this->event_factory('\core\event\course_viewed', 1, 'user', 1, null, 'origin1'));
         Event::create($this->event_factory('\core\event\course_viewed', 1, 'user', 1, null, 'origin2'));
+        Event::create($this->event_factory('\core\event\course_viewed', 11, 'user', 1));
+        Event::create($this->event_factory('\core\event\course_viewed', 12, 'user', 1));
     }
 }
