@@ -33,15 +33,7 @@ trait Util
 
     public function getAnonymizedUsername(User $actor): string
     {
-        $eppnValue = env('DB_EPPN');
-        if (is_bool($eppnValue) && $eppnValue) {
-            $enableEppn = true;
-        } elseif (is_string($eppnValue) && $eppnValue == 'true') {
-            $enableEppn = true;
-        } else {
-            $enableEppn = false;
-        }
-        if ($enableEppn) {
+        if ($this->isEnabledEppn()) {
             $username = ($actor->auth === 'lti')
                 ? $actor->alternatename
                 : $actor->username;
@@ -124,5 +116,17 @@ trait Util
     public function getCourseId(string $id): string
     {
         return env('APP_URL') . '/course/view.php?id=' . $id;
+    }
+
+    protected function isEnabledEppn(): bool
+    {
+        $eppnValue = env('DB_EPPN');
+        if (is_bool($eppnValue) && $eppnValue) {
+            return true;
+        } elseif (is_string($eppnValue) && $eppnValue == 'true') {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
