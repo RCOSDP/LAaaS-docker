@@ -29,7 +29,7 @@ final class SubscriptionDeleted extends ForumEvent
         $objectId = $sd->getObjectId();
         $partOfId = $sd->getCourseId($partOf->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $sd->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::UNSUBSCRIBED))

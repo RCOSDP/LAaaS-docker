@@ -26,7 +26,7 @@ final class DashboardViewed extends ViewEvent
         $actorId = $dv->getUserId($actor->id);
         $objectId = $dv->getUserId($object->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $dv->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::VIEWED))

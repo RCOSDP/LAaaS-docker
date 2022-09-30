@@ -29,7 +29,7 @@ final class SubscriptionCreated extends ForumEvent
         $objectId = $sc->getObjectId();
         $partOfId = $sc->getCourseId($partOf->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $sc->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::SUBSCRIBED))

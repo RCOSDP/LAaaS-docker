@@ -32,7 +32,7 @@ final class AttemptSubmitted extends AssessmentEvent
         $partOfId = $as->getCourseId($partOf->id);
         $generatedId = $as->getGeneratedId();
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $as->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::SUBMITTED))

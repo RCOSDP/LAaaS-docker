@@ -33,7 +33,7 @@ final class SubmissionGraded extends GradeEvent
         $graderId = $sg->getUserId($grader->id);
         $scoreId = $sg->getScoreId();
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $sg->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::GRADED))

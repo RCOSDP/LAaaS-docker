@@ -32,7 +32,7 @@ final class DiscussionViewed extends ViewEvent
         $partOfId = $dv->getPartOfId();
         $courseId = $dv->getCourseId($course->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $dv->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::VIEWED))

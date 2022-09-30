@@ -24,7 +24,7 @@ final class UserLoggedout extends SessionEvent
 
         $actorId = $ul->getUserId($actor->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $ul->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::LOGGED_OUT))

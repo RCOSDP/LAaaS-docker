@@ -29,7 +29,7 @@ final class AssessableSubmitted extends AssignableEvent
         $objectId = $as->getObjectId();
         $partOfId = $as->getCourseId($partOf->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $as->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::SUBMITTED))

@@ -29,7 +29,7 @@ final class CmiCoreTotalTime extends AssessmentEvent
         $objectId = $cctt->getObjectId();
         $generatedId = $cctt->getGeneratedId();
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $cctt->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::SUBMITTED))
