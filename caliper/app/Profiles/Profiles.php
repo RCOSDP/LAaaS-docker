@@ -8,6 +8,6 @@ trait Profiles
 
     public function getOriginalUsername(): string
     {
-        return $this->originalUsername;
+        return $this->originalUsername ?? '';
     }
 }
