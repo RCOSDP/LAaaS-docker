@@ -32,13 +32,13 @@ final class AttemptStarted extends AssessmentEvent
         $partOfId = $as->getCourseId($partOf->id);
         $generatedId = $as->getGeneratedId();
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $as->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::STARTED))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($as->getAnonymizedUsername($actor->username))
+                    ->setName($as->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

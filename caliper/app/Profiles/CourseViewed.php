@@ -26,13 +26,13 @@ final class CourseViewed extends ViewEvent
         $actorId = $cv->getUserId($actor->id);
         $objectId = $cv->getCourseId($object->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $cv->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::VIEWED))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($cv->getAnonymizedUsername($actor->username))
+                    ->setName($cv->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

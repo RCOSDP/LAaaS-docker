@@ -30,13 +30,13 @@ final class CourseModuleViewed extends NavigationEvent
         $objectId = $cmv->getObjectId();
         $partOfId = $cmv->getCourseId($partOf->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $cmv->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::NAVIGATED_TO))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($cmv->getAnonymizedUsername($actor->username))
+                    ->setName($cmv->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

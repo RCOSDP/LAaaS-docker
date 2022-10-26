@@ -29,14 +29,14 @@ final class AssessableSubmitted extends AssignableEvent
         $objectId = $as->getObjectId();
         $partOfId = $as->getCourseId($partOf->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $as->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::SUBMITTED))
             ->setEventTime($as->getEventTime())
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($as->getAnonymizedUsername($actor->username))
+                    ->setName($as->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(

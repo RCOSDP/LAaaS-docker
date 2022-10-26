@@ -24,13 +24,13 @@ final class UserLoggedin extends SessionEvent
 
         $actorId = $ul->getUserId($actor->id);
 
-        $this->originalUsername = $actor->username;
+        $this->originalUsername = $ul->getUsername($actor);
 
         $this
             ->setAction(new Action(Action::LOGGED_IN))
             ->setActor(
                 (new Person((string) $actorId))
-                    ->setName($ul->getAnonymizedUsername($actor->username))
+                    ->setName($ul->getAnonymizedUsername($actor))
                     ->setDescription($actor->description ?? '')
             )
             ->setObject(
