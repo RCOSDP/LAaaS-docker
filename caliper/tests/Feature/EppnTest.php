@@ -269,7 +269,6 @@ final class EppnTest extends TestCase
     {
         putenv('DB_EPPN=true');
         $event = Event::where('userid', 12)->first();
-        $user = User::where('id', 12)->first();
         $interProd = expand($event);
         $product = compile($interProd);
         $this->assertEquals(
