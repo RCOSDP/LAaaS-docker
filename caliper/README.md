@@ -67,7 +67,8 @@
     - generated.comment = <mdl_assignfeedback_comment.commenttext> found by <mdl_assign_grade.assignment> and <mdl_assign_grade.grade>
     - generated.scoredBy.id = <MOODLE_URL>/user/profile.php?id=<mdl_user.id> found by <mdl_assign_grade.grader>
     - generated.scoredBy.type = Person
-    - generated.scoredBy.name = <mdl_user.username>
+    - generated.scoredBy.name = <mdl_user.username> (Converted to SHA256 hash)
+      ※ Set to <mdl_user.alternatename> instead if `DB_EPPN` is enabled and <mdl_user.auth> is 'lti'
     - generated.scoredBy.description = <mdl_user.description>
 
 - \mod_book\event\course_module_viewed
