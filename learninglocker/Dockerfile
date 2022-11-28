@@ -1,11 +1,19 @@
-# Consult http://docs.learninglocker.net/guides-custom-installation/
-FROM centos:centos7
+FROM rockylinux:9.0
 
-LABEL version="2.0.1"
+LABEL version="3.0.0"
 
-SHELL ["/bin/bash", "-c"]
-RUN yum update -y && \
-    yum -y install curl git python make automake gcc gcc-c++ kernel-devel xorg-x11-server-Xvfb git-core
+RUN dnf update -y && \
+    dnf install -y \
+       automake \
+       curl \
+       gcc \
+       gcc-c++ \
+       git \
+       git-core \
+       kernel-devel \
+       make \
+       python \
+       xorg-x11-server-Xvfb
 
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash && \
     source ~/.bashrc && \
