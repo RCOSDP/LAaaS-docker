@@ -1,6 +1,6 @@
 FROM composer:1.9 AS builder
 
-LABEL version="2.3.0"
+LABEL version="2.4.0"
 
 WORKDIR /stage
 COPY . .

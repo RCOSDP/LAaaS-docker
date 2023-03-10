@@ -104,15 +104,15 @@ services:
     #  - ADMIN_LASTNAME=user
     #  - ADMIN_EMAIL=admin@fab.org
     #  - ADMIN_PASSWORD=admin
+      - SUPERSET_DBUSER=superset
+      - SUPERSET_DBPASS=superset
   superset-db:
     build: superset-db
     container_name: superset-db
-    ports:
-      - "5433:5432"
-    volumes:
-      - superset-db:/var/lib/pgsql/9.6/data
-    user: postgres
     environment:
+      - POSTGRES_USER=superset
+      - POSTGRES_PASSWORD=superset
+      - POSTGRES_DB=superset
       - LRS_HOST=learninglocker_mongo
       - LRS_PORT=27017
       - LRS_DB=learninglocker
@@ -125,6 +125,8 @@ services:
       - LRW_DB_USER=caliper
       - LRW_DB_PASSWORD=caliper
       - LRW_COLLECTION=mongoEvent
+    volumes:
+      - superset-db:/var/lib/postgresql/data
   jupyterhub:
     build: jupyterhub
     container_name: jupyterhub

@@ -5,6 +5,7 @@ If not specified, the following properties will be applied.
 
 * actor.objectType = Agent
 * actor.name = <mdl_user.username> (Converted to SHA256 hash)
+  ※ Set to <mdl_user.alternatename> instead if `ePPNScoped` is enabled and <mdl_user.auth> is 'lti'
 * actor.account.name = <mdl_logstore_standard_log.userid>
 * actor.account.homePage = <Moodle_URL>
 * verb.display['en'] = <mdl_logstore_standard_log.action>
@@ -1450,6 +1451,7 @@ If not specified, the following properties will be applied.
 
 * actor.objectType = Agent
 * actor.name = <mdl_user.username> (Converted to SHA256 hash)
+  ※ Set to <mdl_user.alternatename> instead if `ePPNScoped` is enabled and <mdl_user.auth> is 'lti'
 * actor.account.name = <mdl_scorm_scoes_track.userid>
 * actor.account.homePage = <Moodle_URL>
 * context.contextActivities.category

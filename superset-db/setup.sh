@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
+set -e
 
-psql -p $1 << EOF
-/* Create database used to store Superset users, etc. */
-CREATE DATABASE superset;
-
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
 /* Create database used to store data analysis results done with JupyterHub */
 CREATE DATABASE jupyter;
 
@@ -134,4 +132,4 @@ CREATE FOREIGN TABLE caliper_statements (
   password '$LRW_DB_PASSWORD',
   collection '$LRW_COLLECTION'
 );
-EOF
+EOSQL

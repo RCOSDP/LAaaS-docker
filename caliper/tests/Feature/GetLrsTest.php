@@ -14,6 +14,7 @@ final class GetLrsTest extends TestCase
         $test = new MockEvent('user@testscope');
         $test2 = new MockEvent('user@test.ac.jp');
         $test3 = new MockEvent('noeppn');
+        $test4 = new MockEvent('');
 
         $mockConfig = [
             "default" => "default key",
@@ -27,6 +28,7 @@ final class GetLrsTest extends TestCase
         $this->assertEquals($tenants['default'], get_lrs($test->getUserName()));
         $this->assertEquals($tenants['test.ac.jp'], get_lrs($test2->getUserName()));
         $this->assertEquals($tenants['default'], get_lrs($test3->getUserName()));
+        $this->assertEquals($tenants['default'], get_lrs($test4->getUserName()));
     }
 }
 

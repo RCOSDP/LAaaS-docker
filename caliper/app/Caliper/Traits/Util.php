@@ -31,18 +31,22 @@ trait Util
         }
     }
 
-    public function getAnonymizedUsername(string $username): string
+    public function getUsername(User $actor): ?string
     {
-        $hash = hash('sha256', $username);
-        $eppnValue = env('DB_EPPN');
-        if (is_bool($eppnValue) && $eppnValue) {
-            $enableEppn = true;
-        } elseif (is_string($eppnValue) && $eppnValue == 'true') {
-            $enableEppn = true;
+        if ($this->isEnabledEppn()) {
+            return ($actor->auth === 'lti')
+                ? $actor->alternatename
+                : $actor->username;
         } else {
-            $enableEppn = false;
+            return $actor->username;
         }
-        if ($enableEppn) {
+    }
+
+    public function getAnonymizedUsername(User $actor): string
+    {
+        if ($this->isEnabledEppn()) {
+            $username = $this->getUsername($actor);
+            $hash = $username ? hash('sha256', $username) : '';
             $eppn = Eppn::where('username', $username)->first();
             if (is_null($eppn)) {
                 if (strpos($username, '@')) {
@@ -62,7 +66,7 @@ trait Util
                 return $eppn->hash;
             }
         } else {
-            return $hash;
+            return hash('sha256', $actor->username);
         }
     }
 
@@ -121,5 +125,17 @@ trait Util
     public function getCourseId(string $id): string
     {
         return env('APP_URL') . '/course/view.php?id=' . $id;
+    }
+
+    protected function isEnabledEppn(): bool
+    {
+        $eppnValue = env('DB_EPPN');
+        if (is_bool($eppnValue) && $eppnValue) {
+            return true;
+        } elseif (is_string($eppnValue) && $eppnValue == 'true') {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
