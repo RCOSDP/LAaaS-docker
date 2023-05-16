@@ -42,11 +42,7 @@ const config = {
     definition: {
       type: 'http://id.tincanapi.com/activitytype/source',
       name: 'Moodle',
-      description:
-        'Moodle is a open source learning platform designed to ' +
-        'provide educators, administrators and learners with ' +
-        'a single robust, secure and integrated system to create ' +
-        'personalized learning environments.'
+      description: ''
     }
   },
   platform: 'Moodle',
