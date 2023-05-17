@@ -14,7 +14,7 @@ If not specified, the following properties will be applied.
   - category.id =  http://moodle.org
   - category.definition.type = http://id.tincanapi.com/activitytype/source
   - category.definition.name['en'] = Moodle
-  - category.definition.description['en'] = Moodle is a open source learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalized learning environments.
+  - category.definition.description['en'] = ''
 * context.platform = Moodle
 * context.language = en
 * timestamp = <mdl_logstore_standard_log.timecreated> (Converted)
@@ -1459,7 +1459,7 @@ If not specified, the following properties will be applied.
   - category.id =  http://moodle.org
   - category.definition.type = http://id.tincanapi.com/activitytype/source
   - category.definition.name['en'] = Moodle
-  - category.definition.description['en'] = Moodle is a open source learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalized learning environments.
+  - category.definition.description['en'] = ''
 * context.platform = Moodle
 * context.language = en
 * timestamp = <mdl_scorm_scoes_track.timemodified> (Converted)

@@ -2,7 +2,7 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2021年7月29日
+:revdate: 2023年5月17日
 :doctype: book
 :version-label:
 :chapter-label:
@@ -80,7 +80,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
             "en": "Moodle"
           },
           "description": {
-            "en": "Moodle is a open source learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalized learning environments."
+            "en": ""
           }
         }
       }
