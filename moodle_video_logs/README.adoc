@@ -2,7 +2,7 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2022年9月22日
+:revdate: 2023年5月17日
 :doctype: book
 :version-label:
 :chapter-label:
@@ -43,27 +43,13 @@ const config = {
   LRS:{
     url:'http://<lrs-server-hostname>:8081/data/xAPI/', // <1>
     clients:{
-      // LRS client
       'default':{
         user:'<lrs-client-username>', // <2>
         pass:'<lrs-client-password>' // <3>
       }
     }
   },
-  category:{
-    id:'http://moodle.org',
-    definition:{
-      type:'http://id.tincanapi.com/activitytype/source',
-      name:'Moodle',
-      description:
-        'Moodle is a open source learning platform designed to ' +
-        'provide educators, administrators and learners with ' +
-        'a single robust, secure and integrated system to create ' +
-        'personalized learning environments.'
-    }
-  },
-  platform:'Moodle',
-  language:'en',
+  ...
   homepage: '<moodle-site-url>', // <4>
   pathToCSVFile: './videojs.csv'
 };
