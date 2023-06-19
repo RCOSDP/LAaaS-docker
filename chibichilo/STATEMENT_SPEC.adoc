@@ -1,7 +1,6 @@
 :encoding: utf-8
 :lang: ja
 :source-highlighter: rouge
-:revdate: 2023年5月17日
 :doctype: book
 :version-label:
 :chapter-label:
