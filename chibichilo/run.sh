@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dir_name="moodle_video_logs"
+dir_name="chibichilo"
 path_to_log=$1
 lms_domain=$2
 

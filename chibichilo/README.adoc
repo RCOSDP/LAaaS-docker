@@ -2,7 +2,7 @@
 :lang: ja
 :source-highlighter: rouge
 :author: 国立情報学研究所
-:revdate: 2023年5月17日
+:revdate: 2023年6月19日
 :doctype: book
 :version-label:
 :chapter-label:
@@ -101,7 +101,7 @@ OPENLRW_HOST=<LRWServerHostname>:9966/key/caliper
 インストール先のディレクトリに移動し、Dockerイメージのビルドおよびコンテナの起動を行う。
 
 ----
-$ cd /path/to/moodle_video_logs
+$ cd /path/to/chibichilo
 $ docker-compose build
 $ docker-compose up -d xapi_stmt_gen
 $ docker-compose up -d caliper_stmt_gen
