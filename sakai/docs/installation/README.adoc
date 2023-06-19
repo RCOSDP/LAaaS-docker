@@ -53,7 +53,7 @@ https://github.com/RCOSDP/LAaaS-docker/blob/release-v3.0/README.adoc#learning-lo
 ====
 
 == Sakai
-`docker-compose.yml` で `sakai` の環境変数 `LRS_USERNAME` および `LRS_PASSWORD` に作成したLRSクライアントの `Key` と `Secret` をそれぞれ設定する。 +
+`compose.yaml` で `sakai` の環境変数 `LRS_USERNAME` および `LRS_PASSWORD` に作成したLRSクライアントの `Key` と `Secret` をそれぞれ設定する。 +
 Sakaiが提供するデモデータを起動時に登録する場合には `JAVA_OPTS` で `-Dsakai.demo=true` を指定する。
 
 [[source, diff]]
@@ -131,7 +131,7 @@ $ docker-compose up -d jupyterhub
 ステートメントの可視化・分析を例示・動作確認する目的において、
 Sakaiで実際に操作することなく、 link:../statements/README.adoc[仕様]に則したダミーステートメントを生成するサービス `dummy-xapi` を提供する。
 
-`docker-compose.yml` の `dummy-xapi` で以下に示す環境変数を編集し、ダミーステートメントの生成方法およびステートメントを保存するLRSに関する情報を設定する。
+`compose.yaml` の `dummy-xapi` で以下に示す環境変数を編集し、ダミーステートメントの生成方法およびステートメントを保存するLRSに関する情報を設定する。
 
 [source, yml]
 ----
