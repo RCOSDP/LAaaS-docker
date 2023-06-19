@@ -202,7 +202,7 @@ $ docker exec learning_analytics_db psql -U learning_analytics learning_analytic
 <<<
 === Caliperステートメント変換
 ==== ログデータベースの起動
-`docker-compose.yml` の `caliper_log_db` にデフォルトの設定が記載されている。変更する場合、`caliper/.env` 内の `DB_LOG_*` の項目も合わせて変更する。
+`compose.yaml` の `caliper_log_db` にデフォルトの設定が記載されている。変更する場合、`caliper/.env` 内の `DB_LOG_*` の項目も合わせて変更する。
 
 .caliper/.env
 ----
@@ -383,7 +383,7 @@ PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
 
 本問題が生じた場合には、実行ユーザのUID/GIDを以下の環境変数で指定し、コンテナを再起動すること。
 
-.docker-compose.yml
+.compose.yaml
 [source, diff]
 ----
   jupyterhub:
