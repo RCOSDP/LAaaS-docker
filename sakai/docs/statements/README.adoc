@@ -1,7 +1,6 @@
 :encoding: utf-8
 :lang: ja
 :source-highlighter: rouge
-:revnumber: 1.0版
 :doctype: book
 :version-label:
 :chapter-label:
