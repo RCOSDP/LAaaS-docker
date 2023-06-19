@@ -1,5 +1,5 @@
 **/.idea/*
 **/vendor/*
 **/.vscode/*
-xapi_stmt_gen/log/*
+**/xapi_stmt_gen/log/*
 **/.DS_Store
