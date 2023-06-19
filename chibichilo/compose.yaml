@@ -1,4 +1,3 @@
-version: '3'
 services:
   log_processor:
     container_name: log_processor
