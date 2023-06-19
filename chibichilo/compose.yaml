@@ -1,12 +1,12 @@
 services:
   log_processor:
     container_name: log_processor
-    build: log_processor
+    build: ./chibichilo/log_processor
   xapi_stmt_gen:
     container_name: xapi_video_logs
     build: xapi_stmt_gen
     volumes:
-      - ./xapi_stmt_gen/log:/usr/local/src/xapi_stmt_gen/log
+      - ./chibichilo/xapi_stmt_gen/log:/usr/local/src/xapi_stmt_gen/log
     tty: true
     environment:
       - TZ=Asia/Tokyo
@@ -15,12 +15,8 @@ services:
     container_name: caliper_video_logs
     build: caliper_stmt_gen
     env_file:
-      - ./caliper_stmt_gen/.env
+      - ./chibichilo/caliper_stmt_gen/.env
     tty: true
     environment:
       - TZ=Asia/Tokyo
     restart: always
-networks:
-  default:
-    external:
-      name: moodle-docker_default

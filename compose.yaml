@@ -24,26 +24,6 @@ services:
     volumes:
       - learninglocker_redis:/data
     command: redis-server --appendonly yes
-  xapi_stmt_gen:
-    build: xapi_stmt_gen
-    container_name: xapi_stmt_gen
-    volumes:
-      - ./xapi_stmt_gen/log:/usr/local/src/xapi_stmt_gen/log
-    tty: true
-    environment:
-      - TZ=Asia/Tokyo
-      - INTERVAL=-1
-  openlrw_mongo:
-    image: mongo:4.0.27
-    restart: always
-    env_file:
-      - open_lrw/.env
-    container_name: openlrw_mongo
-    volumes:
-      - ./open_lrw/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
-      - openlrw_mongo:/data/db
-    ports:
-      - "27017:27017"
   openlrw:
     build:
       context: open_lrw
@@ -56,39 +36,17 @@ services:
     env_file:
       - open_lrw/.env
     command: bash -c "/app/docker-start.sh"
-  caliper_stmt_gen:
-    container_name: caliper_stmt_gen
-    build:
-      context: caliper
-      dockerfile: Dockerfile
+  openlrw_mongo:
+    image: mongo:4.0.27
+    restart: always
     env_file:
-      - caliper/.env
-    depends_on:
-      - caliper_log_db
-      - openlrw
-      - openlrw_mongo
-  learning_analytics_db:
-    image: postgres:11
-    container_name: learning_analytics_db
-    environment:
-      - POSTGRES_USER=learning_analytics
-      - POSTGRES_PASSWORD=learning_analytics
-      - POSTGRES_DB=learning_analytics
+      - open_lrw/.env
+    container_name: openlrw_mongo
     volumes:
-      - ./learning_analytics_db/init:/docker-entrypoint-initdb.d
-      - learning_analytics_db:/var/lib/postgresql/data
-  caliper_log_db:
-    image: postgres:11
-    container_name: caliper_log_db
-    environment:
-      - POSTGRES_USER=caliper_cli
-      - POSTGRES_PASSWORD=caliper
-      - POSTGRES_DB=caliper_log
+      - ./open_lrw/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+      - openlrw_mongo:/data/db
     ports:
-      - "15432:5432"
-    volumes:
-      - ./caliper_log/init:/docker-entrypoint-initdb.d
-      - caliper_log_db:/var/lib/postgresql/data
+      - "27017:27017"
   superset:
     build: superset
     container_name: superset
@@ -136,14 +94,8 @@ services:
       - "8001:8000"
     volumes:
       - ./jupyterhub/notebooks:/home/jupyter
-networks:
-  default:
-    external:
-      name: moodle-docker_default
 volumes:
   learninglocker_mongo:
   learninglocker_redis:
   openlrw_mongo:
-  learning_analytics_db:
-  caliper_log_db:
   superset-db:

@@ -10,7 +10,7 @@ services:
       - source: moodle-config
         target: /var/www/html/config.php
     volumes:
-      - ./moodle:/var/www/html
+      - ./moodle/moodle:/var/www/html
       - moodledata:/var/www/moodledata
     environment:
       - MOODLE_DOCKER_DBHOST=moodle-db
@@ -28,9 +28,53 @@ services:
       - POSTGRES_DB=moodle
     volumes:
       - moodle-db:/var/lib/postgresql/data
+  xapi_stmt_gen:
+    build: xapi_stmt_gen
+    container_name: xapi_stmt_gen
+    volumes:
+      - ./moodle/xapi_stmt_gen/log:/usr/local/src/xapi_stmt_gen/log
+    tty: true
+    environment:
+      - TZ=Asia/Tokyo
+      - INTERVAL=-1
+  caliper_stmt_gen:
+    container_name: caliper_stmt_gen
+    build:
+      context: caliper
+      dockerfile: Dockerfile
+    env_file:
+      - ./moodle/caliper/.env
+    depends_on:
+      - caliper_log_db
+      - openlrw
+      - openlrw_mongo
+  learning_analytics_db:
+    image: postgres:11
+    container_name: learning_analytics_db
+    environment:
+      - POSTGRES_USER=learning_analytics
+      - POSTGRES_PASSWORD=learning_analytics
+      - POSTGRES_DB=learning_analytics
+    volumes:
+      - ./moodle/learning_analytics_db/init:/docker-entrypoint-initdb.d
+      - learning_analytics_db:/var/lib/postgresql/data
+  caliper_log_db:
+    image: postgres:11
+    container_name: caliper_log_db
+    environment:
+      - POSTGRES_USER=caliper_cli
+      - POSTGRES_PASSWORD=caliper
+      - POSTGRES_DB=caliper_log
+    ports:
+      - "15432:5432"
+    volumes:
+      - ./moodle/caliper_log/init:/docker-entrypoint-initdb.d
+      - caliper_log_db:/var/lib/postgresql/data
 configs:
   moodle-config:
-    file: ./config.php
+    file: ./moodle/config.php
 volumes:
   moodle-db:
   moodledata:
+  caliper_log_db:
+  learning_analytics_db:
