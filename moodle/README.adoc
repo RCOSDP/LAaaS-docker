@@ -1,7 +1,6 @@
 :encoding: utf-8
 :lang: ja
 :source-highlighter: rouge
-:author: 国立情報学研究所
 :revdate: 2022年9月16日
 :doctype: book
 :version-label:
