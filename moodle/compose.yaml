@@ -5,7 +5,7 @@ services:
     depends_on:
       - moodle-db
     ports:
-      - 8000:80
+      - "8000:80"
     configs:
       - source: moodle-config
         target: /var/www/html/config.php
