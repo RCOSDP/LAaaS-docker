@@ -5,7 +5,7 @@ services:
     depends_on:
       - moodle-db
     ports:
-      - 8080:80
+      - 8000:80
     configs:
       - source: moodle-config
         target: /var/www/html/config.php
@@ -17,7 +17,7 @@ services:
       - MOODLE_DOCKER_DBNAME=moodle
       - MOODLE_DOCKER_DBUSER=moodle
       - MOODLE_DOCKER_DBPASS=m@0dl3ing
-      - MOODLE_DOCKER_MDLURL=http://localhost:8080
+      - MOODLE_DOCKER_MDLURL=http://localhost:8000
       - MOODLE_DOCKER_DATAPATH=/var/www/moodledata
   moodle-db:
     image: postgres:13.8
