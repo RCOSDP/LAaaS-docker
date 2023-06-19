@@ -1,7 +1,6 @@
 :encoding: utf-8
 :lang: ja
 :source-highlighter: rouge
-:author: 株式会社Udzuki
 :revdate: 2021年12月7日
 :revnumber: 1.0版
 :doctype: book
