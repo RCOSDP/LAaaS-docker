@@ -86,9 +86,9 @@ $ mongo caliper -u <caliper-username> -p <caliper-password>
 > exit
 ----
 
-`caliper_stmt_gen/.env` に `ApiKey` とLRWサーバのホスト名を設定する。
+`caliper/.env` に `ApiKey` とLRWサーバのホスト名を設定する。
 
-.caliper_stmt_gen/.env
+.caliper/.env
 [source, javascript]
 ----
 OPENLRW_APIKEY=<ApiKey>
