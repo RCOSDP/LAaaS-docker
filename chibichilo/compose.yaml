@@ -1,10 +1,10 @@
 services:
   log_processor:
     container_name: log_processor
-    build: ./chibichilo/log_processor
+    build: chibichilo/log_processor
   xapi_stmt_gen:
     container_name: xapi_video_logs
-    build: xapi_stmt_gen
+    build: chibichilo/xapi_stmt_gen
     volumes:
       - ./chibichilo/xapi_stmt_gen/log:/usr/local/src/xapi_stmt_gen/log
     tty: true
@@ -13,7 +13,7 @@ services:
     restart: always
   caliper_stmt_gen:
     container_name: caliper_video_logs
-    build: caliper_stmt_gen
+    build: chibichilo/caliper_stmt_gen
     env_file:
       - ./chibichilo/caliper_stmt_gen/.env
     tty: true

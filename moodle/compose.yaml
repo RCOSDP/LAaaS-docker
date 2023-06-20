@@ -29,8 +29,8 @@ services:
     volumes:
       - moodle-db:/var/lib/postgresql/data
   xapi_stmt_gen:
-    build: xapi_stmt_gen
     container_name: xapi_stmt_gen
+    build: moodle/xapi_stmt_gen
     volumes:
       - ./moodle/xapi_stmt_gen/log:/usr/local/src/xapi_stmt_gen/log
     tty: true
@@ -40,7 +40,7 @@ services:
   caliper_stmt_gen:
     container_name: caliper_stmt_gen
     build:
-      context: caliper
+      context: moodle/caliper
       dockerfile: Dockerfile
     env_file:
       - ./moodle/caliper/.env

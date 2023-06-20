@@ -13,7 +13,7 @@ services:
     volumes:
       - sakai_mysql:/var/lib/mysql
   sakai:
-    build: .
+    build: sakai
     container_name: sakai
     depends_on:
       - sakai_mysql
@@ -28,7 +28,7 @@ services:
     ports:
       - "8888:8080"
   dummy-xapi:
-    build: dummy-xapi
+    build: sakai/dummy-xapi
     container_name: dummy-xapi
     tty: true
     environment:
