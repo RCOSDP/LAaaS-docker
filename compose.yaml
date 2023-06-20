@@ -26,7 +26,7 @@ services:
     command: redis-server --appendonly yes
   openlrw:
     build: openlrw
-    container_name: openlrw_web
+    container_name: openlrw
     depends_on:
       - openlrw_mongo
     ports:

@@ -77,7 +77,7 @@ image::moodle.png[align=center]
 .5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
                        .2+|Learning Locker(DB)           |learninglocker_mongo
                                                          |learninglocker_redis
-                          |OpenLRW(Web)                  |openlrw_web
+                          |OpenLRW(Web)                  |openlrw
                           |OpenLRW(DB)                   |openlrw_mongo
 .4+|ステートメント変換    |xAPIステートメント変換        |xapi_stmt_gen
                           |Caliperステートメント変換     |caliper_stmt_gen
