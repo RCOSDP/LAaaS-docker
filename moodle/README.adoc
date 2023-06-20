@@ -232,7 +232,7 @@ $ docker-compose up -d caliper_log_db
 <<<
 [[caliper_settings]]
 ==== 初期設定
-`openlrw_mongo` のMongoDBに接続する。ログイン情報は `open_lrw/.env` に従う。
+`openlrw_mongo` のMongoDBに接続する。ログイン情報は `openlrw/.env` に従う。
 
 ----
 $ docker exec -it openlrw_mongo bash

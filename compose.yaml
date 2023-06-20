@@ -25,25 +25,23 @@ services:
       - learninglocker_redis:/data
     command: redis-server --appendonly yes
   openlrw:
-    build:
-      context: open_lrw
-      dockerfile: Dockerfile
+    build: openlrw
     container_name: openlrw_web
     depends_on:
       - openlrw_mongo
     ports:
       - "9966:9966"
     env_file:
-      - open_lrw/.env
+      - openlrw/.env
     command: bash -c "/app/docker-start.sh"
   openlrw_mongo:
     image: mongo:4.0.27
     restart: always
     env_file:
-      - open_lrw/.env
+      - openlrw/.env
     container_name: openlrw_mongo
     volumes:
-      - ./open_lrw/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+      - ./openlrw/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
       - openlrw_mongo:/data/db
     ports:
       - "27017:27017"
