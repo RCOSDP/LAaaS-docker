@@ -151,7 +151,7 @@ image::learninglocker/new-xapi-store-client.png[align=center]
 ==== 初期設定
 スクリプトの設定ファイルを編集する。
 
-.xapi_stmt_gen/xapi_stmt_gen/config/app.js
+.xapi/src/config/app.js
 [source, javascript]
 ----
 const config = {

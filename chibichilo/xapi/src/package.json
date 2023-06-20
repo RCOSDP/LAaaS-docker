@@ -1,5 +1,5 @@
 {
-  "name": "xapi_stmt_gen",
+  "name": "xapi",
   "version": "1.0.0",
   "description": "xAPI statement generator",
   "main": "server.js",

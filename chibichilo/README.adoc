@@ -32,9 +32,9 @@ image::lrs-client.png[align=center]
 
 <<<
 
-`xapi_stmt_gen/xapi_stmt_gen/config/app.js` にLRSのクライアント情報を設定する。
+`xapi/src/config/app.js` にLRSのクライアント情報を設定する。
 
-.xapi_stmt_gen/xapi_stmt_gen/config/app.js
+.xapi/src/config/app.js
 [source, javascript]
 ----
 const config = {
