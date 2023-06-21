@@ -3,46 +3,46 @@ services:
     build: learninglocker
     container_name: learninglocker
     depends_on:
-      - learninglocker_mongo
-      - learninglocker_redis
+      - learninglocker-mongo
+      - learninglocker-redis
     ports:
       - "3000:3000"
       - "8080:8080"
       - "8081:8081"
     working_dir: /usr/local/src/learninglocker
     command: bash -c "source ~/.bashrc && yarn migrate && pm2 start pm2/all.json && cd ../xapi-service && pm2 start pm2/xapi.json && pm2 logs"
-  learninglocker_mongo:
+  learninglocker-mongo:
     image: mongo:4.0.8
-    container_name: learninglocker_mongo
+    container_name: learninglocker-mongo
     restart: always
     volumes:
-      - learninglocker_mongo:/data/db
-  learninglocker_redis:
+      - learninglocker-mongo:/data/db
+  learninglocker-redis:
     image: redis:5.0.4
-    container_name: learninglocker_redis
+    container_name: learninglocker-redis
     restart: always
     volumes:
-      - learninglocker_redis:/data
+      - learninglocker-redis:/data
     command: redis-server --appendonly yes
   openlrw:
     build: openlrw
     container_name: openlrw
     depends_on:
-      - openlrw_mongo
+      - openlrw-mongo
     ports:
       - "9966:9966"
     env_file:
       - openlrw/.env
     command: bash -c "/app/docker-start.sh"
-  openlrw_mongo:
+  openlrw-mongo:
     image: mongo:4.0.27
     restart: always
     env_file:
       - openlrw/.env
-    container_name: openlrw_mongo
+    container_name: openlrw-mongo
     volumes:
       - ./openlrw/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
-      - openlrw_mongo:/data/db
+      - openlrw-mongo:/data/db
     ports:
       - "27017:27017"
   superset:
@@ -68,13 +68,13 @@ services:
       - POSTGRES_USER=superset
       - POSTGRES_PASSWORD=superset
       - POSTGRES_DB=superset
-      - LRS_HOST=learninglocker_mongo
+      - LRS_HOST=learninglocker-mongo
       - LRS_PORT=27017
       - LRS_DB=learninglocker
       - LRS_DB_USER=
       - LRS_DB_PASSWORD=
       - LRS_COLLECTION=statements
-      - LRW_HOST=openlrw_mongo
+      - LRW_HOST=openlrw-mongo
       - LRW_PORT=27017
       - LRW_DB=caliper
       - LRW_DB_USER=caliper
@@ -93,7 +93,7 @@ services:
     volumes:
       - ./jupyterhub/notebooks:/home/jupyter
 volumes:
-  learninglocker_mongo:
-  learninglocker_redis:
-  openlrw_mongo:
+  learninglocker-mongo:
+  learninglocker-redis:
+  openlrw-mongo:
   superset-db:

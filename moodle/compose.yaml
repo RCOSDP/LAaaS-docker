@@ -43,22 +43,22 @@ services:
     env_file:
       - ./moodle/caliper/.env
     depends_on:
-      - caliper_log_db
+      - caliper-log-db
       - openlrw
-      - openlrw_mongo
-  learning_analytics_db:
+      - openlrw-mongo
+  learning-analytics-db:
     image: postgres:11
-    container_name: learning_analytics_db
+    container_name: learning-analytics-db
     environment:
       - POSTGRES_USER=learning_analytics
       - POSTGRES_PASSWORD=learning_analytics
       - POSTGRES_DB=learning_analytics
     volumes:
-      - ./moodle/learning_analytics_db/init:/docker-entrypoint-initdb.d
-      - learning_analytics_db:/var/lib/postgresql/data
-  caliper_log_db:
+      - ./moodle/learning-analytics-db/init:/docker-entrypoint-initdb.d
+      - learning-analytics-db:/var/lib/postgresql/data
+  caliper-log-db:
     image: postgres:11
-    container_name: caliper_log_db
+    container_name: caliper-log-db
     environment:
       - POSTGRES_USER=caliper_cli
       - POSTGRES_PASSWORD=caliper
@@ -66,13 +66,13 @@ services:
     ports:
       - "15432:5432"
     volumes:
-      - ./moodle/caliper_log/init:/docker-entrypoint-initdb.d
-      - caliper_log_db:/var/lib/postgresql/data
+      - ./moodle/caliper-log/init:/docker-entrypoint-initdb.d
+      - caliper-log-db:/var/lib/postgresql/data
 configs:
   moodle-config:
     file: ./moodle/config.php
 volumes:
   moodle-db:
   moodledata:
-  caliper_log_db:
-  learning_analytics_db:
+  caliper-log-db:
+  learning-analytics-db:

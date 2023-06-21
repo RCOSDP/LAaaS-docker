@@ -75,14 +75,14 @@ image::moodle.png[align=center]
 |===
    |項目                  |名称                          |コンテナ名
 .5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
-                       .2+|Learning Locker(DB)           |learninglocker_mongo
-                                                         |learninglocker_redis
+                       .2+|Learning Locker(DB)           |learninglocker-mongo
+                                                         |learninglocker-redis
                           |OpenLRW(Web)                  |openlrw
-                          |OpenLRW(DB)                   |openlrw_mongo
-                          |Caliperステートメント変換(db) |caliper_log_db
-                          |Learning Analytics DB         |learning_analytics_db
+                          |OpenLRW(DB)                   |openlrw-mongo
 .4+|ステートメント変換    |xAPIステートメント変換        |moodle-xapi
                           |Caliperステートメント変換     |moodle-caliper
+                          |Caliperステートメント変換(db) |caliper-log-db
+                          |Learning Analytics DB         |learning-analytics-db
 .3+|分析システム          |Superset(Web)                 |superset
                           |Superset(DB)                  |superset-db
                           |JupyterHub(Web/DB)            |jupyterhub
@@ -188,19 +188,19 @@ image::learninglocker/source.png[align=center]
 なお、Moodleログの処理済み件数を算出する場合は以下のコマンドを実行する。
 
 ----
-$ docker exec learning_analytics_db psql -U learning_analytics learning_analytics -c "SELECT count(*) FROM xapi_records_processed;"
+$ docker exec learning-analytics-db psql -U learning_analytics learning_analytics -c "SELECT count(*) FROM xapi_records_processed;"
 ----
 
 また、スクリプトのバージョンアップ等に伴い処理済みのMoodleログを再度処理したい場合は、以下のコマンドで変換処理の実行履歴を削除する。
 
 ----
-$ docker exec learning_analytics_db psql -U learning_analytics learning_analytics -c "DELETE FROM xapi_records_processed;"
+$ docker exec learning-analytics-db psql -U learning_analytics learning_analytics -c "DELETE FROM xapi_records_processed;"
 ----
 
 <<<
 === Caliperステートメント変換
 ==== ログデータベースの起動
-`compose.yaml` の `caliper_log_db` にデフォルトの設定が記載されている。変更する場合、`caliper/.env` 内の `DB_LOG_*` の項目も合わせて変更する。
+`compose.yaml` の `caliper-log-db` にデフォルトの設定が記載されている。変更する場合、`caliper/.env` 内の `DB_LOG_*` の項目も合わせて変更する。
 
 .caliper/.env
 ----
@@ -208,7 +208,7 @@ $ docker exec learning_analytics_db psql -U learning_analytics learning_analytic
 
 変更前
 ...
-DB_LOG_HOST=caliper_log_db
+DB_LOG_HOST=caliper-log-db
 DB_LOG_DATABASE=caliper_log
 DB_LOG_USERNAME=caliper_cli
 DB_LOG_PASSWORD=caliper
@@ -216,26 +216,26 @@ DB_LOG_PASSWORD=caliper
 
 変更後
 ...
-DB_LOG_HOST=caliper_log_db
+DB_LOG_HOST=caliper-log-db
 DB_LOG_DATABASE=<changed database name>
 DB_LOG_USERNAME=<changed username>
 DB_LOG_PASSWORD=<changed password>
 ...
 ----
 
-設定完了後、 `caliper_log_db` を起動する。
+設定完了後、 `caliper-log-db` を起動する。
 
 ----
-$ docker-compose up -d caliper_log_db
+$ docker compose up -d caliper-log-db
 ----
 
 <<<
 [[caliper_settings]]
 ==== 初期設定
-`openlrw_mongo` のMongoDBに接続する。ログイン情報は `openlrw/.env` に従う。
+`openlrw-mongo` のMongoDBに接続する。ログイン情報は `openlrw/.env` に従う。
 
 ----
-$ docker exec -it openlrw_mongo bash
+$ docker exec -it openlrw-mongo bash
 # mongo <openlrw-database> -u <openlrw-username> -p <openlrw-password>
 ----
 
@@ -285,10 +285,10 @@ $ docker compose build moodle-caliper
 $ docker compose run --rm moodle-caliper
 ----
 
-`openlrw_mongo` に接続し、データベースに送出したステートメントが登録されていることを確認する。
+`openlrw-mongo` に接続し、データベースに送出したステートメントが登録されていることを確認する。
 
 ----
-$ docker exec -it openlrw_mongo bash
+$ docker exec -it openlrw-mongo bash
 # mongo <openlrw-database> -u <openlrw-username> -p <openlrw-password>
 > db.mongoEvent.find().pretty()
 ----

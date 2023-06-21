@@ -21,7 +21,7 @@ const config = {
       prefix: 'mdl_'
     },
     la: {
-      host: 'learning_analytics_db',
+      host: 'learning-analytics-db',
       port: 5432,
       database: 'learning_analytics',
       username: 'learning_analytics',
