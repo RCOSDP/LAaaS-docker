@@ -79,10 +79,10 @@ image::moodle.png[align=center]
                                                          |learninglocker_redis
                           |OpenLRW(Web)                  |openlrw
                           |OpenLRW(DB)                   |openlrw_mongo
-.4+|ステートメント変換    |xAPIステートメント変換        |xapi_stmt_gen
                           |Caliperステートメント変換     |caliper_stmt_gen
                           |Caliperステートメント変換(db) |caliper_log_db
                           |Learning Analytics DB         |learning_analytics_db
+.4+|ステートメント変換    |xAPIステートメント変換        |moodle-xapi
 .3+|分析システム          |Superset(Web)                 |superset
                           |Superset(DB)                  |superset-db
                           |JupyterHub(Web/DB)            |jupyterhub
@@ -166,11 +166,11 @@ const config = {
 ----
 <1> <<learninglocker_client_settings>>で確認したLRSのクライアント情報を設定
 
-設定ファイルの変更を `xapi_stmt_gen` コンテナに反映する。
+設定ファイルの変更を `moodle-xapi` コンテナに反映する。
 
 ----
-$ docker-compose build xapi_stmt_gen
-$ docker-compose up -d xapi_stmt_gen
+$ docker compose build moodle-xapi
+$ docker compose up -d moodle-xapi
 ----
 
 <<<
@@ -178,7 +178,7 @@ $ docker-compose up -d xapi_stmt_gen
 Moodle上での学習活動を実施した後、以下のコマンドでMoodleログをxAPIステートメントに変換する。
 
 ----
-$ docker exec xapi_stmt_gen npm start
+$ docker exec moodle-xapi npm start
 ----
 
 Learning Lockerにアクセスし、ステートメントが正常に登録されていることを確認する。

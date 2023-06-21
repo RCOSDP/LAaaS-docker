@@ -2,8 +2,8 @@ services:
   log_processor:
     container_name: log_processor
     build: chibichilo/log_processor
-  xapi_stmt_gen:
-    container_name: xapi_video_logs
+  chibichilo-xapi:
+    container_name: chibichilo-xapi
     build: chibichilo/xapi
     volumes:
       - ./chibichilo/xapi/log:/app/log

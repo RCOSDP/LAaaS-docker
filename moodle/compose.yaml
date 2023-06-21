@@ -28,9 +28,9 @@ services:
       - POSTGRES_DB=moodle
     volumes:
       - moodle-db:/var/lib/postgresql/data
-  xapi_stmt_gen:
-    container_name: xapi_stmt_gen
+  moodle-xapi:
     build: moodle/xapi
+    container_name: moodle-xapi
     volumes:
       - ./moodle/xapi/log:/app/log
     tty: true
