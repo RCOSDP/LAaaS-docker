@@ -79,10 +79,10 @@ image::moodle.png[align=center]
                                                          |learninglocker_redis
                           |OpenLRW(Web)                  |openlrw
                           |OpenLRW(DB)                   |openlrw_mongo
-                          |Caliperステートメント変換     |caliper_stmt_gen
                           |Caliperステートメント変換(db) |caliper_log_db
                           |Learning Analytics DB         |learning_analytics_db
 .4+|ステートメント変換    |xAPIステートメント変換        |moodle-xapi
+                          |Caliperステートメント変換     |moodle-caliper
 .3+|分析システム          |Superset(Web)                 |superset
                           |Superset(DB)                  |superset-db
                           |JupyterHub(Web/DB)            |jupyterhub
@@ -281,8 +281,8 @@ Moodle上での学習活動を実施した後、以下のコマンドでMoodle�
 ApiKeyの設定を適用するため、コンテナをリビルドしてから行うこと。
 
 ----
-$ docker-compose build caliper_stmt_gen
-$ docker-compose run --rm caliper_stmt_gen
+$ docker compose build moodle-caliper
+$ docker compose run --rm moodle-caliper
 ----
 
 `openlrw_mongo` に接続し、データベースに送出したステートメントが登録されていることを確認する。

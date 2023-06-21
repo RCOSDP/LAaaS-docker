@@ -11,8 +11,8 @@ services:
     environment:
       - TZ=Asia/Tokyo
     restart: always
-  caliper_stmt_gen:
-    container_name: caliper_video_logs
+  chibichilo-caliper:
+    container_name: chibichilo-caliper
     build: chibichilo/caliper
     env_file:
       - ./chibichilo/caliper/.env

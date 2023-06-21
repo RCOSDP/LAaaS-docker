@@ -37,11 +37,9 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - INTERVAL=-1
-  caliper_stmt_gen:
-    container_name: caliper_stmt_gen
-    build:
-      context: moodle/caliper
-      dockerfile: Dockerfile
+  moodle-caliper:
+    build: moodle/caliper
+    container_name: moodle-caliper
     env_file:
       - ./moodle/caliper/.env
     depends_on:
