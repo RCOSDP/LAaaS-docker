@@ -1,7 +1,7 @@
 services:
-  log_processor:
-    container_name: log_processor
-    build: chibichilo/log_processor
+  log-processor:
+    container_name: log-processor
+    build: chibichilo/log-processor
   chibichilo-xapi:
     container_name: chibichilo-xapi
     build: chibichilo/xapi
