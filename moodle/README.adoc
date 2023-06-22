@@ -53,18 +53,18 @@ docker compose up -d
 [source, mermaid]
 ----
 graph TB
-  ST([Students]) -- Learning Activity                   --> M[Moodle]
-  M              -. Learning Log                        .-> X[[xAPI]]    -- xAPI Statements    --> L[(Learning Locker)]
-  M              -. Learning Log                        .-> C[[Caliper]] -- Caliper Statements --> O[(OpenLRW)]
-  L              -- xAPI Statements                     --> S[Superset]
-  L              -- xAPI Statements                     --> J[JupyterHub]
-  O              -- Caliper Statements                  --> S
-  O              -- Caliper Statements                  --> J
-  S              -- Visualization                       --> T([Teachers])
-  J              -- Analysis                            --> T
-  J              -. Analysis Result                     .-> S
-  T              -- Refining Instruction and Coursework --> M
-  T              -- Advancing Student Success           --> ST
+  ST([受講者]) -- 学習活動                   --> M[Moodle]
+  M            -. 学習ログ                   .-> X[[xAPI変換]]    -- xAPIステートメント    --> L[(Learning Locker)]
+  M            -. 学習ログ                   .-> C[[Caliper変換]] -- Caliperステートメント --> O[(OpenLRW)]
+  L            --> S[Superset]
+  L            --> J[JupyterHub]
+  O            --> S
+  O            --> J
+  S            -- 可視化                     --> T([コース管理者])
+  J            -- 分析結果                   --> T
+  J            -. 分析結果                   .-> S
+  T            == 教育方法とコース設計の改善 ==> M
+  M            == 学習体験と成果の向上       ==> ST
 ----
 
 == Moodle
