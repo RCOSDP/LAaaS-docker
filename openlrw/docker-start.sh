@@ -5,7 +5,6 @@ export JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
 
 # Pass in some spring boot opts https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 
-# These currently match the settings in compose.yaml
 export SPRING_BOOT_OPTS="--spring.data.mongodb.uri=$OPENLRW_URI"
 
 # If SSL/TLS is enabled, add Java options
