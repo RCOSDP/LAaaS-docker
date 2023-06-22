@@ -23,57 +23,19 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-= ラーニングアナリティクス基盤システム Docker 環境構築手順書
+= Moodleの学習ログ分析
 
-== 前提
-* Docker
-* Docker Compose
-
-== LAaaS-dockerのインストール
+Moodleの学習ログ分析基盤を構築する。
 
 ----
-$ git clone https://github.com/RCOSDP/LAaaS-docker.git
+docker compose up -d
 ----
 
-== LMS(学習管理システム) - Moodle
-=== インストール
-`bin/moodle_install` を実行してMoodleのDocker環境をインストールする。 +
-本スクリプトでは主に次の処理を行う。
-
-* Moodle 3.4をダウンロード
-* `moodle-docker` の設定で `MOODLE_DOCKER_DBUSER` および `POSTGRES_USER` を `moodleuser` に変更( `moodle-docker/base.yml` )
-* Moodleの設定でMoodleデータベースのテーブル名に付与する接頭辞を `mdl_` に変更( `moodle-docker/moodle/config.php` )
-* Moodleのコンテナ群を起動
-
-----
-$ cd LAaaS-docker
-$ bin/moodle_install
-----
-
-起動したコンテナを停止するには次のコマンドを実行する。
-
-----
-$ bin/moodle_stop
-----
-
-Moodleのコンテナ群を立ち上げるには次のコマンドを実行する。
-
-----
-$ bin/moodle_start
-----
-
-<<<
-
-=== 初期設定
-Moodle( http://localhost:8000 )にアクセスし、画面の指示に従って初期設定を行う。
-
-image::moodle.png[align=center]
-
-== LA(学習履歴分析)基盤
-次のコンテナを起動する。
-
+.システム構成
 |===
    |項目                  |名称                          |コンテナ名
+.2+|学習管理システム      |Moodle(Web)                   |moodle
+                          |Moodle(DB)                    |moodle-db
 .5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
                        .2+|Learning Locker(DB)           |learninglocker-mongo
                                                          |learninglocker-redis
@@ -81,74 +43,73 @@ image::moodle.png[align=center]
                           |OpenLRW(DB)                   |openlrw-mongo
 .4+|ステートメント変換    |xAPIステートメント変換        |moodle-xapi
                           |Caliperステートメント変換     |moodle-caliper
-                          |Caliperステートメント変換(db) |caliper-log-db
+                          |Caliperステートメント変換(DB) |caliper-log-db
                           |Learning Analytics DB         |learning-analytics-db
 .3+|分析システム          |Superset(Web)                 |superset
                           |Superset(DB)                  |superset-db
                           |JupyterHub(Web/DB)            |jupyterhub
 |===
 
+[source, mermaid]
 ----
-$ docker-compose up -d
-----
-<<<
-各コンテナ間の関係を下図に示す。
-
-.Moodleログから生成したxAPIステートメントをLearning Lockerに登録
-image::generate_xapi_statements.png[align=center]
-
-.Supersetを用いた分析(xAPIステートメントの例)
-image::analysis_using_superset.png[align=center]
-
-.xAPIステートメントのJupyterHubおよびSupersetを用いた分析
-image::xapi_analysis_using_jupyterhub_and_superset.png[align=center]
-
-.CaliperステートメントのJupyterHubを用いた分析
-image::caliper_analysis_using_jupyterhub.png[align=center]
-
-<<<
-=== Learning Locker
-==== Adminユーザの作成
-`learninglocker` コンテナに接続し、Adminユーザを作成する。
-
-----
-$ docker exec -it learninglocker bash
-# node ./cli/dist/server createSiteAdmin "<e-mail-address> " "<organization>" "<password>"
+graph TB
+  ST([Students]) -- Learning Activity                   --> M[Moodle]
+  M              -. Learning Log                        .-> X[[xAPI]]    -- xAPI Statements    --> L[(Learning Locker)]
+  M              -. Learning Log                        .-> C[[Caliper]] -- Caliper Statements --> O[(OpenLRW)]
+  L              -- xAPI Statements                     --> S[Superset]
+  L              -- xAPI Statements                     --> J[JupyterHub]
+  O              -- Caliper Statements                  --> S
+  O              -- Caliper Statements                  --> J
+  S              -- Visualization                       --> T([Teachers])
+  J              -- Analysis                            --> T
+  J              -. Analysis Result                     .-> S
+  T              -- Refining Instruction and Coursework --> M
+  T              -- Advancing Student Success           --> ST
 ----
 
+== Moodle
+Moodle( http://localhost:8000 )で学習活動を行う。
+
+== Learning Locker
+=== Adminユーザの作成
+Learning LockerのAdminユーザを作成する。
+
+----
+EMAIL_ADDRESS=<e-mail-address>
+ORGANIZATION=<organization>
+PASSWORD=<password>
+docker exec learninglocker bash -c '\
+  source ~/.bashrc;
+  node ./cli/dist/server createSiteAdmin "${EMAIL_ADDRESS}" "${ORGANIZATION}" "${PASSWORD}"'
+----
+
+=== ログイン
+Learning Locker( http://localhost:3000/ )にAdminユーザのアカウントでログインし、組織を選択する。
+
+[cols="a,a", frame=none, grid=none]
+|===
+| image::learninglocker/login.png[]
+| image::learninglocker/select-org.png[]
+|===
+
 <<<
-==== ログイン
-Learning Locker( http://localhost:3000/ )にアクセスし、Adminユーザのアカウントでログインする。
-
-image::learninglocker/login.png[align=center, scaledwidth=50%]
-
-<<<
-組織を選択する。
-
-image::learninglocker/select-org.png[align=center, scaledwidth=50%]
-
-ダッシュボードが表示されることを確認する。
-
-image::learninglocker/dashboards.png[align=center]
-
-<<<
-==== LRSの作成
-サイドメニューの `Settings>Stores` から任意の名称でLRSを作成する。
+=== LRSの作成
+サイドメニューの `[Settings] > [Stores]` から任意の名称でLRSを作成する。
 
 image::learninglocker/stores.png[align=center]
 image::learninglocker/add-new-lrs.png[align=center]
 
 <<<
 [[learninglocker_client_settings]]
-==== クライアント情報の設定
-サイドメニューの `Settings>Clients` から `New xAPI store client` を選択する。
+=== クライアント情報の設定
+サイドメニューの `[Settings] > [Clients]` から `New xAPI store client` を選択する。 +
 `Overall Scopes` の `API All` にチェックを入れ、 `LRS (optional)` に上記で作成したLRSを指定する。
 
 image::learninglocker/new-xapi-store-client.png[align=center]
 
 <<<
-=== xAPIステートメント変換
-==== 初期設定
+== xAPIステートメント変換
+=== 初期設定
 スクリプトの設定ファイルを編集する。
 
 .xapi/src/config/app.js
@@ -169,153 +130,119 @@ const config = {
 設定ファイルの変更を `moodle-xapi` コンテナに反映する。
 
 ----
-$ docker compose build moodle-xapi
-$ docker compose up -d moodle-xapi
+docker compose build moodle-xapi
+docker compose up -d moodle-xapi
 ----
 
 <<<
-==== ステートメント変換
-Moodle上での学習活動を実施した後、以下のコマンドでMoodleログをxAPIステートメントに変換する。
+=== ステートメント変換
+学習ログをxAPIステートメントに変換する。
 
 ----
-$ docker exec moodle-xapi npm start
+docker exec moodle-xapi npm start
 ----
 
-Learning Lockerにアクセスし、ステートメントが正常に登録されていることを確認する。
+Learning Lockerにステートメントが登録されていることを確認する。
 
 image::learninglocker/source.png[align=center]
 
-なお、Moodleログの処理済み件数を算出する場合は以下のコマンドを実行する。
+[TIP]
+====
+変換が完了したログの件数を取得する場合は以下のコマンドを実行する。
 
 ----
-$ docker exec learning-analytics-db psql -U learning_analytics learning_analytics -c "SELECT count(*) FROM xapi_records_processed;"
+docker exec learning-analytics-db \
+  psql -U learning_analytics learning_analytics \
+  -c "SELECT count(*) FROM xapi_records_processed;"
 ----
 
-また、スクリプトのバージョンアップ等に伴い処理済みのMoodleログを再度処理したい場合は、以下のコマンドで変換処理の実行履歴を削除する。
+ログを再変換したい場合は、以下のコマンドで変換処理の実行履歴を削除する。
 
 ----
-$ docker exec learning-analytics-db psql -U learning_analytics learning_analytics -c "DELETE FROM xapi_records_processed;"
+docker exec learning-analytics-db \
+  psql -U learning_analytics learning_analytics \
+  -c "DELETE FROM xapi_records_processed;"
 ----
+====
 
 <<<
-=== Caliperステートメント変換
-==== ログデータベースの起動
-`compose.yaml` の `caliper-log-db` にデフォルトの設定が記載されている。変更する場合、`caliper/.env` 内の `DB_LOG_*` の項目も合わせて変更する。
+== Caliperステートメント変換
 
-.caliper/.env
-----
-(変更例)
-
-変更前
-...
-DB_LOG_HOST=caliper-log-db
-DB_LOG_DATABASE=caliper_log
-DB_LOG_USERNAME=caliper_cli
-DB_LOG_PASSWORD=caliper
-...
-
-変更後
-...
-DB_LOG_HOST=caliper-log-db
-DB_LOG_DATABASE=<changed database name>
-DB_LOG_USERNAME=<changed username>
-DB_LOG_PASSWORD=<changed password>
-...
-----
-
-設定完了後、 `caliper-log-db` を起動する。
-
-----
-$ docker compose up -d caliper-log-db
-----
-
-<<<
 [[caliper_settings]]
-==== 初期設定
-`openlrw-mongo` のMongoDBに接続する。ログイン情報は `openlrw/.env` に従う。
+=== 初期設定
+OpenLRWから取得したAPIキー( `mongoOrg.apiKey` )を `lrw.php` に設定する。
 
 ----
-$ docker exec -it openlrw-mongo bash
-# mongo <openlrw-database> -u <openlrw-username> -p <openlrw-password>
-----
+OPENLRW_DATABASE=caliper // <1>
+OPENLRW_USERNAME=caliper // <1>
+OPENLRW_PASSWORD=caliper // <1>
+API_KEY=$(
+  docker exec openlrw-mongo \
+  mongo --quiet ${OPENLRW_DATABASE} \
+    -u ${OPENLRW_USERNAME} \
+    -p ${OPENLRW_PASSWORD} \
+    --eval 'db.mongoOrg.findOne({"org.name": "DEFAULT_ORG"}, {_id:0,apiKey:1}).apiKey'
+)
 
-次のコマンドを実行し、 `apiKey` を取得する。
+cat <<EOF > ./caliper/config/lrw.php
+<?php
 
-----
-> db.mongoOrg.find().pretty()
-
-(表示例)
-{
-	"_id" : ObjectId("5c9921dea1de1800064caff1"),
-	"apiKey" : "77bb4005-1a77-4984-97bd-1c033fc101e9",
-	"apiSecret" : "d2f39c9d-cf5a-43e6-aa2b-2fa993b2cd2f",
-	"tenantId" : "5c9921dda1de1800064caff0",
-	"org" : {
-		"sourcedId" : "7410cd7b-b761-4150-8cf9-a7fdb89a704e",
-		"status" : "active",
-		"metadata" : {
-			"https://matthews/tenant" : "5c9921dda1de1800064caff0"
-		},
-		"dateLastModified" : ISODate("2019-03-25T18:45:49.988Z"),
-		"name" : "DEFAULT_ORG",
-		"type" : "other"
-	},
-	"_class" : "org.apereo.openlrw.oneroster.service.repository.MongoOrg"
-}
-----
-
-取得した `apiKey` で `caliper/config/lrw.php` 内の `default` を設定する。
-
-.caliper/config/lrw.php
-----
 return [
-    tenants => [
-        'default' => '<your apiKey>'
+    "tenants" => [
+        "default" => "${API_KEY}"
     ]
 ];
+EOF
+
+docker compose build moodle-caliper
+----
+<1> link:../openlrw/.env[OpenLRWの設定] を参照
+
+<<<
+=== ステートメント変換
+学習ログをCaliperステートメントに変換する。
+
+----
+docker compose run --rm moodle-caliper
+----
+
+OpenLRWにステートメントが登録されていることを確認する。
+
+----
+docker exec openlrw-mongo \
+  mongo --quiet ${OPENLRW_DATABASE} \
+    -u ${OPENLRW_USERNAME} \
+    -p ${OPENLRW_PASSWORD} \
+    --eval 'db.mongoEvent.find().pretty()'
 ----
 
 <<<
-==== ステートメント変換
-Moodle上での学習活動を実施した後、以下のコマンドでMoodleログをCaliperステートメントに変換する。
-ApiKeyの設定を適用するため、コンテナをリビルドしてから行うこと。
-
-----
-$ docker compose build moodle-caliper
-$ docker compose run --rm moodle-caliper
-----
-
-`openlrw-mongo` に接続し、データベースに送出したステートメントが登録されていることを確認する。
-
-----
-$ docker exec -it openlrw-mongo bash
-# mongo <openlrw-database> -u <openlrw-username> -p <openlrw-password>
-> db.mongoEvent.find().pretty()
-----
-
-<<<
-=== Superset
+== Superset
 TIP: 操作方法の詳細は https://superset.apache.org/docs/creating-charts-dashboards/creating-your-first-dashboard[ユーザガイド - Creating Charts and Dashboards] を参照すること。
 
-==== 初期設定
-以下のコマンドを実行し、データベースの初期設定を行う。
+=== 初期設定
+以下のコマンドを実行し、Adminユーザの作成やデータベースの初期設定を行う。
+
+NOTE: Adminユーザのユーザ情報は `superset` の環境変数 `ADMIN_USERNAME` 、 `ADMIN_PASSWORD` 等で設定する。
 
 ----
-$ docker exec superset /init.sh
+docker exec superset /init.sh
 ----
 
-==== ログイン
-Superset( http://localhost:8088 )にアクセスし、Adminユーザでログインする（Username: `admin` 、Password: `admin` ）。
+=== ログイン
+Superset( http://localhost:8088 )にAdminユーザでログインする（デフォルトのユーザ名・パスワードは `admin` ）。
 
 image::superset/signin.png[align=center]
 
 image::superset/home.png[align=center]
 
-==== xAPIステートメントの可視化
-[Data] > [Datasets] から `xapi_statements` を選択する。
+<<<
+=== xAPIステートメントの可視化
+`[Data] > [Datasets]` から `xapi_statements` を選択する。
 
 image::superset/datasets.png[align=center]
 
+<<<
 「DATA」および「CUSTOMIZE」タブからチャートの設定を行い、「CREATE CHART」でステートメントを可視化する。
 
 .ユーザの行動（ログイン、閲覧等）毎の件数を円グラフで可視化する例
@@ -330,11 +257,13 @@ image::superset/datasets.png[align=center]
 
 image::superset/xapi-statements.png[align=center]
 
-==== Caliperステートメントの可視化
-[Data] > [Datasets] から `caliper_statements` を選択する。
+<<<
+=== Caliperステートメントの可視化
+`[Data] > [Datasets]` から `caliper_statements` を選択する。
 
 image::superset/datasets.png[align=center]
 
+<<<
 「DATA」および「CUSTOMIZE」タブからチャートの設定を行い、「CREATE CHART」でステートメントを可視化する。
 
 .ユーザの行動（ログイン、閲覧等）毎の件数を円グラフで可視化する例
@@ -350,24 +279,25 @@ image::superset/datasets.png[align=center]
 image::superset/caliper-statements.png[align=center]
 
 <<<
-=== JupyterHub
-==== ログイン
-JupyterHub( http://localhost:8001 )にアクセスし、 `jupyter` ユーザ（Username: `jupyter` 、Password: `jupyter` ）でログインする。
+== JupyterHub
+=== ログイン
+JupyterHub( http://localhost:8001 )に `jupyter` ユーザ（パスワード: `jupyter` ）でログインする。
 
 image::jupyterhub/signin.png[align=center, scaledwidth=50%]
 
-ノートブック一覧が表示されることを確認する。
+ノートブック一覧の表示を確認する。
 
 image::jupyterhub/notebooks.png[align=center]
 
+<<<
 [TIP]
 ====
 ユーザを追加する場合は以下のコマンドを実行する。
 
 ----
-$ USERNAME=<username>
-$ PASSWORD=<password>
-$ docker exec jupyterhub useradd -m -p $(echo "$PASSWORD" | openssl passwd -1 -stdin) -s /bin/bash $USERNAME
+USERNAME=<username>
+PASSWORD=<password>
+docker exec jupyterhub useradd -m -p $(echo "$PASSWORD" | openssl passwd -1 -stdin) -s /bin/bash $USERNAME
 ----
 ====
 
@@ -381,7 +311,7 @@ PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
 
 本問題が生じた場合には、実行ユーザのUID/GIDを以下の環境変数で指定し、コンテナを再起動すること。
 
-.compose.yaml
+.base.yaml
 [source, diff]
 ----
   jupyterhub:
@@ -393,31 +323,35 @@ PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
 ====
 
 <<<
-==== xAPIステートメントの取得
-ノートブック「link:jupyterhub/notebooks/xAPI_statements.ipynb[xAPI_statements]」を活用し、Learning LockerからxAPIステートメントを取得する。
+=== xAPIステートメントの取得
+link:../jupyterhub/notebooks/xAPI_statements.ipynb[xAPI_statements.ipynb]を使用して、xAPIステートメントを取得する例を示す。
 
 image::jupyterhub/xapi-statements.png[align=center]
 
-==== Caliperステートメントの取得
-ノートブック「link:jupyterhub/notebooks/Caliper_statements.ipynb[Caliper_statements]」を活用し、OpenLRWからCaliperステートメントを取得する。
+<<<
+=== Caliperステートメントの取得
+link:../jupyterhub/notebooks/Caliper_statements.ipynb[Caliper_statements.ipynb]を使用して、Caliperステートメントを取得する例を示す。
 
 image::jupyterhub/caliper-statements.png[align=center]
 
-=== JupyterHubとSupersetの連携
-==== Jupyterノートブック実行結果をSupersetデータベースに登録
-ノートブック「link:jupyterhub/notebooks/Import_to_Superset.ipynb[Import_to_Superset]」を活用し、ステートメントの取得、分析、Supersetへの登録を行う。
+== JupyterHub-Superset連携
+=== ノートブック実行結果の登録
+link:../jupyterhub/notebooks/Import_to_Superset.ipynb[Import_to_Superset.ipynb]に示す例に従って、ノートブックで加工したログをSupersetに登録する。
 
 image::jupyterhub/import-to-superset.png[align=center]
 
-==== Supersetで可視化
-[Data] > [Datasets] から登録したDataset（下図の `notebook_results` ）を確認する。
+<<<
+=== ノートブック実行結果の可視化
+Supersetの `[Data] > [Datasets]` から登録したデータセットにアクセスする。
 
 image::superset/jupyter/datasets.png[align=center]
 
-必要に応じて、[Actions] > [Edit] からDatasetの設定を行う。
+カラム等の設定を変更する場合には `[Actions] > [Edit]` からデータセットを編集する。 +
+既存のデータセットを異なる構成で再登録した場合には、 `[Actions] > [Edit] > [COLUMNS]` から `SYNC COLUMNS FROM SOURCE` を押下し、変更を反映する。
 
-image::superset/jupyter/edit-notebook-results.png[align=center]
+image::superset/jupyter/edit-notebook-results.png[align=center, scaledwidth=70%]
 
+<<<
 チャートの設定を行い、ノートブックの実行結果を可視化する。
 
 .ノートブックの実行結果を可視化する例
