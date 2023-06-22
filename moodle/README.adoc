@@ -36,15 +36,15 @@ docker compose up -d
    |項目                  |名称                          |コンテナ名
 .2+|学習管理システム      |Moodle(Web)                   |moodle
                           |Moodle(DB)                    |moodle-db
+.4+|ステートメント変換    |xAPIステートメント変換        |moodle-xapi
+                          |Caliperステートメント変換     |moodle-caliper
+                          |Caliperステートメント変換(DB) |caliper-log-db
+                          |Learning Analytics DB         |learning-analytics-db
 .5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
                        .2+|Learning Locker(DB)           |learninglocker-mongo
                                                          |learninglocker-redis
                           |OpenLRW(Web)                  |openlrw
                           |OpenLRW(DB)                   |openlrw-mongo
-.4+|ステートメント変換    |xAPIステートメント変換        |moodle-xapi
-                          |Caliperステートメント変換     |moodle-caliper
-                          |Caliperステートメント変換(DB) |caliper-log-db
-                          |Learning Analytics DB         |learning-analytics-db
 .3+|分析システム          |Superset(Web)                 |superset
                           |Superset(DB)                  |superset-db
                           |JupyterHub(Web/DB)            |jupyterhub
