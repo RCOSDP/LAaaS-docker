@@ -25,6 +25,8 @@ endif::[]
 
 = Moodleの学習ログ分析
 
+WARNING: 以降の手順を実行する前にxref:../README.adoc#init[初期設定]を行うこと。
+
 Moodleの学習ログ分析基盤を構築する。
 
 ----
@@ -70,44 +72,6 @@ graph TB
 == Moodle
 Moodle( http://localhost:8000 )で学習活動を行う。
 
-== Learning Locker
-=== Adminユーザの作成
-Learning LockerのAdminユーザを作成する。
-
-----
-EMAIL_ADDRESS=<e-mail-address>
-ORGANIZATION=<organization>
-PASSWORD=<password>
-docker exec learninglocker bash -c '\
-  source ~/.bashrc;
-  node ./cli/dist/server createSiteAdmin "${EMAIL_ADDRESS}" "${ORGANIZATION}" "${PASSWORD}"'
-----
-
-=== ログイン
-Learning Locker( http://localhost:3000/ )にAdminユーザのアカウントでログインし、組織を選択する。
-
-[cols="a,a", frame=none, grid=none]
-|===
-| image::learninglocker/login.png[]
-| image::learninglocker/select-org.png[]
-|===
-
-<<<
-=== LRSの作成
-サイドメニューの `[Settings] > [Stores]` から任意の名称でLRSを作成する。
-
-image::learninglocker/stores.png[align=center]
-image::learninglocker/add-new-lrs.png[align=center]
-
-<<<
-[[learninglocker_client_settings]]
-=== クライアント情報の設定
-サイドメニューの `[Settings] > [Clients]` から `New xAPI store client` を選択する。 +
-`Overall Scopes` の `API All` にチェックを入れ、 `LRS (optional)` に上記で作成したLRSを指定する。
-
-image::learninglocker/new-xapi-store-client.png[align=center]
-
-<<<
 == xAPIステートメント変換
 === 初期設定
 スクリプトの設定ファイルを編集する。
@@ -125,7 +89,7 @@ const config = {
     },
 …
 ----
-<1> <<learninglocker_client_settings>>で確認したLRSのクライアント情報を設定
+<1> xref:../README.adoc#learninglocker_client_settings[クライアントの設定] で確認したLRSのクライアント情報を設定
 
 設定ファイルの変更を `moodle-xapi` コンテナに反映する。
 
@@ -134,7 +98,6 @@ docker compose build moodle-xapi
 docker compose up -d moodle-xapi
 ----
 
-<<<
 === ステートメント変換
 学習ログをxAPIステートメントに変換する。
 
@@ -165,10 +128,8 @@ docker exec learning-analytics-db \
 ----
 ====
 
-<<<
 == Caliperステートメント変換
 
-[[caliper_settings]]
 === 初期設定
 OpenLRWから取得したAPIキー( `mongoOrg.apiKey` )を `lrw.php` に設定する。
 
@@ -198,7 +159,6 @@ docker compose build moodle-caliper
 ----
 <1> link:../openlrw/.env[OpenLRWの設定] を参照
 
-<<<
 === ステートメント変換
 学習ログをCaliperステートメントに変換する。
 
@@ -216,33 +176,21 @@ docker exec openlrw-mongo \
     --eval 'db.mongoEvent.find().pretty()'
 ----
 
-<<<
 == Superset
 TIP: 操作方法の詳細は https://superset.apache.org/docs/creating-charts-dashboards/creating-your-first-dashboard[ユーザガイド - Creating Charts and Dashboards] を参照すること。
 
-=== 初期設定
-以下のコマンドを実行し、Adminユーザの作成やデータベースの初期設定を行う。
-
-NOTE: Adminユーザのユーザ情報は `superset` の環境変数 `ADMIN_USERNAME` 、 `ADMIN_PASSWORD` 等で設定する。
-
-----
-docker exec superset /init.sh
-----
-
 === ログイン
-Superset( http://localhost:8088 )にAdminユーザでログインする（デフォルトのユーザ名・パスワードは `admin` ）。
+Superset( http://localhost:8088 )にAdminユーザでログインする。
 
 image::superset/signin.png[align=center]
 
 image::superset/home.png[align=center]
 
-<<<
 === xAPIステートメントの可視化
 `[Data] > [Datasets]` から `xapi_statements` を選択する。
 
 image::superset/datasets.png[align=center]
 
-<<<
 「DATA」および「CUSTOMIZE」タブからチャートの設定を行い、「CREATE CHART」でステートメントを可視化する。
 
 .ユーザの行動（ログイン、閲覧等）毎の件数を円グラフで可視化する例
@@ -257,13 +205,11 @@ image::superset/datasets.png[align=center]
 
 image::superset/xapi-statements.png[align=center]
 
-<<<
 === Caliperステートメントの可視化
 `[Data] > [Datasets]` から `caliper_statements` を選択する。
 
 image::superset/datasets.png[align=center]
 
-<<<
 「DATA」および「CUSTOMIZE」タブからチャートの設定を行い、「CREATE CHART」でステートメントを可視化する。
 
 .ユーザの行動（ログイン、閲覧等）毎の件数を円グラフで可視化する例
@@ -278,7 +224,6 @@ image::superset/datasets.png[align=center]
 
 image::superset/caliper-statements.png[align=center]
 
-<<<
 == JupyterHub
 === ログイン
 JupyterHub( http://localhost:8001 )に `jupyter` ユーザ（パスワード: `jupyter` ）でログインする。
@@ -289,46 +234,11 @@ image::jupyterhub/signin.png[align=center, scaledwidth=50%]
 
 image::jupyterhub/notebooks.png[align=center]
 
-<<<
-[TIP]
-====
-ユーザを追加する場合は以下のコマンドを実行する。
-
-----
-USERNAME=<username>
-PASSWORD=<password>
-docker exec jupyterhub useradd -m -p $(echo "$PASSWORD" | openssl passwd -1 -stdin) -s /bin/bash $USERNAME
-----
-====
-
-[WARNING]
-====
-Linux環境において、マウントしたホームディレクトリ（ `/home/jupyter` ）の所有者が適切に設定されず、権限エラーが発生する場合がある。
-
-----
-PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
-----
-
-本問題が生じた場合には、実行ユーザのUID/GIDを以下の環境変数で指定し、コンテナを再起動すること。
-
-.base.yaml
-[source, diff]
-----
-  jupyterhub:
-    ...
-    environment:
-      - LOCAL_UID=<uid> # id -u
-      - LOCAL_GID=<gid> # id -g
-----
-====
-
-<<<
 === xAPIステートメントの取得
 link:../jupyterhub/notebooks/xAPI_statements.ipynb[xAPI_statements.ipynb]を使用して、xAPIステートメントを取得する例を示す。
 
 image::jupyterhub/xapi-statements.png[align=center]
 
-<<<
 === Caliperステートメントの取得
 link:../jupyterhub/notebooks/Caliper_statements.ipynb[Caliper_statements.ipynb]を使用して、Caliperステートメントを取得する例を示す。
 
@@ -340,18 +250,11 @@ link:../jupyterhub/notebooks/Import_to_Superset.ipynb[Import_to_Superset.ipynb]�
 
 image::jupyterhub/import-to-superset.png[align=center]
 
-<<<
 === ノートブック実行結果の可視化
 Supersetの `[Data] > [Datasets]` から登録したデータセットにアクセスする。
 
 image::superset/jupyter/datasets.png[align=center]
 
-カラム等の設定を変更する場合には `[Actions] > [Edit]` からデータセットを編集する。 +
-既存のデータセットを異なる構成で再登録した場合には、 `[Actions] > [Edit] > [COLUMNS]` から `SYNC COLUMNS FROM SOURCE` を押下し、変更を反映する。
-
-image::superset/jupyter/edit-notebook-results.png[align=center, scaledwidth=70%]
-
-<<<
 チャートの設定を行い、ノートブックの実行結果を可視化する。
 
 .ノートブックの実行結果を可視化する例

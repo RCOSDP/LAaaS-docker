@@ -1,0 +1,126 @@
+:encoding: utf-8
+:lang: ja
+:source-highlighter: rouge
+:doctype: book
+:version-label:
+:chapter-label:
+:toc:
+:toc-title: 目次
+:figure-caption: 図
+:table-caption: 表
+:example-caption: 例
+:appendix-caption: 付録
+:toclevels: 1
+:pagenums:
+:sectnums:
+:imagesdir: images
+:icons: font
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+= LAaaS-docker: ラーニングアナリティクス基盤システム
+
+== インストール
+
+----
+git clone --recurse-submodules https://github.com/RCOSDP/LAaaS-docker.git
+----
+
+[[init]]
+== 初期設定
+
+----
+docker compose -f base.yaml up -d
+----
+
+=== Learning Locker
+==== Adminユーザの作成
+Learning LockerのAdminユーザを作成する。
+
+----
+EMAIL_ADDRESS=<e-mail-address>
+ORGANIZATION=<organization>
+PASSWORD=<password>
+docker exec learninglocker bash -c '\
+  source ~/.bashrc;
+  node ./cli/dist/server createSiteAdmin "${EMAIL_ADDRESS}" "${ORGANIZATION}" "${PASSWORD}"'
+----
+
+==== ログイン
+Learning Locker( http://localhost:3000/ )にAdminユーザのアカウントでログインし、組織を選択する。
+
+[cols="a,a", frame=none, grid=none]
+|===
+| image::learninglocker/login.png[]
+| image::learninglocker/select-org.png[]
+|===
+
+==== LRSの作成
+サイドメニューの `[Settings] > [Stores]` から任意の名称でLRSを作成する。
+
+image::learninglocker/stores.png[align=center]
+image::learninglocker/add-new-lrs.png[align=center]
+
+[[learninglocker_client_settings]]
+==== クライアントの設定
+サイドメニューの `[Settings] > [Clients]` から `New xAPI store client` を選択する。 +
+`Overall Scopes` の `API All` にチェックを入れ、 `LRS (optional)` に上記で作成したLRSを指定する。
+
+image::learninglocker/new-xapi-store-client.png[align=center]
+
+=== Superset
+
+以下のコマンドを実行し、Adminユーザの作成やデータベースの初期設定を行う。
+
+TIP: ユーザ情報は `superset` の環境変数 `ADMIN_USERNAME` 、 `ADMIN_PASSWORD` 等で設定する(デフォルトのユーザ名・パスワードは `admin` )。
+
+----
+docker exec superset /init.sh
+----
+
+== 学習ログの分析
+ログを取得するLMS/LTIツールに応じて、以下のリンク先を参照する。
+
+* link:./moodle/README.adoc[Moodle]
+* link:./chibichilo/README.adoc[CHiBi-CHiLO]
+
+== FAQ
+=== JupyterHubにユーザを追加するには？
+以下のコマンドを実行する。
+
+----
+USERNAME=<username>
+PASSWORD=<password>
+docker exec jupyterhub \
+  useradd -m -p $(echo "$PASSWORD" | openssl passwd -1 -stdin) -s /bin/bash $USERNAME
+----
+
+=== JupyterHubの起動で権限エラーが発生する
+Linux環境において、マウントしたホームディレクトリ（ `/home/jupyter` ）の所有者が適切に設定されず、権限エラーが発生する場合がある。
+
+----
+PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
+----
+
+本問題が生じた場合には、実行ユーザのUID/GIDを以下の環境変数で指定し、コンテナを再起動すること。
+
+.base.yaml
+[source, diff]
+----
+  jupyterhub:
+    ...
+    environment:
+      - LOCAL_UID=<uid> # id -u
+      - LOCAL_GID=<gid> # id -g
+----
+
+=== Supersetに登録したノートブック実行結果のカラム設定を変更する方法は？
+カラム等の設定を変更する場合には `[Actions] > [Edit]` からデータセットを編集する。 +
+既存のデータセットを異なる構成で再登録した場合には、 `[Actions] > [Edit] > [COLUMNS]` から `SYNC COLUMNS FROM SOURCE` を押下し、変更を反映する。
+
+image::superset/edit-dataset.png[align=center, scaledwidth=70%]
