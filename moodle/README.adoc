@@ -225,12 +225,12 @@ JupyterHub( http://localhost:8001 )に `jupyter` ユーザ（パスワード: `j
 image::jupyterhub/notebooks.png[align=center]
 
 === xAPIステートメント
-link:../jupyterhub/notebooks/xAPI_statements.ipynb[xAPI_statements.ipynb]を使用して、xAPIステートメントを取得する例を示す。
+link:../jupyterhub/notebooks/xAPI_statements.ipynb[xAPI_statements.ipynb]を使用して、xAPIステートメントを可視化する例を示す。
 
 image::jupyterhub/xapi-statements.png[align=center]
 
 === Caliperステートメント
-link:../jupyterhub/notebooks/Caliper_statements.ipynb[Caliper_statements.ipynb]を使用して、Caliperステートメントを取得する例を示す。
+link:../jupyterhub/notebooks/Caliper_statements.ipynb[Caliper_statements.ipynb]を使用して、Caliperステートメントを可視化する例を示す。
 
 image::jupyterhub/caliper-statements.png[align=center]
 
