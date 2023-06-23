@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 if [ $# != 3 ] || ([ $1 != "xapi" ] && [ $1 != "caliper" ]); then
   echo "Usage: run.sh [xapi|caliper] <PATH_TO_LOG> <LMS_DOMAIN>"
