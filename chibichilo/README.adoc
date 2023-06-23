@@ -16,165 +16,141 @@
 :imagesdir: images
 :icons: font
 
-= 学認LMS 動画ログ 環境構築手順書
+= CHiBi-CHiLOの視聴ログ分析
 
-== 前提
-* Learning LockerをインストールしたLRSサーバの環境構築が完了しており、実行環境から接続できること。
-* OpenLRWをインストールしたLRWサーバの環境構築が完了しており、実行環境から接続できること。
-* 実行環境にDockerおよびDocker Composeがインストール済みであること。
+WARNING: 以降の手順を実行する前にxref:../README.adoc#init[初期設定]を行うこと。
 
-== 事前準備
-=== xAPIステートメント変換スクリプトの設定
+https://github.com/npocccties/chibichilo[CHiBi-CHiLO] の https://npocccties.github.io/chibichilo/V2.1/Design/build/html/Logs.html[視聴ログ] 分析基盤を構築する。 +
 
-LRSのクライアントから `Key` および `Secret` を確認する。
+----
+docker compose up -d
+----
 
-image::lrs-client.png[align=center]
+.システム構成
+|===
+   |項目                  |名称                          |コンテナ名
+   |前処理                |ログフォーマット変換・加工    |log-processor
+.2+|ステートメント変換    |xAPIステートメント変換        |chibichilo-xapi
+                          |Caliperステートメント変換     |chibichilo-caliper
+.5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
+                       .2+|Learning Locker(DB)           |learninglocker-mongo
+                                                         |learninglocker-redis
+                          |OpenLRW(Web)                  |openlrw
+                          |OpenLRW(DB)                   |openlrw-mongo
+.3+|分析システム          |Superset(Web)                 |superset
+                          |Superset(DB)                  |superset-db
+                          |JupyterHub(Web/DB)            |jupyterhub
+|===
 
-<<<
+[source, mermaid]
+----
+graph TB
+  ST([生徒])     -- 学習活動                   --> LMS[LMS]         --> VL[/視聴ログ/]
+  subgraph 本システムの対象
+    VL           .-> P[[前処理]]
+    P            -.  学習ログ                  .-> X[[xAPI変換]]    --  xAPIステートメント    --> L[(Learning Locker)]
+    P            -.  学習ログ                  .-> C[[Caliper変換]] --  Caliperステートメント --> O[(OpenLRW)]
+    L            --> S[Superset]
+    L            --> J[JupyterHub]
+    O            --> S
+    O            --> J
+    S            --  可視化                    --> T([教師])
+    J            --  分析結果                  --> T
+    J            -.  分析結果                  .-> S
+  end
+  T              == 教育方法とコース設計の改善 ==> LMS
+  LMS            == 学習体験と成果の向上       ==> ST
+----
 
-`xapi/src/config/app.js` にLRSのクライアント情報を設定する。
+== xAPIステートメント変換
+=== 初期設定
+スクリプトの設定ファイルを編集する。
 
 .xapi/src/config/app.js
 [source, javascript]
 ----
 const config = {
   LRS:{
-    url:'http://<lrs-server-hostname>:8081/data/xAPI/', // <1>
+    url:'http://<learninglocker-ip-address>:8081/data/xAPI/', // <1>
     clients:{
       'default':{
         user:'<lrs-client-username>', // <2>
-        pass:'<lrs-client-password>' // <3>
+        pass:'<lrs-client-password>' // <2>
       }
     }
   },
-  ...
-  homepage: '<moodle-site-url>', // <4>
-  pathToCSVFile: './videojs.csv'
-};
-module.exports = config;
+...
 ----
-<1> LRSサーバのホスト名を設定すること
-<2> LRSクライアントの `Key` を設定すること
-<3> LRSクライアントの `Secret` を設定すること
-<4> MoodleサイトのURLを設定すること
+<1> Learning LockerのIPアドレスを設定
+<2> xref:../README.adoc#learninglocker_client_settings[クライアントの設定] で確認したLRSのクライアント情報を設定
 
-<<<
-=== Caliperステートメント変換スクリプトの設定
-
-LRWサーバのMongoDBに接続し、 `ApiKey` を確認する。
+設定ファイルの変更を `chibichilo-xapi` コンテナに反映する。
 
 ----
-$ mongo caliper -u <caliper-username> -p <caliper-password>
-> db.mongoOrg.find().pretty()
-{
-  "_id" : ObjectId("************************"),
-  "apiKey" : "<ApiKey>",
-  "apiSecret" : "********-****-****-****-************",
-  "tenantId" : "************************",
-  "org" : {
-    "sourcedId" : "********-****-****-****-************",
-    "status" : "active",
-    "metadata" : {
-      "https://matthews/tenant" : "************************"
-    },
-    "dateLastModified" : ISODate("2020-01-01T00:00:00.000Z"),
-    "name" : "DEFAULT_ORG",
-    "type" : "other"
-  },
-  "_class" : "org.apereo.openlrw.oneroster.service.repository.MongoOrg"
-}
-> exit
+docker compose build chibichilo-xapi
+docker compose up -d chibichilo-xapi
 ----
 
-`caliper/.env` に `ApiKey` とLRWサーバのホスト名を設定する。
-
-.caliper/.env
-[source, javascript]
-----
-OPENLRW_APIKEY=<ApiKey>
-OPENLRW_HOST=<LRWServerHostname>:9966/key/caliper
-----
-
-=== Dockerコンテナのビルド・起動
-インストール先のディレクトリに移動し、Dockerイメージのビルドおよびコンテナの起動を行う。
+=== ステートメント変換
+視聴ログをxAPIステートメントに変換する。
 
 ----
-$ cd /path/to/chibichilo
-$ docker-compose build
-$ docker-compose up -d chibichilo-xapi
-$ docker-compose up -d chibichilo-caliper
+./run xapi /path/to/logfile <LTI_KEY>
 ----
 
-== Videojsログのステートメント変換
-=== ステートメント変換スクリプトの実行
-VideojsのログファイルとLMSのFQDNを引数に `run.sh` を実行する。
-
-----
-$ sh run.sh /path/to/videojs.log <lms-domain>
-----
-
-=== xAPIステートメントの確認
-Learning Lockerにアクセスし、ステートメントが登録されていることを確認する。
+Learning Lockerにステートメントが登録されていることを確認する。
 
 image::xapi-statements.png[align=center]
 
-<<<
-=== Caliperステートメントの確認
-
-LRWサーバのMongoDBに接続し、ステートメントが登録されていることを確認する。
+== Caliperステートメント変換
+=== 初期設定
+OpenLRWから取得したAPIキー( `mongoOrg.apiKey` )を `caliper/.env` に設定する。
 
 ----
-$ mongo caliper -u <caliper-username> -p <caliper-password>
-> db.mongoEvent.find().pretty()
-{
-  "_id" : ObjectId("5f62c7fafc4da710189f9634"),
-  "userId" : "716",
-  "organizationId" : "e94e66e6-25df-4825-a9fd-109e47bd8e22",
-  "tenantId" : "5e65e8d3b23e0b450a0b668f",
-  "event" : {
-    "_id" : "urn:uuid:a8d0ac3a-5dab-44fe-b1f2-80e45212a241",
-    "context" : "http://purl.imsglobal.org/ctx/caliper/v1p2",
-    "type" : "MediaEvent",
-    "agent" : {
-      "_id" : "716",
-      "type" : "Person",
-      "name" : "716",
-      "description" : ""
-    },
-    "action" : "Started",
-    "object" : {
-      "_id" : "https://lms.nii.ac.jp/51/2",
-      "type" : "VideoObject",
-      "name" : "sample.mp4",
-      "extensions" : {
-        "courseId" : "51",
-        "nonce" : "60f7bd9853ae464a797d8c9bdaec9f83",
-        "videoplayerlog" : "videoplayerlog"
-      }
-    },
-    "target" : {
-      "_id" : "https://lms.nii.ac.jp/51/2",
-      "type" : "MediaLocation",
-      "currentTime" : "PT0.0S"
-    },
-    "edApp" : {
-      "_id" : "moodle",
-      "type" : "SoftwareApplication",
-      "name" : "moodle",
-      "description" : "Moodle is a open source learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalized learning environments."
-    },
-    "eventTime" : ISODate("2020-06-26T13:41:08Z"),
-    "timeZoneOffset" : NumberLong(0)
-  },
-  "_class" : "org.apereo.openlrw.events.service.repository.MongoEvent"
-} ...
+OPENLRW_DATABASE=caliper // <1>
+OPENLRW_USERNAME=caliper // <1>
+OPENLRW_PASSWORD=caliper // <1>
+API_KEY=$(
+  docker exec openlrw-mongo \
+  mongo --quiet ${OPENLRW_DATABASE} \
+    -u ${OPENLRW_USERNAME} \
+    -p ${OPENLRW_PASSWORD} \
+    --eval 'db.mongoOrg.findOne({"org.name": "DEFAULT_ORG"}, {_id:0,apiKey:1}).apiKey'
+)
+
+sed -i -e "s/OPENLRW_APIKEY=.*/OPENLRW_APIKEY=${API_KEY}/" caliper/.env
+
+docker compose build chibichilo-caliper
+docker-compose up -d chibichilo-caliper
+----
+<1> link:../openlrw/.env[OpenLRWの設定] を参照
+
+=== ステートメント変換
+学習ログをCaliperステートメントに変換する。
+
+----
+./run caliper /path/to/logfile <LTI_KEY>
 ----
 
-<<<
-=== Supersetを用いたxAPIステートメントの可視化例
-ユーザが行った行動（日本語表記）を円グラフで可視化する例を以下に示す。
+OpenLRWにステートメントが登録されていることを確認する。
 
-.検索条件
+----
+docker exec openlrw-mongo \
+  mongo --quiet ${OPENLRW_DATABASE} \
+    -u ${OPENLRW_USERNAME} \
+    -p ${OPENLRW_PASSWORD} \
+    --eval 'db.mongoEvent.find().pretty()'
+----
+
+== Superset
+TIP: 操作方法の詳細は https://superset.apache.org/docs/creating-charts-dashboards/creating-your-first-dashboard[ユーザガイド - Creating Charts and Dashboards] を参照すること。
+
+Superset( http://localhost:8088 )にAdminユーザでログインする。
+
+=== xAPIステートメント
+`[Data] > [Datasets]` で選択した `xapi_statements` を以下の条件で可視化する。
+
+.ユーザの行動毎の件数を円グラフで可視化する例
 [cols="30%,30%,40%"]
 |===
    |大項目                   |小項目             |設定値
@@ -186,11 +162,10 @@ $ mongo caliper -u <caliper-username> -p <caliper-password>
 
 image::superset-xapi.png[align=center]
 
-<<<
-=== Supersetを用いたCaliperステートメントの可視化例
-ユーザが行った行動を円グラフで可視化する例を以下に示す。
+=== Caliperステートメント
+`[Data] > [Datasets]` で選択した `caliper_statements` を以下の条件で可視化する。
 
-.検索条件
+.ユーザの行動毎の件数を円グラフで可視化する例
 [cols="30%,30%,40%"]
 |===
    |大項目                   |小項目             |設定値
@@ -202,16 +177,15 @@ image::superset-xapi.png[align=center]
 
 image::superset-caliper.png[align=center]
 
-<<<
-=== JupyterHubを用いたxAPIステートメントの可視化例
+== JupyterHub
+JupyterHub( http://localhost:8001 )に `jupyter` ユーザ（パスワード: `jupyter` ）でログインする。
 
-link:../jupyterhub/notebooks/xAPI_statements.ipynb[xAPIステートメントを取得するノートブック]でユーザが行った行動（英語表記）を棒グラフで可視化する例を以下に示す。
+=== xAPIステートメント
+link:../jupyterhub/notebooks/xAPI_statements.ipynb[xAPI_statements.ipynb]を使用して、xAPIステートメントを可視化する例を示す。
 
 image::jupyterhub-xapi.png[align=center]
 
-<<<
-=== JupyterHubを用いたCaliperステートメントの可視化例
-
-link:../jupyterhub/notebooks/Caliper_statements.ipynb[Caliperステートメントを取得するノートブック]でユーザが行った行動を棒グラフで可視化する例を以下に示す。
+=== Caliperステートメント
+link:../jupyterhub/notebooks/Caliper_statements.ipynb[Caliper_statements.ipynb]を使用して、Caliperステートメントを可視化する例を示す。
 
 image::jupyterhub-caliper.png[align=center]
