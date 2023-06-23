@@ -2,7 +2,7 @@
 set -e
 
 if [ $# != 3 ] || ([ $1 != "xapi" ] && [ $1 != "caliper" ]); then
-  echo "Usage: run.sh [xapi|caliper] <PATH_TO_LOG> <LMS_DOMAIN>"
+  echo "Usage: run [xapi|caliper] <PATH_TO_LOG> <LMS_DOMAIN>"
   exit 1
 fi
 
