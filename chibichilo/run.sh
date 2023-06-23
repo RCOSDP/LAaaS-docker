@@ -5,6 +5,11 @@ if [ $# != 3 ] || ([ $1 != "xapi" ] && [ $1 != "caliper" ]); then
   exit 1
 fi
 
+if [ ! -f "$2" ]; then
+  echo "Log file not found."
+  exit 1
+fi
+
 CONTAINER=chibichilo-$1
 if [ $1 = "xapi" ]; then
   SCRIPT="cat - > /app/videojs.csv; npm start"
