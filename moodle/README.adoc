@@ -179,12 +179,7 @@ docker exec openlrw-mongo \
 == Superset
 TIP: 操作方法の詳細は https://superset.apache.org/docs/creating-charts-dashboards/creating-your-first-dashboard[ユーザガイド - Creating Charts and Dashboards] を参照すること。
 
-=== ログイン
 Superset( http://localhost:8088 )にAdminユーザでログインする。
-
-image::superset/signin.png[align=center]
-
-image::superset/home.png[align=center]
 
 === xAPIステートメントの可視化
 `[Data] > [Datasets]` から `xapi_statements` を選択する。
@@ -225,12 +220,7 @@ image::superset/datasets.png[align=center]
 image::superset/caliper-statements.png[align=center]
 
 == JupyterHub
-=== ログイン
 JupyterHub( http://localhost:8001 )に `jupyter` ユーザ（パスワード: `jupyter` ）でログインする。
-
-image::jupyterhub/signin.png[align=center, scaledwidth=50%]
-
-ノートブック一覧の表示を確認する。
 
 image::jupyterhub/notebooks.png[align=center]
 
