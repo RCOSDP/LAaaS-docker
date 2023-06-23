@@ -53,14 +53,14 @@ docker compose up -d
 [source, mermaid]
 ----
 graph TB
-  ST([受講者]) -- 学習活動                   --> M[Moodle]
+  ST([生徒])   -- 学習活動                   --> M[Moodle]
   M            -. 学習ログ                   .-> X[[xAPI変換]]    -- xAPIステートメント    --> L[(Learning Locker)]
   M            -. 学習ログ                   .-> C[[Caliper変換]] -- Caliperステートメント --> O[(OpenLRW)]
   L            --> S[Superset]
   L            --> J[JupyterHub]
   O            --> S
   O            --> J
-  S            -- 可視化                     --> T([コース管理者])
+  S            -- 可視化                     --> T([教師])
   J            -- 分析結果                   --> T
   J            -. 分析結果                   .-> S
   T            == 教育方法とコース設計の改善 ==> M
