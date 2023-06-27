@@ -46,9 +46,12 @@ Learning LockerのAdminユーザを作成する。
 EMAIL_ADDRESS=<e-mail-address>
 ORGANIZATION=<organization>
 PASSWORD=<password>
-docker exec learninglocker bash -c '\
-  source ~/.bashrc;
-  node ./cli/dist/server createSiteAdmin "${EMAIL_ADDRESS}" "${ORGANIZATION}" "${PASSWORD}"'
+docker exec \
+  -e EMAIL_ADDRESS=${EMAIL_ADDRESS} \
+  -e ORGANIZATION=${ORGANIZATION} \
+  -e PASSWORD=${PASSWORD} learninglocker bash -c '\
+    source ~/.bashrc;
+    node ./cli/dist/server createSiteAdmin "${EMAIL_ADDRESS}" "${ORGANIZATION}" "${PASSWORD}"'
 ----
 
 ==== ログイン
