@@ -22,6 +22,6 @@ LMS_DOMAIN=$3
 
 if [ -f "$PATH_TO_LOG" ] ; then
   cat "$PATH_TO_LOG" | \
-    docker compose run -T -e LMS_DOMAIN=${LMS_DOMAIN} log-processor | \
+    docker compose run -T -e LMS_DOMAIN=${LMS_DOMAIN} chibichilo-log-processor | \
     docker exec -i ${CONTAINER} sh -c "${SCRIPT}"
 fi

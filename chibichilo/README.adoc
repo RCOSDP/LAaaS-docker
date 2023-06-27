@@ -36,7 +36,7 @@ docker compose up -d
 .システム構成
 |===
    |項目                  |名称                          |コンテナ名
-   |前処理                |ログフォーマット変換・加工    |log-processor
+   |前処理                |ログフォーマット変換・加工    |chibichilo-log-processor
 .2+|ステートメント変換    |xAPIステートメント変換        |chibichilo-xapi
                           |Caliperステートメント変換     |chibichilo-caliper
 .5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
