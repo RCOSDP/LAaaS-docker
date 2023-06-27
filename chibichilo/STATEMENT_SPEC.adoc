@@ -23,7 +23,7 @@
 https://npocccties.github.io/chibichilo/V2.1/Design/build/html/Logs.html[視聴ログ]のTSVファイルから以下の定義に従ってステートメントを生成する。 +
 TSVファイルはヘッダーを含まず、下表の通りログが格納されていること。
 
-.Videojsログの仕様
+.視聴ログの仕様
 [cols="8%,17%,30%,15%,30%"]
 |===
 |列番号|カラム名          |概要                               |ステートメント化対象   |備考
@@ -135,7 +135,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 <<<
 [[xapi_verb]]
 === Verb (statement.verb)
-`force-ended` イベントはVideojsのログにビデオ再生終了のイベントが存在しない場合に生成する。
+`force-ended` イベントは視聴ログにビデオ再生終了のイベントが存在しない場合に生成する。
 
 .Verbの仕様
 |===
@@ -199,7 +199,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 https://npocccties.github.io/chibichilo/V2.1/Design/build/html/Logs.html[視聴ログ]のTSVファイルから以下の定義に従ってステートメントを生成する。 +
 TSVファイルはヘッダーを含まず、下表の通りログが格納されていること。
 
-.Videojsログの仕様
+.視聴ログの仕様
 [cols="8%,17%,30%,15%,30%"]
 |===
 |列番号|カラム名          |概要                               |ステートメント化対象   |備考
@@ -274,7 +274,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 <<<
 [[caliper_event]]
 === Event (type)
-`force-ended` イベントはVideojsのログにビデオ再生終了のイベントが存在しない場合に生成する。
+`force-ended` イベントは視聴ログにビデオ再生終了のイベントが存在しない場合に生成する。
 
 .Eventの仕様
 |===
@@ -312,7 +312,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 <<<
 [[caliper_action]]
 === Action (action)
-`force-ended` イベントはVideojsのログにビデオ再生終了のイベントが存在しない場合に生成する。 +
+`force-ended` イベントは視聴ログにビデオ再生終了のイベントが存在しない場合に生成する。 +
 動画再生の一連のログのうち初回の `play` イベントは `Started` 、それ以外の `play` イベントは `Resumed` に変換する。
 また、`trackchange` イベントは `v-event-detail` が `off` の場合に `DisabledClosedCaptioning` 、それ以外の場合に `EnabledClosedCaptioning` に変換する。
 
