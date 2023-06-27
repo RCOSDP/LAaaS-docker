@@ -16,7 +16,7 @@
 :imagesdir: images
 :icons: font
 
-= 学認LMS 動画ログ ステートメント仕様
+= CHiBi-CHiLO 視聴ログ ステートメント仕様
 
 == xAPIステートメント
 
