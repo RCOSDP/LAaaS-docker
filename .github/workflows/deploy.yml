@@ -1,7 +1,6 @@
 name: deploy
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       registry_type:
