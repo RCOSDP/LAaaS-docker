@@ -1,6 +1,6 @@
 FROM rockylinux:9.0
 
-LABEL version="3.0.0"
+LABEL version="3.0.1"
 
 RUN dnf update -y && \
     dnf install -y \
