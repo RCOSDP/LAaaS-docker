@@ -1,10 +1,12 @@
 services:
   chibichilo-log-processor:
-    container_name: chibichilo-log-processor
     build: chibichilo/log-processor
+    image: public.ecr.aws/v8a6v1r8/chibichilo-log-processor:1.0.0
+    container_name: chibichilo-log-processor
   chibichilo-xapi:
-    container_name: chibichilo-xapi
     build: chibichilo/xapi
+    image: public.ecr.aws/v8a6v1r8/chibichilo-xapi:1.0.0
+    container_name: chibichilo-xapi
     volumes:
       - ./chibichilo/xapi/log:/app/log
     tty: true
@@ -12,8 +14,9 @@ services:
       - TZ=Asia/Tokyo
     restart: always
   chibichilo-caliper:
-    container_name: chibichilo-caliper
     build: chibichilo/caliper
+    image: public.ecr.aws/v8a6v1r8/chibichilo-caliper:1.0.0
+    container_name: chibichilo-caliper
     env_file:
       - ./chibichilo/caliper/.env
     tty: true

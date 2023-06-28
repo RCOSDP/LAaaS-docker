@@ -30,6 +30,7 @@ services:
       - moodle-db:/var/lib/postgresql/data
   moodle-xapi:
     build: moodle/xapi
+    image: public.ecr.aws/v8a6v1r8/moodle-xapi:2.10.0
     container_name: moodle-xapi
     volumes:
       - ./moodle/xapi/log:/app/log
@@ -39,6 +40,7 @@ services:
       - INTERVAL=-1
   moodle-caliper:
     build: moodle/caliper
+    image: public.ecr.aws/v8a6v1r8/moodle-caliper:2.4.0
     container_name: moodle-caliper
     env_file:
       - ./moodle/caliper/.env
