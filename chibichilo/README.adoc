@@ -30,8 +30,9 @@ WARNING: 以降の手順を実行する前にxref:../README.adoc#init[初期設�
 https://github.com/npocccties/chibichilo[CHiBi-CHiLO] の https://npocccties.github.io/chibichilo/V2.1/Design/build/html/Logs.html[視聴ログ] 分析基盤を構築する。 +
 
 ----
-docker compose up -d
+docker compose up -d --no-build // <1>
 ----
+<1> イメージをビルドする場合は `--no-build` の代わりに `--build` オプションを指定
 
 .システム構成
 |===

@@ -30,8 +30,9 @@ WARNING: 以降の手順を実行する前にxref:../README.adoc#init[初期設�
 Moodleの学習ログ分析基盤を構築する。
 
 ----
-docker compose up -d
+docker compose up -d --no-build // <1>
 ----
+<1> イメージをビルドする場合は `--no-build` の代わりに `--build` オプションを指定
 
 .システム構成
 |===

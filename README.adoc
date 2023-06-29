@@ -35,8 +35,9 @@ git clone --recurse-submodules https://github.com/RCOSDP/LAaaS-docker.git
 == 初期設定
 
 ----
-docker compose -f base.yaml up -d
+docker compose -f base.yaml up -d --no-build // <1>
 ----
+<1> イメージをビルドする場合は `--no-build` の代わりに `--build` オプションを指定
 
 === Learning Locker
 ==== Adminユーザの作成
