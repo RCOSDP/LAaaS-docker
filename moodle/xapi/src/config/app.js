@@ -13,7 +13,7 @@ const config = {
   db: {
     // LMS database connection settings
     lms: {
-      host: 'moodle-docker_db_1',
+      host: 'moodle-db',
       port: 5432,
       database: 'moodle',
       username: 'moodleuser',
