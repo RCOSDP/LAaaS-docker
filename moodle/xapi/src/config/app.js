@@ -16,7 +16,7 @@ const config = {
       host: 'moodle-db',
       port: 5432,
       database: 'moodle',
-      username: 'moodleuser',
+      username: 'moodle',
       password: 'm@0dl3ing',
       prefix: 'mdl_'
     },
