@@ -73,7 +73,7 @@ image::learninglocker/add-new-lrs.png[align=center]
 [[learninglocker_client_settings]]
 ==== クライアントの設定
 サイドメニューの `[Settings] > [Clients]` から `New xAPI store client` を選択する。 +
-`Overall Scopes` の `API All` にチェックを入れ、 `LRS (optional)` に上記で作成したLRSを指定する。
+`LRS (optional)` に上記で作成したLRSが指定されていることを確認し、 `Overall Scopes` の `API All` にチェックを入れる。
 
 image::learninglocker/new-xapi-store-client.png[align=center]
 
