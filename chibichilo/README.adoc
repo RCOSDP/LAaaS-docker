@@ -92,13 +92,6 @@ const config = {
 <1> Learning LockerのIPアドレスを設定
 <2> xref:../README.adoc#learninglocker_client_settings[クライアントの設定] で確認したLRSのクライアント情報を設定
 
-設定ファイルの変更を `chibichilo-xapi` コンテナに反映する。
-
-----
-docker compose build chibichilo-xapi
-docker compose up -d chibichilo-xapi
-----
-
 === ステートメント変換
 視聴ログをxAPIステートメントに変換する。
 
@@ -128,8 +121,7 @@ API_KEY=$(
 
 sed -i -e "s/OPENLRW_APIKEY=.*/OPENLRW_APIKEY=${API_KEY}/" caliper/.env
 
-docker compose build chibichilo-caliper
-docker-compose up -d chibichilo-caliper
+docker compose up -d chibichilo-caliper # 変更を反映
 ----
 <1> link:../openlrw/.env[OpenLRWの設定] を参照
 

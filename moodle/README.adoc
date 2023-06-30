@@ -92,13 +92,6 @@ const config = {
 ----
 <1> xref:../README.adoc#learninglocker_client_settings[クライアントの設定] で確認したLRSのクライアント情報を設定
 
-設定ファイルの変更を `moodle-xapi` コンテナに反映する。
-
-----
-docker compose build moodle-xapi
-docker compose up -d moodle-xapi
-----
-
 === ステートメント変換
 学習ログをxAPIステートメントに変換する。
 
@@ -155,8 +148,6 @@ return [
     ]
 ];
 EOF
-
-docker compose build moodle-caliper
 ----
 <1> link:../openlrw/.env[OpenLRWの設定] を参照
 

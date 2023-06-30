@@ -32,6 +32,9 @@ services:
     build: moodle/xapi
     image: public.ecr.aws/v8a6v1r8/moodle-xapi:2.10.0
     container_name: moodle-xapi
+    configs:
+      - source: xapi-config-app
+        target: /app/config/app.js
     volumes:
       - ./moodle/xapi/log:/app/log
     tty: true
@@ -42,6 +45,9 @@ services:
     build: moodle/caliper
     image: public.ecr.aws/v8a6v1r8/moodle-caliper:2.4.0
     container_name: moodle-caliper
+    configs:
+      - source: caliper-config-lrw
+        target: /app/config/lrw.php
     env_file:
       - ./moodle/caliper/.env
     depends_on:
@@ -73,6 +79,10 @@ services:
 configs:
   moodle-config:
     file: ./moodle/config.php
+  xapi-config-app:
+    file: ./moodle/xapi/src/config/app.js
+  caliper-config-lrw:
+    file: ./moodle/caliper/config/lrw.php
 volumes:
   moodle-db:
   moodledata:
