@@ -7,6 +7,9 @@ services:
     build: chibichilo/xapi
     image: public.ecr.aws/v8a6v1r8/chibichilo-xapi:1.0.0
     container_name: chibichilo-xapi
+    configs:
+      - source: xapi-config-app
+        target: /app/config/app.js
     volumes:
       - ./chibichilo/xapi/log:/app/log
     tty: true
@@ -23,3 +26,6 @@ services:
     environment:
       - TZ=Asia/Tokyo
     restart: always
+configs:
+  xapi-config-app:
+    file: ./chibichilo/xapi/src/config/app.js
