@@ -1,6 +1,6 @@
 FROM rockylinux:9.0
 
-LABEL version="3.0.0"
+LABEL version="3.0.1"
 
 RUN dnf update -y && \
     dnf install -y \
@@ -17,7 +17,7 @@ RUN dnf update -y && \
 
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash && \
     source ~/.bashrc && \
-    nvm install 8.15.1 && \
+    nvm install 8.17 && \
     npm install -g yarn && \
     npm install -g pm2@4 && \
     pm2 install pm2-logrotate && \

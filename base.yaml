@@ -1,0 +1,104 @@
+services:
+  learninglocker:
+    build: learninglocker
+    image: public.ecr.aws/v8a6v1r8/learninglocker:3.0.1
+    container_name: learninglocker
+    depends_on:
+      - learninglocker-mongo
+      - learninglocker-redis
+    ports:
+      - "3000:3000"
+      - "8080:8080"
+      - "8081:8081"
+    working_dir: /usr/local/src/learninglocker
+    command: bash -c "source ~/.bashrc && yarn migrate && pm2 start pm2/all.json && cd ../xapi-service && pm2 start pm2/xapi.json && pm2 logs"
+  learninglocker-mongo:
+    image: mongo:4.0.8
+    container_name: learninglocker-mongo
+    restart: always
+    volumes:
+      - learninglocker-mongo:/data/db
+  learninglocker-redis:
+    image: redis:5.0.4
+    container_name: learninglocker-redis
+    restart: always
+    volumes:
+      - learninglocker-redis:/data
+    command: redis-server --appendonly yes
+  openlrw:
+    build: openlrw
+    image: public.ecr.aws/v8a6v1r8/openlrw:2.3.0
+    container_name: openlrw
+    depends_on:
+      - openlrw-mongo
+    ports:
+      - "9966:9966"
+    env_file:
+      - openlrw/.env
+    command: bash -c "/app/docker-start.sh"
+  openlrw-mongo:
+    image: mongo:4.0.27
+    restart: always
+    env_file:
+      - openlrw/.env
+    container_name: openlrw-mongo
+    volumes:
+      - ./openlrw/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+      - openlrw-mongo:/data/db
+    ports:
+      - "27017:27017"
+  superset:
+    build: superset
+    image: public.ecr.aws/v8a6v1r8/superset:3.0.0
+    container_name: superset
+    ports:
+      - "8088:8088"
+    depends_on:
+      - superset-db
+    environment:
+      - SECRET_KEY=JmAH_gnn9y5T8Wgjt4IBlzjmYMHEGOQONLuJyfmMMOg
+    #  - ADMIN_USERNAME=admin
+    #  - ADMIN_FIRSTNAME=admin
+    #  - ADMIN_LASTNAME=user
+    #  - ADMIN_EMAIL=admin@fab.org
+    #  - ADMIN_PASSWORD=admin
+      - SUPERSET_DBUSER=superset
+      - SUPERSET_DBPASS=superset
+  superset-db:
+    build: superset-db
+    image: public.ecr.aws/v8a6v1r8/superset-db:3.1.0
+    container_name: superset-db
+    environment:
+      - POSTGRES_USER=superset
+      - POSTGRES_PASSWORD=superset
+      - POSTGRES_DB=superset
+      - LRS_HOST=learninglocker-mongo
+      - LRS_PORT=27017
+      - LRS_DB=learninglocker
+      - LRS_DB_USER=
+      - LRS_DB_PASSWORD=
+      - LRS_COLLECTION=statements
+      - LRW_HOST=openlrw-mongo
+      - LRW_PORT=27017
+      - LRW_DB=caliper
+      - LRW_DB_USER=caliper
+      - LRW_DB_PASSWORD=caliper
+      - LRW_COLLECTION=mongoEvent
+    volumes:
+      - superset-db:/var/lib/postgresql/data
+  jupyterhub:
+    build: jupyterhub
+    image: public.ecr.aws/v8a6v1r8/jupyterhub:2.2.1
+    container_name: jupyterhub
+    #environment:
+    #  - LOCAL_UID=9001
+    #  - LOCAL_GID=9001
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./jupyterhub/notebooks:/home/jupyter
+volumes:
+  learninglocker-mongo:
+  learninglocker-redis:
+  openlrw-mongo:
+  superset-db:

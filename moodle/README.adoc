@@ -1,0 +1,252 @@
+:encoding: utf-8
+:lang: ja
+:source-highlighter: rouge
+:doctype: book
+:version-label:
+:chapter-label:
+:toc:
+:toc-title: 目次
+:figure-caption: 図
+:table-caption: 表
+:example-caption: 例
+:appendix-caption: 付録
+:toclevels: 2
+:pagenums:
+:sectnums:
+:imagesdir: images
+:icons: font
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+= Moodleの学習ログ分析
+
+WARNING: 以降の手順を実行する前にxref:../README.adoc#init[初期設定]を行うこと。
+
+Moodleの学習ログ分析基盤を構築する。
+
+----
+docker compose up -d --no-build // <1>
+----
+<1> イメージをビルドする場合は `--no-build` の代わりに `--build` オプションを指定
+
+.システム構成
+|===
+   |項目                  |名称                          |コンテナ名
+.2+|学習管理システム      |Moodle(Web)                   |moodle
+                          |Moodle(DB)                    |moodle-db
+.4+|ステートメント変換    |xAPIステートメント変換        |moodle-xapi
+                          |Caliperステートメント変換     |moodle-caliper
+                          |Caliperステートメント変換(DB) |caliper-log-db
+                          |Learning Analytics DB         |learning-analytics-db
+.5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
+                       .2+|Learning Locker(DB)           |learninglocker-mongo
+                                                         |learninglocker-redis
+                          |OpenLRW(Web)                  |openlrw
+                          |OpenLRW(DB)                   |openlrw-mongo
+.3+|分析システム          |Superset(Web)                 |superset
+                          |Superset(DB)                  |superset-db
+                          |JupyterHub(Web/DB)            |jupyterhub
+|===
+
+[source, mermaid]
+----
+graph TB
+  ST([生徒])   -- 学習活動                   --> M[Moodle]
+  M            -. 学習ログ                   .-> X[[xAPI変換]]    -- xAPIステートメント    --> L[(Learning Locker)]
+  M            -. 学習ログ                   .-> C[[Caliper変換]] -- Caliperステートメント --> O[(OpenLRW)]
+  L            --> S[Superset]
+  L            --> J[JupyterHub]
+  O            --> S
+  O            --> J
+  S            -- 可視化                     --> T([教師])
+  J            -- 分析結果                   --> T
+  J            -. 分析結果                   .-> S
+  T            == 教育方法とコース設計の改善 ==> M
+  M            == 学習体験と成果の向上       ==> ST
+----
+
+== Moodle
+Moodle( http://localhost:8000 )で学習活動を行う。
+
+== xAPIステートメント変換
+=== 初期設定
+スクリプトの設定ファイルを編集する。
+
+.xapi/src/config/app.js
+[source, javascript]
+----
+const config = {
+…
+  LRS: {
+    ...
+    client: {
+      key: '<xapi-store-client-key>', // <1>
+      secret: '<xapi-store-client-secret>' // <1>
+    },
+…
+----
+<1> xref:../README.adoc#learninglocker_client_settings[クライアントの設定] で確認したLRSのクライアント情報を設定
+
+=== ステートメント変換
+学習ログをxAPIステートメントに変換する。
+
+----
+docker exec moodle-xapi npm start
+----
+
+Learning Lockerにステートメントが登録されていることを確認する。
+
+image::learninglocker/source.png[align=center]
+
+[TIP]
+====
+変換が完了したログの件数を取得する場合は以下のコマンドを実行する。
+
+----
+docker exec learning-analytics-db \
+  psql -U learning_analytics learning_analytics \
+  -c "SELECT count(*) FROM xapi_records_processed;"
+----
+
+ログを再変換したい場合は、以下のコマンドで変換処理の実行履歴を削除する。
+
+----
+docker exec learning-analytics-db \
+  psql -U learning_analytics learning_analytics \
+  -c "DELETE FROM xapi_records_processed;"
+----
+====
+
+== Caliperステートメント変換
+
+=== 初期設定
+OpenLRWから取得したAPIキー( `mongoOrg.apiKey` )を `lrw.php` に設定する。
+
+----
+OPENLRW_DATABASE=caliper // <1>
+OPENLRW_USERNAME=caliper // <1>
+OPENLRW_PASSWORD=caliper // <1>
+API_KEY=$(
+  docker exec openlrw-mongo \
+  mongo --quiet ${OPENLRW_DATABASE} \
+    -u ${OPENLRW_USERNAME} \
+    -p ${OPENLRW_PASSWORD} \
+    --eval 'db.mongoOrg.findOne({"org.name": "DEFAULT_ORG"}, {_id:0,apiKey:1}).apiKey'
+)
+
+cat <<EOF > ./caliper/config/lrw.php
+<?php
+
+return [
+    "tenants" => [
+        "default" => "${API_KEY}"
+    ]
+];
+EOF
+----
+<1> link:../openlrw/.env[OpenLRWの設定] を参照
+
+=== ステートメント変換
+学習ログをCaliperステートメントに変換する。
+
+----
+docker compose run --rm moodle-caliper
+----
+
+OpenLRWにステートメントが登録されていることを確認する。
+
+----
+docker exec openlrw-mongo \
+  mongo --quiet ${OPENLRW_DATABASE} \
+    -u ${OPENLRW_USERNAME} \
+    -p ${OPENLRW_PASSWORD} \
+    --eval 'db.mongoEvent.find().pretty()'
+----
+
+== Superset
+TIP: 操作方法の詳細は https://superset.apache.org/docs/creating-charts-dashboards/creating-your-first-dashboard[ユーザガイド - Creating Charts and Dashboards] を参照すること。
+
+Superset( http://localhost:8088 )にAdminユーザでログインする。
+
+=== xAPIステートメント
+`[Data] > [Datasets]` から `xapi_statements` を選択する。
+
+image::superset/datasets.png[align=center]
+
+「DATA」および「CUSTOMIZE」タブからチャートの設定を行い、「CREATE CHART」でステートメントを可視化する。
+
+.ユーザの行動（ログイン、閲覧等）毎の件数を円グラフで可視化する例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`timestamp`
+.2+|Query                    |DIMENSIONS         |`statement.verb.display.en`
+                             |METRIC             |`COUNT(*)`
+|===
+
+image::superset/xapi-statements.png[align=center]
+
+=== Caliperステートメント
+`[Data] > [Datasets]` から `caliper_statements` を選択する。
+
+image::superset/datasets.png[align=center]
+
+「DATA」および「CUSTOMIZE」タブからチャートの設定を行い、「CREATE CHART」でステートメントを可視化する。
+
+.ユーザの行動（ログイン、閲覧等）毎の件数を円グラフで可視化する例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`event.eventTime`
+.2+|Query                    |DIMENSIONS         |`event.action`
+                             |METRIC             |`COUNT(*)`
+|===
+
+image::superset/caliper-statements.png[align=center]
+
+== JupyterHub
+JupyterHub( http://localhost:8001 )に `jupyter` ユーザ（パスワード: `jupyter` ）でログインする。
+
+image::jupyterhub/notebooks.png[align=center]
+
+=== xAPIステートメント
+link:../jupyterhub/notebooks/xAPI_statements.ipynb[xAPI_statements.ipynb]を使用して、xAPIステートメントを可視化する例を示す。
+
+image::jupyterhub/xapi-statements.png[align=center]
+
+=== Caliperステートメント
+link:../jupyterhub/notebooks/Caliper_statements.ipynb[Caliper_statements.ipynb]を使用して、Caliperステートメントを可視化する例を示す。
+
+image::jupyterhub/caliper-statements.png[align=center]
+
+== JupyterHub-Superset連携
+=== ノートブック実行結果の登録
+link:../jupyterhub/notebooks/Import_to_Superset.ipynb[Import_to_Superset.ipynb]に示す例に従って、ノートブックで加工したログをSupersetに登録する。
+
+image::jupyterhub/import-to-superset.png[align=center]
+
+=== ノートブック実行結果の可視化
+Supersetの `[Data] > [Datasets]` から登録したデータセットにアクセスする。
+
+image::superset/jupyter/datasets.png[align=center]
+
+チャートの設定を行い、ノートブックの実行結果を可視化する。
+
+.ノートブックの実行結果を可視化する例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`timestamp`
+.2+|Query                    |DIMENSIONS         |`object.definition.description.en`
+                             |METRIC             |`COUNT(*)`
+|===
+
+image::superset/jupyter/visualize-notebook-results.png[align=center, scaledwidth=90%]
