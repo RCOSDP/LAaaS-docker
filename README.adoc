@@ -68,7 +68,6 @@ Learning Locker( http://localhost:3000/ )にAdminユーザのアカウントで�
 サイドメニューの `[Settings] > [Stores]` から任意の名称でLRSを作成する。
 
 image::learninglocker/stores.png[align=center]
-image::learninglocker/add-new-lrs.png[align=center]
 
 [[learninglocker_client_settings]]
 ==== クライアントの設定
