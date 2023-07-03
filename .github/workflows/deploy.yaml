@@ -22,6 +22,7 @@ on:
           - jupyterhub
           - moodle-xapi
           - moodle-caliper
+          - sakai
           - chibichilo-log-processor
           - chibichilo-xapi
           - chibichilo-caliper
@@ -49,6 +50,9 @@ jobs:
     - if: inputs.ecr_repository == 'moodle-caliper'
       run: |
         echo "BUILD_PATH=moodle/caliper/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'sakai'
+      run: |
+        echo "BUILD_PATH=sakai/" >> $GITHUB_ENV
     - if: inputs.ecr_repository == 'chibichilo-log-processor'
       run: |
         echo "BUILD_PATH=chibichilo/log-processor/" >> $GITHUB_ENV
