@@ -1,17 +1,4 @@
 services:
-  sakai-mysql:
-    image: mysql:5.6.39
-    container_name: sakai-mysql
-    # Sakai requires the database to use UTF-8.
-    command: --character-set-server=utf8
-    environment:
-      # See https://docs.docker.com/samples/library/mysql/#environment-variables
-      MYSQL_DATABASE: sakai
-      MYSQL_USER: sakai
-      MYSQL_PASSWORD: sakaipass
-      MYSQL_ROOT_PASSWORD: rootpass
-    volumes:
-      - sakai-mysql:/var/lib/mysql
   sakai:
     build: sakai
     container_name: sakai
@@ -27,6 +14,19 @@ services:
       LRS_PASSWORD: cf72e40f90f6d02569a93a44b41f841c32fc41a0
     ports:
       - "8888:8080"
+  sakai-mysql:
+    image: mysql:5.6.39
+    container_name: sakai-mysql
+    # Sakai requires the database to use UTF-8.
+    command: --character-set-server=utf8
+    environment:
+      # See https://docs.docker.com/samples/library/mysql/#environment-variables
+      MYSQL_DATABASE: sakai
+      MYSQL_USER: sakai
+      MYSQL_PASSWORD: sakaipass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - sakai-mysql:/var/lib/mysql
   dummy-xapi:
     build: sakai/dummy-xapi
     container_name: dummy-xapi
