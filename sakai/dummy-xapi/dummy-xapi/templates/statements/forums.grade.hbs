@@ -1,0 +1,29 @@
+{
+  "id": "{{guid}}",
+  "actor": {{> instructor}},
+  "result": {
+    "completion": true,
+    "score": {
+      "min": 0.0,
+      "raw": {{float 0 100 '0.0'}}
+    }
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/scored"
+  },
+  "context": {{> context}},
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User received a grade"
+      },
+      "description": {
+        "en-US": "User received a grade for their forum post: example-forum-post-{{int 1 10}}"
+      },
+      "type": "http://adlnet.gov/expapi/activities/received-grade-forum"
+    },
+    "id": "{{homePage}}/portal/forums",
+    "objectType": "Activity"
+  },
+  "timestamp": "{{timestamp}}"
+}

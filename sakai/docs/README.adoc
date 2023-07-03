@@ -1,0 +1,49 @@
+:encoding: utf-8
+:lang: ja
+:source-highlighter: rouge
+:author: 株式会社Udzuki
+:revdate: 2021年12月7日
+:revnumber: 1.1版
+:doctype: book
+:version-label:
+:chapter-label:
+:toc:
+:toc-title: 目次
+:figure-caption: 図
+:table-caption: 表
+:listing-caption: リスト
+:example-caption: 例
+:appendix-caption: 付録
+:toclevels: 2
+:pagenums:
+:sectnums:
+:imagesdir: resources/images
+
+= AsciiDocを用いたマニュアル作成: 作成手順
+
+== インストール
+
+関連ツールをインストール
+
+[source]
+----
+$ sudo gem install asciidoctor
+$ sudo gem install --pre asciidoctor-pdf
+$ sudo gem install asciidoctor-pdf-cjk
+$ sudo gem install rouge
+$ sudo gem install coderay
+----
+
+== コンパイル
+
+対象のAsciiDocをコンパイル
+
+[source]
+----
+$ asciidoctor-pdf \
+    -r asciidoctor-pdf-cjk \
+    -a pdf-style=mystyle-theme.yml \
+    -a pdf-stylesdir=resources/themes \
+    -a pdf-fontsdir=resources/fonts \
+    README.adoc
+----

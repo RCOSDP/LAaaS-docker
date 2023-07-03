@@ -1,0 +1,22 @@
+{
+  "id": "{{guid}}",
+  "actor": {{> student}},
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/shared"
+  },
+  "context": {{> context}},
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User sent a private message"
+      },
+      "description": {
+        "en-US": "User sent a private message with subject: example-message-{{int 1 30}}"
+      },
+      "type": "http://adlnet.gov/expapi/activities/send-private-message"
+    },
+    "id": "{{homePage}}/portal/privateMessage",
+    "objectType": "Activity"
+  },
+  "timestamp": "{{timestamp}}"
+}
