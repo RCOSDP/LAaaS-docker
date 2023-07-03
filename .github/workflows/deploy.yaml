@@ -23,6 +23,7 @@ on:
           - moodle-xapi
           - moodle-caliper
           - sakai
+          - sakai-dummy-xapi
           - chibichilo-log-processor
           - chibichilo-xapi
           - chibichilo-caliper
@@ -53,6 +54,9 @@ jobs:
     - if: inputs.ecr_repository == 'sakai'
       run: |
         echo "BUILD_PATH=sakai/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'sakai-dummy-xapi'
+      run: |
+        echo "BUILD_PATH=sakai/dummy-xapi/" >> $GITHUB_ENV
     - if: inputs.ecr_repository == 'chibichilo-log-processor'
       run: |
         echo "BUILD_PATH=chibichilo/log-processor/" >> $GITHUB_ENV
