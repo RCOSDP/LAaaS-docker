@@ -30,6 +30,7 @@ services:
       - sakai-db:/var/lib/mysql
   sakai-dummy-xapi:
     build: sakai/dummy-xapi
+    image: public.ecr.aws/v8a6v1r8/sakai-dummy-xapi:1.0.0
     container_name: sakai-dummy-xapi
     tty: true
     environment:
