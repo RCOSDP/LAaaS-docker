@@ -31,6 +31,8 @@ RUN mvn -s /usr/share/maven/ref/settings.xml clean install sakai:deploy -Dmaven.
 
 FROM openjdk:8
 
+LABEL version="1.0.0"
+
 # Copy Sakai configuration
 COPY sakai.properties /opt/tomcat/sakai/
 
