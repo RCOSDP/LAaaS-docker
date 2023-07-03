@@ -3,10 +3,10 @@ services:
     build: sakai
     container_name: sakai
     depends_on:
-      - sakai-mysql
+      - sakai-db
     environment:
       JAVA_OPTS: -server -Xms512m -Xmx1024m -XX:NewSize=192m -XX:MaxNewSize=384m -Djava.awt.headless=true -Dhttp.agent=Sakai -Dorg.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING=false -Dsun.lang.ClassLoader.allowArraySyntax=true -Djava.util.Arrays.useLegacyMergeSort=true # -Dsakai.demo=true
-      DATABASE_HOST: sakai-mysql:3306
+      DATABASE_HOST: sakai-db:3306
       DATABASE_NAME: sakai
       DATABASE_USER: sakai
       DATABASE_PASSWORD: sakaipass
@@ -14,9 +14,9 @@ services:
       LRS_PASSWORD: cf72e40f90f6d02569a93a44b41f841c32fc41a0
     ports:
       - "8888:8080"
-  sakai-mysql:
+  sakai-db:
     image: mysql:5.6.39
-    container_name: sakai-mysql
+    container_name: sakai-db
     # Sakai requires the database to use UTF-8.
     command: --character-set-server=utf8
     environment:
@@ -26,7 +26,7 @@ services:
       MYSQL_PASSWORD: sakaipass
       MYSQL_ROOT_PASSWORD: rootpass
     volumes:
-      - sakai-mysql:/var/lib/mysql
+      - sakai-db:/var/lib/mysql
   dummy-xapi:
     build: sakai/dummy-xapi
     container_name: dummy-xapi
@@ -43,4 +43,4 @@ services:
     volumes:
       - ./sakai/notebooks:/home/jupyter
 volumes:
-  sakai-mysql:
+  sakai-db:
