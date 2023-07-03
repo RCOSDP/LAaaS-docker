@@ -1,6 +1,7 @@
 services:
   sakai:
     build: sakai
+    image: public.ecr.aws/v8a6v1r8/sakai:1.0.0
     container_name: sakai
     depends_on:
       - sakai-db
