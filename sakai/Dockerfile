@@ -22,8 +22,10 @@ RUN git clone --depth 1 --branch 12.x https://github.com/Apereo-Learning-Analyti
 WORKDIR SakaiXAPI-Provider
 COPY patches patches
 # Change version to 12.6
-RUN apt-get update -y
-RUN apt-get install -y patch
+RUN echo "deb http://archive.debian.org/debian/ stretch main" > /etc/apt/sources.list && \
+    echo "deb http://archive.debian.org/debian-security stretch/updates main" >> /etc/apt/sources.list && \
+    apt-get update -y && \
+    apt-get install -y patch
 RUN patch -u pom.xml < ./patches/SakaiXAPI-Provider/pom.xml.patch
 RUN patch -u impl/pom.xml < ./patches/SakaiXAPI-Provider/impl/pom.xml.patch
 RUN patch -u pack/pom.xml < ./patches/SakaiXAPI-Provider/pack/pom.xml.patch
