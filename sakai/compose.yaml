@@ -27,9 +27,9 @@ services:
       MYSQL_ROOT_PASSWORD: rootpass
     volumes:
       - sakai-db:/var/lib/mysql
-  dummy-xapi:
+  sakai-dummy-xapi:
     build: sakai/dummy-xapi
-    container_name: dummy-xapi
+    container_name: sakai-dummy-xapi
     tty: true
     environment:
       TZ: Asia/Tokyo
