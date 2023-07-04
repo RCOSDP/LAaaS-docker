@@ -215,6 +215,12 @@ image::object-types.png[align=center]
 image::assessment-score.png[align=center]
 
 == JupyterHub
+分析に使用するノートブックを読み込むため、コンテナを再起動する。
+
+----
+docker compose up -d jupyterhub --no-build
+----
+
 JupyterHub( http://localhost:8001 )に `jupyter` ユーザ（パスワード: `jupyter` ）でログインする。
 
 === xAPIステートメント
