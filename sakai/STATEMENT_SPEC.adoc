@@ -1,9 +1,6 @@
 :encoding: utf-8
 :lang: ja
 :source-highlighter: rouge
-:author: 株式会社Udzuki
-:revdate: 2021年12月7日
-:revnumber: 1.0版
 :doctype: book
 :version-label:
 :chapter-label:
@@ -20,9 +17,6 @@
 :icons: font
 
 = Sakai LMS v12.6: xAPIステートメント仕様
-:header-recto-left-content: Sakai LMS v12.6　xAPIステートメント仕様
-:header-verso-left-content: Sakai LMS v12.6　xAPIステートメント仕様
-
 
 本書に、Sakai LMS v12.6のCoreツールが送信するxAPIステートメントをまとめる。 +
 Sakaiは、イベントの発生を検知してステートメント変換を行うため、下表の通りイベントコード毎のステートメントを記載する。 +
