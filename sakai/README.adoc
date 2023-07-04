@@ -50,7 +50,7 @@ Sakaiの学習ログ分析基盤を構築する。
 graph TB
   ST([生徒])                    -- 学習活動                   --> SA[Sakai]
   SA                            -- xAPIステートメント         --> L[(Learning Locker)]
-	D[[ダミーステートメント生成]] -. ダミーステートメント       .-> L
+  D[[ダミーステートメント生成]] -. ダミーステートメント       .-> L
   L                             --> S[Superset]
   L                             --> J[JupyterHub]
   S                             -- 可視化                     --> T([教師])
