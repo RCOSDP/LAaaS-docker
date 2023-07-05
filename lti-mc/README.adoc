@@ -23,11 +23,11 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-= CHiBi-CHiLOの視聴ログ分析
+= GakuNinLMS-LTI-MCの視聴ログ分析
 
 WARNING: 以降の手順を実行する前にxref:../README.adoc#init[初期設定]を行うこと。
 
-https://github.com/npocccties/chibichilo[CHiBi-CHiLO] の https://npocccties.github.io/chibichilo/V2.1/Design/build/html/Logs.html[視聴ログ] 分析基盤を構築する。 +
+https://github.com/RCOSDP/GakuNinLMS-LTI-MC[GakuNinLMS-LTI-MC] (https://github.com/npocccties/chibichilo[CHiBi-CHiLO]互換) の https://npocccties.github.io/chibichilo/V2.1/Design/build/html/Logs.html[視聴ログ]分析基盤を構築する。
 
 ----
 docker compose up -d --no-build // <1>
@@ -37,9 +37,9 @@ docker compose up -d --no-build // <1>
 .システム構成
 |===
    |項目                  |名称                          |コンテナ名
-   |前処理                |ログフォーマット変換・加工    |chibichilo-log-processor
-.2+|ステートメント変換    |xAPIステートメント変換        |chibichilo-xapi
-                          |Caliperステートメント変換     |chibichilo-caliper
+   |前処理                |ログフォーマット変換・加工    |lti-mc-log-processor
+.2+|ステートメント変換    |xAPIステートメント変換        |lti-mc-xapi
+                          |Caliperステートメント変換     |lti-mc-caliper
 .5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
                        .2+|Learning Locker(DB)           |learninglocker-mongo
                                                          |learninglocker-redis
@@ -121,7 +121,7 @@ API_KEY=$(
 
 sed -i -e "s/OPENLRW_APIKEY=.*/OPENLRW_APIKEY=${API_KEY}/" caliper/.env
 
-docker compose up -d chibichilo-caliper # 変更を反映
+docker compose up -d lti-mc-caliper # 変更を反映
 ----
 <1> link:../openlrw/.env[OpenLRWの設定] を参照
 
