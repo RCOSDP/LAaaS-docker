@@ -90,6 +90,7 @@ docker exec superset /init.sh
 ログを取得するLMS/LTIツールに応じて、以下のリンク先を参照する。
 
 * link:./moodle/README.adoc[Moodle]
+* link:./sakai/README.adoc[Sakai]
 * link:./chibichilo/README.adoc[CHiBi-CHiLO]
 
 == FAQ

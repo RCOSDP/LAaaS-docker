@@ -1,0 +1,301 @@
+:encoding: utf-8
+:lang: ja
+:source-highlighter: rouge
+:doctype: book
+:version-label:
+:chapter-label:
+:toc:
+:toc-title: 目次
+:figure-caption: 図
+:table-caption: 表
+:example-caption: 例
+:appendix-caption: 付録
+:toclevels: 2
+:pagenums:
+:sectnums:
+:imagesdir: images
+:icons: font
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+= Sakaiの学習ログ分析
+
+WARNING: 以降の手順を実行する前にxref:../README.adoc#init[初期設定]を行うこと。
+
+NOTE: Caliperステートメントは未対応
+
+Sakaiの学習ログ分析基盤を構築する。
+
+.システム構成
+|===
+   |項目                  |名称                          |コンテナ名
+.2+|学習管理システム      |Sakai(Web)                    |sakai
+                          |Sakai(DB)                     |sakai-db
+.3+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
+                       .2+|Learning Locker(DB)           |learninglocker-mongo
+                                                         |learninglocker-redis
+.3+|分析システム          |Superset(Web)                 |superset
+                          |Superset(DB)                  |superset-db
+                          |JupyterHub(Web/DB)            |jupyterhub
+   |ツール                |ダミーステートメント生成      |sakai-dummy-xapi
+|===
+
+[source, mermaid]
+----
+graph TB
+  ST([生徒])                    -- 学習活動                   --> SA[Sakai]
+  SA                            -- xAPIステートメント         --> L[(Learning Locker)]
+  D[[ダミーステートメント生成]] -. ダミーステートメント       .-> L
+  L                             --> S[Superset]
+  L                             --> J[JupyterHub]
+  S                             -- 可視化                     --> T([教師])
+  J                             -- 分析結果                   --> T
+  J                             -. 分析結果                   .-> S
+  T                             == 教育方法とコース設計の改善 ==> SA
+  SA                            == 学習体験と成果の向上       ==> ST
+----
+
+== 事前準備
+=== Sakai
+`compose.yml` で `sakai` の環境変数 `LRS_USERNAME` および `LRS_PASSWORD` に作成したLRSクライアントの `Key` と `Secret` をそれぞれ設定する。 +
+Sakaiが提供するデモデータを起動時に登録する場合には `JAVA_OPTS` で `-Dsakai.demo=true` を指定する。
+
+[[source, diff]]
+----
+  sakai:
+    ...
+    environment:
++      JAVA_OPTS: ... -Dsakai.demo=true
+       ...
++      LRS_USERNAME: ... // <1>
++      LRS_PASSWORD: ... // <1>
+----
+<1> xref:../README.adoc#learninglocker_client_settings[LRSクライアント]の `Key` と `Secret`
+
+=== Superset
+Sakaiのステートメントを取り扱うため、外部テーブルを変更し、カラムを追加・リネームする。
+
+----
+docker compose exec superset-db psql -U superset learninglocker -c '
+  ALTER FOREIGN TABLE xapi_statements RENAME "statement.object.definition.description.en" TO "statement.object.definition.description.en-US";
+  ALTER FOREIGN TABLE xapi_statements RENAME "statement.object.definition.name.en" TO "statement.object.definition.name.en-US";
+  ALTER FOREIGN TABLE xapi_statements ADD "statement.result.extensions" VARCHAR;'
+----
+
+Supersetからデータセット `xapi_statements` を編集し、 `SYNC COLUMNS FROM SOURCE` で変更を反映する。
+
+image::sync-columns-from-source.png[align=center]
+
+== Sakai
+SakaiのMySQLデータベースを起動する。
+
+----
+docker compose up -d sakai-db
+----
+
+MySQLの起動完了を確認する。
+
+----
+docker logs -f sakai-db
+
+...mysqld: ready for connections.
+----
+
+Sakaiコンテナを起動する。
+
+----
+docker compose up -d sakai --no-build // <1>
+----
+<1> イメージをビルドする場合は `--no-build` の代わりに `--build` オプションを指定
+
+Sakai( http://localhost:8888/portal )で学習活動を行う。
+
+== Superset
+TIP: 操作方法の詳細は https://superset.apache.org/docs/creating-charts-dashboards/creating-your-first-dashboard[ユーザガイド - Creating Charts and Dashboards] を参照すること。
+
+Superset( http://localhost:8088 )にAdminユーザでログインする。
+
+=== xAPIステートメント
+`[Data] > [Datasets]` で選択した `xapi_statements` を以下の条件で可視化する。
+
+.ユーザの総数を算出
+[cols="30%,30%,40%"]
+|===
+   |大項目               |小項目             |設定値
+ 2+|Visualization Type                       |`Big Number`
+   |Time                 |TIME COLUMN        |`timestamp`
+   |Query                |METRIC             |`COUNT_DISTINCT(statement.actor.account.name)`
+   |Display settings     |SUBHEADER          |`#Users`
+|===
+
+image::users.png[align=center]
+
+.日毎のログイン回数を棒グラフで可視化
+[cols="30%,30%,40%"]
+|===
+   |大項目               |小項目             |設定値
+ 2+|Visualization Type                       |`Time series Bar Chart`
+.2+|Time                 |TIME COLUMN        |`timestamp`
+                         |TIME GRAIN         |`Day`
+.2+|Query                |METRICS            |`COUNT(*)`
+                         |FILTERS            |`statement.object.definition.type LIKE 'http://adlnet.gov/expapi/activities/session-started'`
+|===
+
+image::logins-per-day.png[align=center]
+
+.特定期間のログイン回数を1時間単位でカウント
+[cols="30%,30%,40%"]
+|===
+   |大項目               |小項目             |設定値
+ 2+|Visualization Type                       |`Time series Bar Chart`
+.3+|Time                 |TIME COLUMN        |`timestamp`
+                         |TIME GRAIN         |`Hour`
+                         |TIME RANGE         |`2021-04-01 ≦ col < 2021-08-01`
+.2+|Query                |METRICS            |`COUNT(*)`
+                         |FILTERS            |`statement.object.definition.type LIKE 'http://adlnet.gov/expapi/activities/session-started'`
+|===
+
+image::logins-per-hour-during-specific-period.png[align=center]
+
+.週毎の各ユーザ数を積み上げて可視化
+[cols="30%,30%,40%"]
+|===
+   |大項目               |小項目             |設定値
+ 2+|Visualization Type                       |`Area Chart`
+.2+|Time                 |TIME COLUMN        |`timestamp`
+                         |TIME GRAIN         |`Week`
+.2+|Query                |METRICS            |`COUNT(*)`
+                         |DIMENSIONS         |`statement.actor.account.name`
+|===
+
+image::stacked-users.png[align=center]
+
+.カレンダーヒートマップでアクセス集中度を可視化
+[cols="30%,30%,40%"]
+|===
+   |大項目               |小項目             |設定値
+ 2+|Visualization Type                       |`Calendar Heatmap`
+.2+|Time                 |TIME COLUMN        |`timestamp`
+                         |TIME RANGE         |`2021-04-01 ≦ col < 2021-10-01`
+.3+|Query                |DOMAIN             |`month`
+                         |SUBDOMAIN          |`hour`
+                         |METRICS            |`COUNT(*)`
+|===
+
+image::calendar-heatmap.png[align=center]
+
+.ユーザ操作（ログインなど）毎の件数を円グラフで可視化
+[cols="30%,30%,40%"]
+|===
+   |大項目               |小項目             |設定値
+ 2+|Visualization Type                       |`Pie Chart`
+   |Time                 |TIME COLUMN        |`timestamp`
+.2+|Query                |DIMENSIONS         |`statement.object.definition.type`
+                         |METRICS            |`COUNT(*)`
+|===
+
+image::object-types.png[align=center]
+
+.Tests & QuizzesにおけるAssessment提出時の点数を箱ひげ図でユーザごとに可視化
+[cols="30%,30%,40%"]
+|===
+   |大項目               |小項目             |設定値
+ 2+|Visualization Type                       |`Box Plot`
+   |Time                 |Time Column        |`timestamp`
+.3+|Query                |METRICS            |`MAX(statement.result.score.raw)`
+                         |FILTERS            |`statement.object.definition.type LIKE 'http://adlnet.gov/expapi/activities/received-grade-assessment'`
+                         |DIMENSIONS         |`statement.actor.account.name`
+|===
+
+image::assessment-score.png[align=center]
+
+== JupyterHub
+分析に使用するノートブックを読み込むため、コンテナを再起動する。
+
+----
+docker compose up -d jupyterhub --no-build
+----
+
+JupyterHub( http://localhost:8001 )に `jupyter` ユーザ（パスワード: `jupyter` ）でログインする。
+
+=== xAPIステートメント
+以下の処理を行うlink:notebooks/analyze-xapi-statements.ipynb[analyze-xapi-statements.ipynb]にノートブックの利用例を示す。 +
+詳細はノートブック内の説明を参照すること。
+
+* Learning LockerのAggregation APIを使用したステートメントの取得
+* Seabornを使用した集計結果の可視化
+* Assignmentsの採点（ `asn.grade.submission` ）をより詳細にSupersetで可視化するためのステートメント加工
+  ** 分析対象項目の絞り込み
+  ** Grade ScaleがLetter Grade、Pass or Fail、またはCheckmarkである場合の評点（A+、Pass、Checkedなど）の抽出
+  ** 採点されたAssignmentの名前を項目化
+* Supersetへのノートブック実行結果の登録
+
+=== ノートブック実行結果の可視化
+Supersetの `[Data] > [Datasets]` から登録したデータセットにアクセスする。
+
+=== 例1: Gradeの件数を集計
+ノートブックで追加した項目 `result.extensions.classification.definition.name.en-US` の件数を円グラフで描画する。
+
+[cols="30%,30%,40%"]
+|===
+   |大項目               |小項目             |設定値
+ 2+|Visualization Type                       |`Pie Chart`
+   |Time                 |TIME COLUMN        |`timestamp`
+.3+|Query                |DIMENSIONS         |`result.extensions.classification.definition.name.en-US`
+                         |METRICS            |`COUNT(*)`
+												 |FILTERS            |`result.extensions.classification.definition.name.en-US IS NOT NULL`
+|===
+
+image::grade-class.png[align=center]
+
+=== 例2: Assignmentごとに採点回数を集計
+ノートブックで追加した項目 `received_grade_assignment_name` の件数を円グラフで描画する。
+
+[cols="30%,30%,40%"]
+|===
+   |大項目               |小項目             |設定値
+   |Visualization Type   |-                  |`Pie Chart`
+   |Time                 |TIME COLUMN        |`timestamp`
+.3+|Query                |DIMENSIONS         |`received_grade_assignment_name`
+                         |METRICS            |`COUNT(*)`
+												 |FILTERS            |`received_grade_assignment_name IS NOT NULL`
+|===
+
+image::graded-assignments.png[align=center]
+
+[appendix]
+== ダミーステートメントの登録
+ステートメントの可視化・分析を例示・動作確認する目的において、
+Sakaiで実際に操作することなく、 link:STATEMENT_SPEC.adoc[仕様]に則したダミーステートメントを生成するサービス `sakai-dummy-xapi` を提供する。
+
+`compose.yaml` の `sakai-dummy-xapi` で以下に示す環境変数を編集し、ダミーステートメントの生成方法およびステートメントを保存するLRSに関する情報を設定する。
+
+[source, yml]
+----
+sakai-dummy-xapi:
+  ...
+  environment:
+    TZ: Asia/Tokyo
+    STATEMENT_NUM: 300 // <1>
+    TIMESTAMP_MIN: "2021-04-01T00:00:00+00:00" // <2>
+    TIMESTAMP_MAX: "2021-10-01T00:00:00+00:00" // <3>
+    LRS_URL: http://learninglocker:8081/data/xAPI/
+    LRS_USERNAME: ... // <4>
+    LRS_PASSWORD: ... // <4>
+----
+<1> 登録するダミーステートメントの数
+<2> ステートメントに設定するタイムスタンプの最小値
+<3> ステートメントに設定するタイムスタンプの最大値
+<4> xref:../README.adoc#learninglocker_client_settings[LRSクライアント]の `Key` と `Secret`
+
+次のコマンドを実行し、LRSにステートメントを登録する。
+
+----
+docker compose up -d sakai-dummy-xapi --no-build
+docker compose exec sakai-dummy-xapi npm start
+----

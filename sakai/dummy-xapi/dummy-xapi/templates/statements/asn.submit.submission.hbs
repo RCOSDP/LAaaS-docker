@@ -1,0 +1,22 @@
+{
+  "id": "{{guid}}",
+  "actor": {{> student}},
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/attempted"
+  },
+  "context": {{> context}},
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User submitted an assignment"
+      },
+      "description": {
+        "en-US": "User submitted an assignment: example-asn-{{int 1 20}}"
+      },
+      "type": "http://adlnet.gov/expapi/activities/submit-assignment"
+    },
+    "id": "{{homePage}}/access{{guid}}",
+    "objectType": "Activity"
+  },
+  "timestamp": "{{timestamp}}"
+}

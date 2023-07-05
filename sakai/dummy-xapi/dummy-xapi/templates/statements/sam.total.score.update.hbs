@@ -1,0 +1,30 @@
+{
+  "id": "{{guid}}",
+  "actor": {{> instructor}},
+  "result": {
+    "completion": true,
+    "score": {
+      "min": 0.0,
+      "max": 100.0,
+      "raw": {{float 0 100 '0.0'}}
+    }
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/scored"
+  },
+  "context": {{> context}},
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "Total score updated"
+      },
+      "description": {
+        "en-US": "Total score updated for Assessment Title: example-assessment-{{int 1 10}}; User Eid: {{account.student}}; Release To: {{guid}}; Submitted: on time"
+      },
+      "type": "http://adlnet.gov/expapi/activities/total-score-update"
+    },
+    "id": "{{homePage}}/portal/assessment",
+    "objectType": "Activity"
+  },
+  "timestamp": "{{timestamp}}"
+}

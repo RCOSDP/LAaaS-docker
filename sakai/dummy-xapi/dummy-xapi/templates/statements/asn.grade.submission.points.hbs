@@ -1,0 +1,30 @@
+{
+  "id": "{{guid}}",
+  "actor": {{> instructor}},
+  "result": {
+    "completion": true,
+    "score": {
+      "min": 0.0,
+      "max": 100.0,
+      "raw": {{float 0 100 '0.0'}}
+    }
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/scored"
+  },
+  "context": {{> context}},
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User received a grade"
+      },
+      "description": {
+        "en-US": "User received a grade for their assginment: example-asn-{{int 1 10}}; Submission #: {{int 1 3}}"
+      },
+      "type": "http://adlnet.gov/expapi/activities/received-grade-assignment"
+    },
+    "id": "{{homePage}}/portal/assignment/s/{{guid}}/{{guid}}/{{guid}}",
+    "objectType": "Activity"
+  },
+  "timestamp": "{{timestamp}}"
+}

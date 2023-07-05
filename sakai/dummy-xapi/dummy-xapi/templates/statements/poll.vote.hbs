@@ -1,0 +1,22 @@
+{
+  "id": "{{guid}}",
+  "actor": {{> student}},
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {{> context}},
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User voted in a poll"
+      },
+      "description": {
+        "en-US": "User voted in a poll with text:example-poll-{{int 1 30}}; their vote was option: {{int 1 4}}"
+      },
+      "type": "http://adlnet.gov/expapi/activities/voted-in-poll"
+    },
+    "id": "{{homePage}}/portal/poll",
+    "objectType": "Activity"
+  },
+  "timestamp": "{{timestamp}}"
+}

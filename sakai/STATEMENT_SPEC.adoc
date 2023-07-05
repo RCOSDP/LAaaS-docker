@@ -1,0 +1,1897 @@
+:encoding: utf-8
+:lang: ja
+:source-highlighter: rouge
+:doctype: book
+:version-label:
+:chapter-label:
+:toc:
+:toc-title: 目次
+:figure-caption: 図
+:table-caption: 表
+:example-caption: 例
+:appendix-caption: 付録
+:toclevels: 2
+:pagenums:
+:sectnums:
+:imagesdir: images
+:icons: font
+
+= Sakai LMS v12.6: xAPIステートメント仕様
+
+本書に、Sakai LMS v12.6のCoreツールが送信するxAPIステートメントをまとめる。 +
+Sakaiは、イベントの発生を検知してステートメント変換を行うため、下表の通りイベントコード毎のステートメントを記載する。 +
+付記するステートメント例においては、Sakai自身が送信する `actor` 、 `verb` 、 `object` 、 `context` 、 `result` 、 `timestamp` を記載する（つまり、受信側であるLRSがステートメントに設定する項目は除く）。 +
+ただし、<<statement, ステートメント構成>>で共通する設定値を含む場合、省略記号（ `...` ）で記載を省略する。
+
+[cols="25%,75%"]
+|===
+| 項目                     | 概要
+
+| イベントコード           | ステートメント変換処理が捕捉するSakaiのイベント +
+                             ※Sakaiがステートメント変換を指示した場合のみ対象となり、本イベントが生じる全てのケースでステートメントが送信されるわけではない。
+| 概要                     | https://confluence.sakaiproject.org/display/UDAT/Sakai+12.x+Event+Table+Descriptions[Sakaiのイベント一覧]から転記（一部改変）
+| 操作例                   | ステートメント送信を伴う操作の例
+| ユーザの役割             | （対象操作の想定ユーザ） +
+                             学習者（生徒）またはインストラクター（教師）
+| ステートメントの実装箇所 | （開発者向け情報） +
+                             BaseLearningResourceStoreService: org.sakaiproject.event.impl.BaseLearningResourceStoreService +
+                             AssignmentServiceImpl: org.sakaiproject.assignment.impl.AssignmentServiceImpl +
+                             AssignmentAction: org.sakaiproject.assignment.tool.AssignmentAction +
+                             DiscussionForumTool: org.sakaiproject.tool.messageforums.DiscussionForumTool +
+                             PrivateMessagesTool: org.sakaiproject.tool.messageforums.PrivateMessagesTool +
+                             ExternalLogicImpl: org.sakaiproject.poll.logic.impl.ExternalLogicImpl +
+                             SamigoLRSStatements: org.sakaiproject.tool.assessment.util.SamigoLRSStatements
+|===
+
+
+[NOTE]
+====
+Sakaiのイベント一覧 +
+https://confluence.sakaiproject.org/display/UDAT/Sakai+12.x+Event+Table+Description
+====
+
+全てのステートメントは、以下の構成に従う。各要素の定義については、 https://www.elc.or.jp/files/user/doc/tincan/xAPI_ja.pdf#object[xAPIステートメントの仕様]を参照すること。
+
+[NOTE]
+====
+xAPIステートメントの仕様 +
+https://www.elc.or.jp/files/user/doc/tincan/xAPI_ja.pdf#object
+====
+
+[[statement]]
+[source, json]
+----
+{
+  "version": "1.0.0",                           // xAPIのバージョン
+  "id": "f5031ff9-a246-4e9a-9759-b7b0c5d698e9", // ステートメントを一意に特定するUUID
+  "authority": {                                // LRSクライアントの情報
+    "objectType": "Agent",
+    "name": "New Client",
+    "mbox": "mailto:hello@learninglocker.net"
+  },
+  "timestamp": "2021-12-03T07:12:27+00:00",     // Sakaiのイベントが発生した時刻（操作時刻）
+  "stored": "2021-12-03T07:12:27.406Z",         // ステートメントがLRSに登録された時刻
+  "actor": {
+    "name": "Sakai Administrator",              // ユーザの姓名
+    "account": {
+      "name": "admin",                          // ユーザID
+      "homePage": "http://localhost:8888"       // SakaiのURL
+    },
+    "objectType": "Agent"
+  },
+  "context": {                                  // 任意項目
+    "contextActivities": {
+      "parent": [
+        {
+          "id": "http://localhost:8888/portal/site/88826102-74c2-4453-b0cc-a1c0d811b190",
+                                                // SakaiにおけるサイトのID
+          "objectType": "Activity"
+        }
+      ]
+    }
+  },
+  // 以下は後述するイベント毎に設定値が異なる
+  "verb": {...},
+  "object": {...},
+  "result": {...},                              // 任意項目
+}
+----
+
+
+== Login and Logout
+
+=== Login
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | user.login
+| 概要 | User logs into Sakai
+| 操作例 | > Login
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/initialized"
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/session-started"
+    },
+    "id": "http://localhost:8888/portal",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Logout
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | user.logout
+| 概要 | User logs out of Sakai
+| 操作例 | > `${username}` > Log Out
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/exited"
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/session-ended"
+    },
+    "id": "http://localhost:8888/portal/logout",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Accouncements
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | annc.read
+| 概要 | Announcement read
+| 操作例 | 1. > Accouncements > Add > Post Announcement +
+          2. > Accouncements > View > `${subject}`
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-announcement"
+    },
+    "id": "http://localhost:8888/portal/announcement/msg/87c5c03a-9175-4db5-ab55-93035866d933/main/a545e00e-20e4-4bbf-8c8c-479a55399a62",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Assignments
+
+=== Grading Submission
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | asn.grade.submission
+| 概要 | Assignment submission graded, released, and returned
+| 操作例 | > Assignments > Grade > `${student}` > Save and Release to Student
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | AssignmentServiceImpl
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "result": {
+    // 後述
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/scored"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User received a grade"
+      },
+      "description": {
+        "en-US": "User received a grade for their assginment: xxx; Submission #: 1"
+      },
+      "type": "http://adlnet.gov/expapi/activities/received-grade-assignment"
+    },
+    "id": "http://localhost:8888/portal/assignment/s/87c5c03a-9175-4db5-ab55-93035866d933/c677653e-6021-48ce-9d8d-b0c205069a00/c3295f52-e0e8-4dc2-bd1b-0c4b5c57c8b8",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+* `result` にはAssignmentのGrade Scaleに応じた値を設定する。
+* Grade ScaleがPointsの場合、 `result.score` にポイントを設定する。
+
+[source, json]
+----
+"result": {
+  "completion": true,
+  "score": {
+    "min": 0.0,
+    "max": 100.0,
+    "raw": 80.0
+  }
+}
+----
+
+下表に示すその他のGrade Scaleの場合には、Extension `http://sakaiproject.org/xapi/extensions/result/classification` で `${grade}` にGradeで選択した値を設定する。
+
+[cols="25%,75%"]
+|===
+| Grade Scale  | `${grade}` 値
+
+| Letter Grade | Ungraded（未選択）, A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, E, or F
+| Pass or Fail    | Ungraded（未選択）, Pass, or Fail
+| Checkmark    | Ungraded（未選択） or Checked
+|===
+
+[source, json]
+----
+"result": {
+  "completion": true,
+  "extensions": {
+    "http://sakaiproject.org/xapi/extensions/result/classification": {
+      "definition": {
+        "name": {
+          "en-US": "${grade}"
+        },
+        "type": "http://sakaiproject.org/xapi/activitytypes/grade_classification"
+      },
+      "id": "http://sakaiproject.org/xapi/activities/${grade}",
+      "objectType": "activity"
+    }
+  }
+}
+----
+
+NOTE: `AssignmentServiceImpl::getStatementForUnsubmittedAssignmentGraded` に未提出のAssignmentを評価する場合のステートメントが定義されている。しかし、そのような操作においても上記のステートメント（ `AssignmentServiceImpl::getStatementForAssignmentGraded` の実装）が送信され、当該メソッドに到達可能な操作が確認できないため、本書には記載しない。
+
+=== Reading Assignment
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | asn.read.assignment
+| 概要 | Assignment (directions) read
+| 操作例 | (提出前) +
+          > Assignments > `${assignment_title}`
+| ユーザの役割 | 学習者
+| ステートメントの実装箇所 | AssignmentAction
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User viewed an assignment"
+      },
+      "description": {
+        "en-US": "User viewed assignment: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/view-assignment"
+    },
+    "id": "http://localhost:8888/portalc677653e-6021-48ce-9d8d-b0c205069a00",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Reading Submission
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | asn.read.submission
+| 概要 | Assignment submission read
+| 操作例 | (提出後) +
+          > Assignments > `${assignment_title}`
+| ユーザの役割 | -
+| ステートメントの実装箇所 | AssignmentAction
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User reviewed a submitted assignment"
+      },
+      "description": {
+        "en-US": "User reviewed a submitted assignment: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/view-submitted-assignment"
+    },
+    "id": "http://localhost:8888/portal597a5f40-d4bc-4d31-853d-ef5ab92fd65f",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Submitting Assignment
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | asn.submit.submission
+| 概要 | Assignment submission submitted
+| 操作例 | (提出後) +
+          > Assignments > `${assignment_title}`
+| ユーザの役割 | 学習者
+| ステートメントの実装箇所 | AssignmentServiceImpl
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/attempted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User submitted an assignment"
+      },
+      "description": {
+        "en-US": "User submitted an assignment: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/submit-assignment"
+    },
+    "id": "http://localhost:8888/accessc677653e-6021-48ce-9d8d-b0c205069a00",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Calendar
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | calendar.read
+| 概要 | Calendar read and accessed
+| 操作例 | > Calendar
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-calendar"
+    },
+    "id": "http://localhost:8888/portal/calendar/calendar/~cc0fa712-51e8-4ef2-888a-46a1b3d7e22a/week",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Chat
+
+=== Creating Chat Message
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | chat.new
+| 概要 | New chat message and channel
+| 操作例 | > Chat Room > Add message
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/responded"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-chats"
+    },
+    "id": "http://localhost:8888/portal/chat/msg/87c5c03a-9175-4db5-ab55-93035866d933/d71a90e5-f642-4f97-8348-2985763e160a/b0670884-7433-47a9-b0e0-7d13dc387331",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Reading Chat Message
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | chat.read
+| 概要 | Chat message read
+| 操作例 | > Chat Room
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-chats"
+    },
+    "id": "http://localhost:8888/portal/chat/channel/87c5c03a-9175-4db5-ab55-93035866d933/d71a90e5-f642-4f97-8348-2985763e160a",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Forums
+
+=== Grading Forum Post
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | forums.grade
+| 概要 | Forum topic and response graded
+| 操作例 | > Forums > `${topic}` > `${conversation}` > Grade > Submit Grade（要Gradebook item）
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | DiscussionForumTool
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "result": {
+    "completion": true,
+    "score": {
+      "min": 0.0,
+      "raw": 20.0
+    }
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/scored"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User received a grade"
+      },
+      "description": {
+        "en-US": "User received a grade for their forum post: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/received-grade-forum"
+    },
+    "id": "http://localhost:8888/portal/forums",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Creating Topic
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | forums.newtopic
+| 概要 | New topic created
+| 操作例 | > Forums > New Forum > Save Settings & Add Topic > Save
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | DiscussionForumTool
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User created a new topic"
+      },
+      "description": {
+        "en-US": "User created a new topic with subject: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/created-topic"
+    },
+    "id": "http://localhost:8888/portal/forums",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Reading Thread
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | forums.read
+| 概要 | Topic accessed
+| 操作例 | > Forums > `${topic}` > `${conversation}`
+| ユーザの役割 | -
+| ステートメントの実装箇所 | DiscussionForumTool
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User viewed thread"
+      },
+      "description": {
+        "en-US": "User viewed thread with subject: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/viewed-thread"
+    },
+    "id": "http://localhost:8888/portal/forums",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Creating Topic Response
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | forums.response
+| 概要 | Topic response created
+| 操作例 | > Forums > `${topic}` > Start a New Conversation > Post
+| ユーザの役割 | -
+| ステートメントの実装箇所 | DiscussionForumTool
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/responded"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User responded to a thread"
+      },
+      "description": {
+        "en-US": "User responded to a thread with subject: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/post-to-thread"
+    },
+    "id": "http://localhost:8888/portal/forums",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Reading Topic
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | forums.topic.read
+| 概要 | Forum topic read
+| 操作例 | > Forums > `${topic}`
+| ユーザの役割 | -
+| ステートメントの実装箇所 | DiscussionForumTool
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User viewed topic"
+      },
+      "description": {
+        "en-US": "User viewed topic with subject: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/viewed-topic"
+    },
+    "id": "http://localhost:8888/portal/forums",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Lesson Builder
+
+=== Reading Lesson Page
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | lessonbuilder.page.read
+| 概要 | Reading a page
+| 操作例 | > Lessons
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-lesson"
+    },
+    "id": "http://localhost:8888/portal/lessonbuilder/page/1",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Reading Lesson Item
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | lessonbuilder.item.read
+| 概要 | Item is read
+| 操作例 | 
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-lesson"
+    },
+    "id": "http://localhost:8888/portal/lessonbuilder/page/1",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Messages
+
+=== Forwarding Message
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | messages.forward
+| 概要 | Message forwarded
+| 操作例 | > Messages > Received > `${subject}` > Forward > Send
+| ユーザの役割 | -
+| ステートメントの実装箇所 | PrivateMessagesTool
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/responded"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User sent a private message"
+      },
+      "description": {
+        "en-US": "User sent a private message with subject: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/send-private-message"
+    },
+    "id": "http://localhost:8888/portal/privateMessage",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Sending Message
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | messages.new
+| 概要 | New message composed and sent
+| 操作例 | > Messages > Compose Message > Send
+| ユーザの役割 | -
+| ステートメントの実装箇所 | PrivateMessagesTool
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/shared"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User sent a private message"
+      },
+      "description": {
+        "en-US": "User sent a private message with subject: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/send-private-message"
+    },
+    "id": "http://localhost:8888/portal/privateMessage",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Reading Message
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | messages.read
+| 概要 | Message accessed
+| 操作例 | > Messages > Received > `${subject}`
+| ユーザの役割 | -
+| ステートメントの実装箇所 | PrivateMessagesTool
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User read a private message"
+      },
+      "description": {
+        "en-US": "User read a private message with subject: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/read-private-message"
+    },
+    "id": "http://localhost:8888/portal/privateMessage",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Replying to Message
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | messages.reply
+| 概要 | Message reply composed and sent
+| 操作例 | > Messages > Received > `${subject}` > Reply > Send
+| ユーザの役割 | -
+| ステートメントの実装箇所 | PrivateMessagesTool
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/responded"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User sent a private message"
+      },
+      "description": {
+        "en-US": "User sent a private message with subject: xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/send-private-message"
+    },
+    "id": "http://localhost:8888/portal/privateMessage",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== News
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | news.read
+| 概要 | News feed accessed
+| 操作例 | > News
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-news"
+    },
+    "id": "http://localhost:8888/portal/news/site/88826102-74c2-4453-b0cc-a1c0d811b190/placement/cf126302-78c2-5453-90cc-a189ab11b190",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Podcasts
+
+=== Reading Private Podcast
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | podcast.read
+| 概要 | Podcast feed accessed by authenticated user
+| 操作例 | > Podcasts
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-podcast"
+    },
+    "id": "http://localhost:8888/portal/group/87c5c03a-9175-4db5-ab55-93035866d933/Podcasts/",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Reading Public Podcast
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | podcast.read.public
+| 概要 | Public podcast feed accessed
+| 操作例 | 1. > Podcasts > Options > Display to non-members (publicly viewable) > Save Cahnges +
+          2. > Podcasts > `${rss_feed_address}`
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-podcast"
+    },
+    "id": "http://localhost:8888/portal/group/87c5c03a-9175-4db5-ab55-93035866d933/Podcasts/",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+
+=== Reading Site-only Podcast
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | podcast.read.site
+| 概要 | Site-only podcast feed accessed
+| 操作例 | 1. > Podcasts > Options > Display to site > Save Cahnges +
+          2. > Podcasts > `${rss_feed_address}`
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-podcast"
+    },
+    "id": "http://localhost:8888/portal/group/87c5c03a-9175-4db5-ab55-93035866d933/Podcasts/",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Polls
+
+=== Creating Poll
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | poll.edit
+| 概要 | Poll created and revised
+| 操作例 | > Polls > Add > Save and add options
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | ExternalLogicImpl
+|===
+
+NOTE: 更新時と同じイベントコードです。
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User created a poll"
+      },
+      "description": {
+        "en-US": "User created a poll with text:xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/new-poll"
+    },
+    "id": "http://localhost:8888/portal/poll",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Updating Poll
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | poll.edit
+| 概要 | Poll created and revised
+| 操作例 | > Polls > Edit > Save
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | ExternalLogicImpl
+|===
+
+NOTE: 作成時と同じイベントコードです。
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User updated a poll"
+      },
+      "description": {
+        "en-US": "User updated a poll with text:xxx"
+      },
+      "type": "http://adlnet.gov/expapi/activities/updated-poll"
+    },
+    "id": "http://localhost:8888/portal/poll",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Voting in Poll
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | poll.vote
+| 概要 | Poll vote entered
+| 操作例 | > Polls > `${question}` > Vote!
+| ユーザの役割 | -
+| ステートメントの実装箇所 | ExternalLogicImpl
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User voted in a poll"
+      },
+      "description": {
+        "en-US": "User voted in a poll with text:xxx; their vote was option: 1"
+      },
+      "type": "http://adlnet.gov/expapi/activities/voted-in-poll"
+    },
+    "id": "http://localhost:8888/portal/poll",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Resources and Drop Box
+
+=== Creating Resource Item
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | content.new
+| 概要 | Resource item created
+| 操作例 | > Resources > ( `${resource}` の) Actions > Upload Files > Drop files to upload, or click here to browse. > Continue
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/shared"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/add-resource"
+    },
+    "id": "http://localhost:8888/access/content/group/550d4088-7fa3-4984-bd34-01bb741fe529/example.png",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Reading Resource Item
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | content.read
+| 概要 | Resource item accessed and downloaded
+| 操作例 | > Resources > `${resource}`
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-resource"
+    },
+    "id": "http://localhost:8888/access/content/group/550d4088-7fa3-4984-bd34-01bb741fe529/example.png",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Updating Resource Item
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | content.revise
+| 概要 | Resource item revised
+| 操作例 | > Resources > ( `${resource}` の) Actions > Edit Details > Update
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/shared"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/edit-resource"
+    },
+    "id": "http://localhost:8888/access/content/group/87c5c03a-9175-4db5-ab55-93035866d933/Podcasts/test.mp3",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Syllabus
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | syllabus.read
+| 概要 | Syllabus item accessed
+| 操作例 | > Syllabus
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-syllabus"
+    },
+    "id": "http://localhost:8888/portal/syllabus/87c5c03a-9175-4db5-ab55-93035866d933/1",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Tests & Quizzes
+
+=== Submitting Assessment
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | sam.assessment.graded.auto
+| 概要 | Assessment submitted for grading
+| 操作例 | > Tests & Quizzes > `${assessment}` > Begin Assessment > Submit for Grading > Submit for Grading
+| ユーザの役割 | 学習者
+| ステートメントの実装箇所 | SamigoLRSStatements
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "result": {
+    "completion": true,
+    "score": {
+      "min": 0.0,
+      "max": 10.0,
+      "raw": 10.0
+    }
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/scored"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User received a grade"
+      },
+      "description": {
+        "en-US": "User received a grade for their assessment: xxx; User Eid: test; Release To: 88826102-74c2-4453-b0cc-a1c0d811b190; Submitted: on time"
+      },
+      "type": "http://adlnet.gov/expapi/activities/received-grade-assessment"
+    },
+    "id": "http://localhost:8888/portal/assessment",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Beginning Assessment
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | sam.assessment.take
+| 概要 | Student clicked "Begin Assessment"
+| 操作例 | > Tests & Quizzes > `${assessment}` > Begin Assessment
+| ユーザの役割 | 学習者
+| ステートメントの実装箇所 | SamigoLRSStatements
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/attempted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User attempted assessment"
+      },
+      "description": {
+        "en-US": "User attempted assessment: Assesment: xxx, Past Due?: false, Release to:88826102-74c2-4453-b0cc-a1c0d811b190"
+      },
+      "type": "http://adlnet.gov/expapi/activities/attempted-assessment"
+    },
+    "id": "http://localhost:8888/portal/assessment",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Beginning Assessment via URL
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | sam.assessment.take.via_url
+| 概要 | Student accessed the assessment via a link, e.g., the Published Assessment URL or a link on a Lessons page, and selects the "Begin Assessment" button.
+| 操作例 | > `${published_assessment_url}` > Begin Assessment
+| ユーザの役割 | 学習者
+| ステートメントの実装箇所 | SamigoLRSStatements
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/attempted"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User attempted assessment"
+      },
+      "description": {
+        "en-US": "User attempted assessment: Assesment: test, Past Due?: false, Assesment taken via URL., Release to:null"
+      },
+      "type": "http://adlnet.gov/expapi/activities/attempted-assessment"
+    },
+    "id": "http://localhost:8888/portal/assessment",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Updating Student Question Score
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | sam.question.score.update
+| 概要 | Student question score updated
+| 操作例 | > Tests & Quizzes > Published Copies: released to students > ( `${assessment}` のActionから) Scores > Questions > Update
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | SamigoLRSStatements
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "result": {
+    "completion": true,
+    "score": {
+      "min": 0.0,
+      "max": 10.0,
+      "raw": 1.0
+    }
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/scored"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "Question score updated"
+      },
+      "description": {
+        "en-US": "Student score updated for: test; User Eid: test; Release To: 88826102-74c2-4453-b0cc-a1c0d811b190; Submitted: on time; Old Auto Score: 0.0; New Auto Score: 1.0"
+      },
+      "type": "http://adlnet.gov/expapi/activities/question-score-update"
+    },
+    "id": "http://localhost:8888/portal/assessment",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Updating Student Score
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | sam.student.score.update
+| 概要 | Student score updated
+| 操作例 | > Tests & Quizzes > User Activity Report > `${title}` > Update > Tests & Quizzes > Published Copies: released to students > Scores > `${student}` > Update
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | SamigoLRSStatements
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "result": {
+    "completion": true,
+    "score": {
+      "min": 0.0,
+      "max": 10.0,
+      "raw": 10.0
+    }
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/scored"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "Student score updated"
+      },
+      "description": {
+        "en-US": "Student score updated for: test; User Eid: test; Release To: 88826102-74c2-4453-b0cc-a1c0d811b190; Submitted: on time"
+      },
+      "type": "http://adlnet.gov/expapi/activities/student-score-update"
+    },
+    "id": "http://localhost:8888/portal/assessment",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Updating Assessment Total Score
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | sam.total.score.update
+| 概要 | Assessment total score updated
+| 操作例 |  Tests & Quizzes > User Activity Report > `${title}` > Total Scores > Update > Tests & Quizzes > Published Copies: released to students > Scores > Update 
+| ユーザの役割 | インストラクター
+| ステートメントの実装箇所 | SamigoLRSStatements
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "result": {
+    "completion": true,
+    "score": {
+      "min": 0.0,
+      "max": 10.0,
+      "raw": 10.0
+    }
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/scored"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "Total score updated"
+      },
+      "description": {
+        "en-US": "Total score updated for Assessment Title: test; User Eid: test; Release To: 88826102-74c2-4453-b0cc-a1c0d811b190; Submitted: on time"
+      },
+      "type": "http://adlnet.gov/expapi/activities/total-score-update"
+    },
+    "id": "http://localhost:8888/portal/assessment",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Web Content
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | webcontent.read
+| 概要 | Web Content tool viewed by user
+| 操作例 |  > Web Content
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-web-content"
+    },
+    "id": "http://localhost:8888/portal/web/87c5c03a-9175-4db5-ab55-93035866d933/id/ed62f301-03b0-444b-97c1-23465fdfa45c/url/%2Flibrary%2Fcontent%2Fwebcontent_instructions.html",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+== Wiki
+
+=== Creating Wiki
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | wiki.new
+| 概要 | New wiki page created
+| 操作例 | (初回アクセス時) +
+           > Wiki
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/initialized"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/add-wiki-page"
+    },
+    "id": "http://localhost:8888/portal/wiki/site/87c5c03a-9175-4db5-ab55-93035866d933/about.",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Reading Wiki
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | wiki.read
+| 概要 | Wiki page accessed
+| 操作例 |  > Wiki
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/experienced"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/view-wiki-page"
+    },
+    "id": "http://localhost:8888/portal/wiki/site/87c5c03a-9175-4db5-ab55-93035866d933/home.",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
+
+=== Updating Wiki
+
+[cols="25%,75%"]
+|===
+| 項目 | 概要
+
+| イベントコード | wiki.revise
+| 概要 | Wiki page revised
+| 操作例 |  > Wiki > Edit > Save
+| ユーザの役割 | -
+| ステートメントの実装箇所 | BaseLearningResourceStoreService
+|===
+
+[source, json]
+.ステートメント例
+----
+{
+  "actor": {
+    ...
+  },
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/shared"
+  },
+  "context": {
+    ...
+  },
+  "object": {
+    "definition": {
+      "type": "http://adlnet.gov/expapi/activities/edit-wiki-page"
+    },
+    "id": "http://localhost:8888/portal/wiki/site/87c5c03a-9175-4db5-ab55-93035866d933/home.",
+    "objectType": "Activity"
+  },
+  "timestamp": "..."
+}
+----
