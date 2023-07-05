@@ -91,7 +91,7 @@ docker exec superset /init.sh
 
 * link:./moodle/README.adoc[Moodle]
 * link:./sakai/README.adoc[Sakai]
-* link:./chibichilo/README.adoc[CHiBi-CHiLO]
+* link:./lti-mc/README.adoc[GakuNinLMS-LTI-MC] (CHiBi-CHiLO互換)
 
 == FAQ
 === JupyterHubにユーザを追加するには？

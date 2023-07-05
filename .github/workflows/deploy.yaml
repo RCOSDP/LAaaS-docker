@@ -24,9 +24,9 @@ on:
           - moodle-caliper
           - sakai
           - sakai-dummy-xapi
-          - chibichilo-log-processor
-          - chibichilo-xapi
-          - chibichilo-caliper
+          - lti-mc-log-processor
+          - lti-mc-xapi
+          - lti-mc-caliper
         required: true
       image_tag:
         description: Image tag
@@ -57,15 +57,15 @@ jobs:
     - if: inputs.ecr_repository == 'sakai-dummy-xapi'
       run: |
         echo "BUILD_PATH=sakai/dummy-xapi/" >> $GITHUB_ENV
-    - if: inputs.ecr_repository == 'chibichilo-log-processor'
+    - if: inputs.ecr_repository == 'lti-mc-log-processor'
       run: |
-        echo "BUILD_PATH=chibichilo/log-processor/" >> $GITHUB_ENV
-    - if: inputs.ecr_repository == 'chibichilo-xapi'
+        echo "BUILD_PATH=lti-mc/log-processor/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'lti-mc-xapi'
       run: |
-        echo "BUILD_PATH=chibichilo/xapi/" >> $GITHUB_ENV
-    - if: inputs.ecr_repository == 'chibichilo-caliper'
+        echo "BUILD_PATH=lti-mc/xapi/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'lti-mc-caliper'
       run: |
-        echo "BUILD_PATH=chibichilo/caliper/" >> $GITHUB_ENV
+        echo "BUILD_PATH=lti-mc/caliper/" >> $GITHUB_ENV
 
     - uses: actions/checkout@v3
 

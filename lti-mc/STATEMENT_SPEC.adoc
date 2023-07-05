@@ -16,7 +16,7 @@
 :imagesdir: images
 :icons: font
 
-= CHiBi-CHiLO 視聴ログ ステートメント仕様
+= GakuNinLMS-LTI-MC 視聴ログ ステートメント仕様
 
 == xAPIステートメント
 
