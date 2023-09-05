@@ -43,7 +43,7 @@ services:
       - INTERVAL=-1
   moodle-caliper:
     build: moodle/caliper
-    image: public.ecr.aws/v8a6v1r8/moodle-caliper:2.5.0
+    image: public.ecr.aws/v8a6v1r8/moodle-caliper:2.4.1
     container_name: moodle-caliper
     configs:
       - source: caliper-config-lrw

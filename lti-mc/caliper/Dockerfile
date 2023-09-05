@@ -8,7 +8,7 @@ RUN composer dumpautoload -o
 
 FROM php:7.3-alpine
 
-LABEL version="1.1.0"
+LABEL version="1.0.1"
 
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.13/community" >> /etc/apk/repositories
 RUN apk update && \
