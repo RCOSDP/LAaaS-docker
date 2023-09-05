@@ -1,6 +1,6 @@
-FROM composer:1.9 AS builder
+FROM public.ecr.aws/v8a6v1r8/caliper-builder:1.0.0 AS builder
 
-LABEL version="2.4.0"
+LABEL version="2.5.0"
 
 WORKDIR /stage
 COPY . .
