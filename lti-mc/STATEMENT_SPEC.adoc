@@ -65,17 +65,17 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 },
 "stored": "2020-07-01T04:28:42.901Z",
 "context": {
-  "platform": "Moodle",
+  "platform": "LMS",
   "language": "en",
   "contextActivities": {
     "category": [
       {
         "objectType": "Activity",
-        "id": "http://moodle.org",
+        "id": "http://example.com",
         "definition": {
           "type": "http://id.tincanapi.com/activitytype/source",
           "name": {
-            "en": "Moodle"
+            "en": "LMS"
           },
           "description": {
             "en": ""
