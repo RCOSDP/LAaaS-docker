@@ -14,70 +14,72 @@ if (process.env.XAPI_GEN_LOG_LEVEL !== undefined) {
 
 logger.info('Start xAPI statement generator.');
 
+const verbIdPrefix = process.env.VERB_ID_PREFIX || 'urn:x-lms-event-action';
+
 // Define videojs events
 const events = {
   'firstplay': {
-    'verb.id': 'urn:x-moodle-event-action:launched',
+    'verb.id': `${verbIdPrefix}:launched`,
     'verb.display.ja': '再生(初回のみ)しました。',
   },
   'play': {
-    'verb.id': 'urn:x-moodle-event-action:played',
+    'verb.id': `${verbIdPrefix}:played`,
     'verb.display.ja': '再生しました。',
   },
   'pause': {
-    'verb.id': 'urn:x-moodle-event-action:paused',
+    'verb.id': `${verbIdPrefix}:paused`,
     'verb.display.ja': '一時停止しました。',
   },
   'seeked': {
-    'verb.id': 'urn:x-moodle-event-action:skipped',
+    'verb.id': `${verbIdPrefix}:skipped`,
     'verb.display.ja': 'スライダー操作しました。',
   },
   'ratechange': {
-    'verb.id': 'urn:x-moodle-event-action:switched',
+    'verb.id': `${verbIdPrefix}:switched`,
     'verb.display.ja': '速度変調しました。',
   },
   'ended': {
-    'verb.id': 'urn:x-moodle-event-action:completed',
+    'verb.id': `${verbIdPrefix}:completed`,
     'verb.display.ja': '動画を最後まで再生しました。',
   },
   'trackchange': {
-    'verb.id': 'urn:x-moodle-event-action:switched',
+    'verb.id': `${verbIdPrefix}:switched`,
     'verb.display.ja': '字幕セレクターを切り替えました。',
   },
   'forward': {
-    'verb.id': 'urn:x-moodle-event-action:pressed',
+    'verb.id': `${verbIdPrefix}:pressed`,
     'verb.display.ja': '早送りボタンをクリックしました。',
   },
   'back': {
-    'verb.id': 'urn:x-moodle-event-action:pressed',
+    'verb.id': `${verbIdPrefix}:pressed`,
     'verb.display.ja': '巻き戻しボタンをクリックしました。',
   },
   'beforeunload-ended': {
-    'verb.id': 'urn:x-moodle-event-action:exited',
+    'verb.id': `${verbIdPrefix}:exited`,
     'verb.display.ja': 'ビデオ再生ページを終了しました。',
   },
   'pagehide-ended': {
-    'verb.id': 'urn:x-moodle-event-action:exited',
+    'verb.id': `${verbIdPrefix}:exited`,
     'verb.display.ja': 'ビデオ再生ページを終了しました。',
   },
   'unload-ended': {
-    'verb.id': 'urn:x-moodle-event-action:exited',
+    'verb.id': `${verbIdPrefix}:exited`,
     'verb.display.ja': 'ビデオ再生ページを終了しました。',
   },
   'hidden-ended': {
-    'verb.id': 'urn:x-moodle-event-action:exited',
+    'verb.id': `${verbIdPrefix}:exited`,
     'verb.display.ja': 'ビデオ再生ページを終了しました。',
   },
   'force-ended': {
-    'verb.id': 'urn:x-moodle-event-action:exited',
+    'verb.id': `${verbIdPrefix}:exited`,
     'verb.display.ja': 'ビデオ再生ページを終了しました。',
   },
   'current-time': {
-    'verb.id': 'urn:x-moodle-event-action:progressed',
+    'verb.id': `${verbIdPrefix}:progressed`,
     'verb.display.ja': 'ビデオの再生位置を記録しました。',
   },
   'changepage': {
-    'verb.id': 'urn:x-moodle-event-action:switched',
+    'verb.id': `${verbIdPrefix}:switched`,
     'verb.display.ja': 'マイクロコンテンツを切り替えました。',
   }
 };

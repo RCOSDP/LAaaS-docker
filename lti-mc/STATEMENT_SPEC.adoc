@@ -100,7 +100,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
   "duration": "PT14.267179999999998S"
 },
 "verb": {
-  "id": "urn:x-moodle-event-action:paused",
+  "id": "urn:x-lms-event-action:paused",
   "display": {
     "en": "pause",
     "ja": "一時停止しました。"
@@ -135,28 +135,29 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 <<<
 [[xapi_verb]]
 === Verb (statement.verb)
-`force-ended` イベントは視聴ログにビデオ再生終了のイベントが存在しない場合に生成する。
+`force-ended` イベントは視聴ログにビデオ再生終了のイベントが存在しない場合に生成する。 +
+`id` の接頭辞は環境変数 `VERB_ID_PREFIX` で設定する(省略した場合は `urn:x-lms-event-action`)。
 
 .Verbの仕様
 |===
-| _v-event_          | id                                         | display.en             | display.ja
+| _v-event_          | id                                | display.en             | display.ja
 
-| firstplay          | urn:x-moodle-event-action:launched         | firstplay              | 再生(初回のみ)しました。
-| play               | urn:x-moodle-event-action:played           | play                   | 再生しました。
-| pause              | urn:x-moodle-event-action:paused           | pause                  | 一時停止しました。
-| seeked             | urn:x-moodle-event-action:skipped          | seeked                 | スライダー操作しました。
-| ratechange         | urn:x-moodle-event-action:switched         | ratechange             | 速度変調しました。
-| ended              | urn:x-moodle-event-action:completed        | ended                  | 動画を最後まで再生しました。
-| trackchange        | urn:x-moodle-event-action:switched         | trackchange            | 字幕セレクターを切り替えました。
-| forward            | urn:x-moodle-event-action:pressed          | forward                | 早送りボタンをクリックしました。
-| back               | urn:x-moodle-event-action:pressed          | back                   | 巻き戻しボタンをクリックしました。
-| beforeunload-ended | urn:x-moodle-event-action:exited           | beforeunload-ended  .5+| ビデオ再生ページを終了しました。
-| pagehide-ended     | urn:x-moodle-event-action:exited           | pagehide-ended
-| unload-ended       | urn:x-moodle-event-action:exited           | unload-ended
-| hidden-ended       | urn:x-moodle-event-action:exited           | hidden-ended
-| -                  | urn:x-moodle-event-action:exited           | force-ended
-| current-time       | urn:x-moodle-event-action:progressed       | current-time           | ビデオの再生位置を記録しました。
-| changepage         | urn:x-moodle-event-action:switched         | changepage             | マイクロコンテンツを切り替えました。
+| firstplay          | <VERB_ID_PREFIX>:launched         | firstplay              | 再生(初回のみ)しました。
+| play               | <VERB_ID_PREFIX>:played           | play                   | 再生しました。
+| pause              | <VERB_ID_PREFIX>:paused           | pause                  | 一時停止しました。
+| seeked             | <VERB_ID_PREFIX>:skipped          | seeked                 | スライダー操作しました。
+| ratechange         | <VERB_ID_PREFIX>:switched         | ratechange             | 速度変調しました。
+| ended              | <VERB_ID_PREFIX>:completed        | ended                  | 動画を最後まで再生しました。
+| trackchange        | <VERB_ID_PREFIX>:switched         | trackchange            | 字幕セレクターを切り替えました。
+| forward            | <VERB_ID_PREFIX>:pressed          | forward                | 早送りボタンをクリックしました。
+| back               | <VERB_ID_PREFIX>:pressed          | back                   | 巻き戻しボタンをクリックしました。
+| beforeunload-ended | <VERB_ID_PREFIX>:exited           | beforeunload-ended  .5+| ビデオ再生ページを終了しました。
+| pagehide-ended     | <VERB_ID_PREFIX>:exited           | pagehide-ended
+| unload-ended       | <VERB_ID_PREFIX>:exited           | unload-ended
+| hidden-ended       | <VERB_ID_PREFIX>:exited           | hidden-ended
+| -                  | <VERB_ID_PREFIX>:exited           | force-ended
+| current-time       | <VERB_ID_PREFIX>:progressed       | current-time           | ビデオの再生位置を記録しました。
+| changepage         | <VERB_ID_PREFIX>:switched         | changepage             | マイクロコンテンツを切り替えました。
 |===
 
 <<<

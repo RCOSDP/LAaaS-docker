@@ -5,6 +5,7 @@ const rewire = require('rewire');
 describe('Test generator', () => {
   describe('translate', () => {
     process.env.XAPI_GEN_LOG_LEVEL = 'off';
+    process.env.VERB_ID_PREFIX = 'urn:x-lms-event-action';
 
     describe('firstplay', () => {
       it('returns xapi statement', (done) => {
@@ -57,7 +58,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('firstplay');
           expect(verb.display.ja).toBe('再生(初回のみ)しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:launched');
+          expect(verb.id).toBe('urn:x-lms-event-action:launched');
 
           // Object
           const object = xapi.object;
@@ -126,7 +127,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('play');
           expect(verb.display.ja).toBe('再生しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:played');
+          expect(verb.id).toBe('urn:x-lms-event-action:played');
 
           // Object
           const object = xapi.object;
@@ -195,7 +196,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('pause');
           expect(verb.display.ja).toBe('一時停止しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:paused');
+          expect(verb.id).toBe('urn:x-lms-event-action:paused');
 
           // Object
           const object = xapi.object;
@@ -264,7 +265,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('seeked');
           expect(verb.display.ja).toBe('スライダー操作しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:skipped');
+          expect(verb.id).toBe('urn:x-lms-event-action:skipped');
 
           // Object
           const object = xapi.object;
@@ -333,7 +334,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('ratechange');
           expect(verb.display.ja).toBe('速度変調しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:switched');
+          expect(verb.id).toBe('urn:x-lms-event-action:switched');
 
           // Object
           const object = xapi.object;
@@ -402,7 +403,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('ended');
           expect(verb.display.ja).toBe('動画を最後まで再生しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:completed');
+          expect(verb.id).toBe('urn:x-lms-event-action:completed');
 
           // Object
           const object = xapi.object;
@@ -471,7 +472,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('trackchange');
           expect(verb.display.ja).toBe('字幕セレクターを切り替えました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:switched');
+          expect(verb.id).toBe('urn:x-lms-event-action:switched');
 
           // Object
           const object = xapi.object;
@@ -540,7 +541,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('forward');
           expect(verb.display.ja).toBe('早送りボタンをクリックしました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:pressed');
+          expect(verb.id).toBe('urn:x-lms-event-action:pressed');
 
           // Object
           const object = xapi.object;
@@ -609,7 +610,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('back');
           expect(verb.display.ja).toBe('巻き戻しボタンをクリックしました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:pressed');
+          expect(verb.id).toBe('urn:x-lms-event-action:pressed');
 
           // Object
           const object = xapi.object;
@@ -678,7 +679,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('beforeunload-ended');
           expect(verb.display.ja).toBe('ビデオ再生ページを終了しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:exited');
+          expect(verb.id).toBe('urn:x-lms-event-action:exited');
 
           // Object
           const object = xapi.object;
@@ -747,7 +748,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('pagehide-ended');
           expect(verb.display.ja).toBe('ビデオ再生ページを終了しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:exited');
+          expect(verb.id).toBe('urn:x-lms-event-action:exited');
 
           // Object
           const object = xapi.object;
@@ -816,7 +817,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('unload-ended');
           expect(verb.display.ja).toBe('ビデオ再生ページを終了しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:exited');
+          expect(verb.id).toBe('urn:x-lms-event-action:exited');
 
           // Object
           const object = xapi.object;
@@ -885,7 +886,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('hidden-ended');
           expect(verb.display.ja).toBe('ビデオ再生ページを終了しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:exited');
+          expect(verb.id).toBe('urn:x-lms-event-action:exited');
 
           // Object
           const object = xapi.object;
@@ -954,7 +955,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('force-ended');
           expect(verb.display.ja).toBe('ビデオ再生ページを終了しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:exited');
+          expect(verb.id).toBe('urn:x-lms-event-action:exited');
 
           // Object
           const object = xapi.object;
@@ -1023,7 +1024,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('current-time');
           expect(verb.display.ja).toBe('ビデオの再生位置を記録しました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:progressed');
+          expect(verb.id).toBe('urn:x-lms-event-action:progressed');
 
           // Object
           const object = xapi.object;
@@ -1092,7 +1093,7 @@ describe('Test generator', () => {
           const verb = xapi.verb;
           expect(verb.display.en).toBe('changepage');
           expect(verb.display.ja).toBe('マイクロコンテンツを切り替えました。');
-          expect(verb.id).toBe('urn:x-moodle-event-action:switched');
+          expect(verb.id).toBe('urn:x-lms-event-action:switched');
 
           // Object
           const object = xapi.object;

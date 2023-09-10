@@ -15,6 +15,7 @@ services:
     tty: true
     environment:
       - TZ=Asia/Tokyo
+      - VERB_ID_PREFIX=urn:x-lms-event-action
     restart: always
   lti-mc-caliper:
     build: lti-mc/caliper
