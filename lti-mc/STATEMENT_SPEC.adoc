@@ -262,10 +262,10 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
     "currentTime" : "PT0.0S"
   },
   "edApp" : {
-    "_id" : "moodle",
+    "_id" : "lms",
     "type" : "SoftwareApplication",
-    "name" : "moodle",
-    "description" : "Moodle is a open source learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalized learning environments."
+    "name" : "lms",
+    "description" : ""
   },
   "eventTime" : ISODate("2020-06-26T13:41:08Z"),
   "timeZoneOffset" : NumberLong(0)
@@ -375,10 +375,11 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 <<<
 [[caliper_edapp]]
 === EdApp (edApp)
+`id` 、 `name` および `description` には、 `caliper/.env` で設定した環境変数の値を設定する。
 
 .EdAppの仕様
 |===
 | id              | type                  | name            | description
 
-| moodle          | SoftwareApplication   | moodle          | Moodle is a open source learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalized learning environments.
+| `<APP_ID>`      | SoftwareApplication   | `<APP_NAME>`    | `<APP_DESCRIPTION>`
 |===

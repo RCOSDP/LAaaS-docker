@@ -17,9 +17,9 @@ class BaseEvent
 
     public function __construct()
     {
-        $this->app_id = "moodle";
-        $this->app_name = "moodle";
-        $this->app_description = "Moodle is a open source learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalized learning environments.";
+        $this->app_id = getenv('APP_ID');
+        $this->app_name = getenv('APP_NAME');
+        $this->app_description = getenv('APP_DESCRIPTION');
         $this->user_description = "";
     }
 }
