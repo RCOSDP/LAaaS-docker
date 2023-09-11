@@ -1,11 +1,11 @@
 services:
   lti-mc-log-processor:
     build: lti-mc/log-processor
-    image: public.ecr.aws/v8a6v1r8/lti-mc-log-processor:1.0.0
+    image: public.ecr.aws/v8a6v1r8/lti-mc-log-processor:1.1.0
     container_name: lti-mc-log-processor
   lti-mc-xapi:
     build: lti-mc/xapi
-    image: public.ecr.aws/v8a6v1r8/lti-mc-xapi:1.0.0
+    image: public.ecr.aws/v8a6v1r8/lti-mc-xapi:1.1.0
     container_name: lti-mc-xapi
     configs:
       - source: xapi-config-app
@@ -19,7 +19,7 @@ services:
     restart: always
   lti-mc-caliper:
     build: lti-mc/caliper
-    image: public.ecr.aws/v8a6v1r8/lti-mc-caliper:1.0.1
+    image: public.ecr.aws/v8a6v1r8/lti-mc-caliper:1.1.0
     container_name: lti-mc-caliper
     env_file:
       - ./lti-mc/caliper/.env
