@@ -26,19 +26,19 @@ def main():
         'v-current',       # Current playback time
         'u-ip',            # User IP
         'u-user-agent',    # User Agent
-        'm-referrer',      # Moodle URL
-        'm-user-id',       # Moodle user ID
-        'm-course-id',     # Moodle course ID(for LTI only)
-        'nonce',           # Nonce(for LTI only)
-        'videoplayerlog',  # 'videoplayerlog'(for LTI only)
+        'resource-key',    # LMS resource key
+        'user-key',        # LMS user key
+        'course-key',      # LMS course key
+        'nonce',           # Nonce
+        'videoplayerlog',  # 'videoplayerlog'
     ]
     # Replace v-current '-' with 0
     df['v-current'] = df['v-current'].replace('-', 0)
-    # Construct object id consisting of m-referrer
-    df['m-referrer'] = df.apply(_construct_object_id, axis=1)
+    # Construct object id consisting of resource-key
+    df['resource-key'] = df.apply(_construct_object_id, axis=1)
     # Remove prefix
-    df['m-user-id'] = df['m-user-id'].map(_remove_lti_log_prefix)
-    df['m-course-id'] = df['m-course-id'].map(_remove_lti_log_prefix)
+    df['user-key'] = df['user-key'].map(_remove_lti_log_prefix)
+    df['course-key'] = df['course-key'].map(_remove_lti_log_prefix)
     # Add timestamp column
     df['timestamp'] = df.apply(_concat_date_time, axis=1)
 
@@ -49,9 +49,9 @@ def main():
         'v-file',
         'v-src-query',
         'v-current',
-        'm-referrer',
-        'm-user-id',
-        'm-course-id',
+        'resource-key',
+        'user-key',
+        'course-key',
         'nonce',
         'videoplayerlog',
     ]]
@@ -62,9 +62,9 @@ def main():
             'v-file': 'file',
             'v-src-query': 'query',
             'v-current': 'current',
-            'm-referrer': 'referrer',
-            'm-user-id': 'userid',
-            'm-course-id': 'courseid',
+            'resource-key': 'referrer',
+            'user-key': 'userid',
+            'course-key': 'courseid',
         }, inplace=True
     )
 
@@ -99,21 +99,21 @@ def main():
 
 
 def _remove_lti_log_prefix(x):
-    """Remove LMS domain from string."""
-    return str(x).replace(f'{os.environ["LMS_DOMAIN"]}:', '')
+    """Remove consumer key from string."""
+    return str(x).replace(f'{os.environ["CONSUMER_KEY"]}:', '')
 
 
 def _construct_object_id(row):
     """Return object ID."""
     scheme = 'https'
-    if str(row['m-referrer']).startswith(f'{scheme}://'):
-        return row['m-referrer']
+    if str(row['resource-key']).startswith(f'{scheme}://'):
+        return row['resource-key']
     else:
         # LTI logs
-        domain = os.environ['LMS_DOMAIN']
-        course_id = _remove_lti_log_prefix(row['m-course-id'])
-        resource_id = _remove_lti_log_prefix(row['m-referrer'])
-        return f'{scheme}://{domain}/{course_id}/{resource_id}'
+        consumer_key = os.environ['CONSUMER_KEY']
+        course_id = _remove_lti_log_prefix(row['course-key'])
+        resource_id = _remove_lti_log_prefix(row['resource-key'])
+        return f'{scheme}://{consumer_key}/{course_id}/{resource_id}'
 
 
 def _concat_date_time(row):

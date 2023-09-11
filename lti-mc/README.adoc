@@ -93,10 +93,11 @@ const config = {
 <2> xref:../README.adoc#learninglocker_client_settings[クライアントの設定] で確認したLRSのクライアント情報を設定
 
 === ステートメント変換
-視聴ログをxAPIステートメントに変換する。
+視聴ログをxAPIステートメントに変換する。 +
+`<CONSUMER_KEY>` にはLMSから取得する情報に付与される `oauth_consumer_key` を指定する。
 
 ----
-./run xapi /path/to/logfile <LTI_KEY>
+./run xapi /path/to/logfile <CONSUMER_KEY>
 ----
 
 Learning Lockerにステートメントが登録されていることを確認する。
@@ -126,10 +127,11 @@ docker compose up -d lti-mc-caliper # 変更を反映
 <1> link:../openlrw/.env[OpenLRWの設定] を参照
 
 === ステートメント変換
-学習ログをCaliperステートメントに変換する。
+学習ログをCaliperステートメントに変換する。 +
+`<CONSUMER_KEY>` にはLMSから取得する情報に付与される `oauth_consumer_key` を指定する。
 
 ----
-./run caliper /path/to/logfile <LTI_KEY>
+./run caliper /path/to/logfile <CONSUMER_KEY>
 ----
 
 OpenLRWにステートメントが登録されていることを確認する。

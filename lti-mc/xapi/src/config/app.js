@@ -10,14 +10,14 @@ const config = {
     }
   },
   category:{
-    id:'http://moodle.org',
+    id:'http://example.com',
     definition:{
       type:'http://id.tincanapi.com/activitytype/source',
-      name:'Moodle',
+      name:'LMS',
       description: ''
     }
   },
-  platform:'Moodle',
+  platform:'LMS',
   language:'en',
   homepage: 'http://localhost:8000',
   pathToCSVFile: './videojs.csv'
