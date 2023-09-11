@@ -26,23 +26,23 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 .視聴ログの仕様
 [cols="8%,17%,30%,15%,30%"]
 |===
-|列番号|カラム名          |概要                               |ステートメント化対象   |備考
+|列番号|カラム名          |概要                                      |ステートメント化対象   |備考
 
-|1     |`date`            | サーバー時間（年月日）            |○                      |
-|2     |`time`            | サーバー時間（時分秒）            |○                      |
-|3     |`tz`              | サーバー時間（タイムゾーン）      |×                      |必ずJSTが設定されると想定
-|4     |`v-event`         | イベント                          |○                      |
-|5     |`v-event-detail`  | イベントの詳細情報                |×                      |
-|6     |`v-file`          | 再生するビデオのファイル名        |○                      |
-|7     |`v-src-query`     | Secure Token                      |○                      |一連の視聴履歴を特定するための情報
-|8     |`v-current`       | ビデオの現在位置                  |○                      |
-|9     |`u-ip`            | ユーザーのIP                      |×                      |
-|10    |`u-user-agent`    | ユーザーのUser Agent              |×                      |
-|11    |`m-referrer`      | Moodleのどこからアクセスしてきたか|○                      |LTI対応マイクロコンテンツの場合はURL形式でないため、 `https://{lms-domain}/{m-course-id}/{m-referrer}` の形式に変換する。なお、URLに含む `m-course-id` および `m-referrer` からは `{lms-domain}:` を除外する。
-|12    |`m-user-id`       | MoodleのユーザID                  |○                      |LTI対応マイクロコンテンツの場合は文字列 `{lms-domain}:` を除去する。
-|13    |`m-course-id`     | MoodleのコースID                  |○                   .3+|LTI対応マイクロコンテンツの場合のみ有意な値を含む
-|14    |`nonce`           | Nonce                             |×
-|15    |`videoplayerlog`  | 'videoplayerlog'                  |×
+|1     |`date`            | サーバー時間（年月日）                   |○                      |
+|2     |`time`            | サーバー時間（時分秒）                   |○                      |
+|3     |`tz`              | サーバー時間（タイムゾーン）             |×                      |必ずJSTが設定されると想定
+|4     |`v-event`         | イベント                                 |○                      |
+|5     |`v-event-detail`  | イベントの詳細情報                       |×                      |
+|6     |`v-file`          | 再生するビデオのファイル名               |○                      |
+|7     |`v-src-query`     | Secure Token                             |○                      |一連の視聴履歴を特定するための情報
+|8     |`v-current`       | ビデオの現在位置                         |○                      |
+|9     |`u-ip`            | ユーザーのIP                             |×                      |
+|10    |`u-user-agent`    | ユーザーのUser Agent                     |×                      |
+|11    |`resource-key`    | `getResourceKey()` で取得するリソース情報|○                      |URL形式でないため、 `https://{<CONSUMER_KEY>}/{course-key}/{resource-key}` の形式に変換する。なお、URLに含む `course-key` および `resource-key` からは `{<CONSUMER_KEY>}:` を除外する。
+|12    |`user-key`        | `getUserKey()` で取得するユーザ情報      |○                   .2+|`{<CONSUMER_KEY>}:` を除去する。
+|13    |`course-key`      | `getCourseKey()` で取得するコース情報    |○
+|14    |`nonce`           | Nonce                                    |×                      |
+|15    |`videoplayerlog`  | 'videoplayerlog'                         |×                      |
 |===
 
 <<<
@@ -129,7 +129,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 |===
 | objectType | name | account.name | account.homePage
 
-| Agent      |      | `m-user-id`  | `config/app.js` の `homepage` (以降 `config.homepage` )
+| Agent      |      | `user-key`   | `config/app.js` の `homepage` (以降 `config.homepage` )
 |===
 
 <<<
@@ -163,13 +163,12 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 <<<
 [[xapi_object]]
 === Object (statement.object)
-`definition.moreInfo` はLTI対応マイクロコンテンツのステートメントにのみ設定する。
 
 .Objectの仕様
 |===
-| objectType | id              | definition.name.en    | definition.description.en      | definition.type                            | definition.moreInfo
+| objectType | id             | definition.name.en    | definition.description.en      | definition.type                            | definition.moreInfo
 
-| Activity   | `m-referrer`    | `v-file`              | `v-file`                       | http://adlnet.gov/expapi/activities/media  | `config.homepage` /mod/lti
+| Activity   | `resource-key` | `v-file`              | `v-file`                       | http://adlnet.gov/expapi/activities/media  | `config.homepage` /mod/lti
 |===
 
 <<<
@@ -203,23 +202,23 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 .視聴ログの仕様
 [cols="8%,17%,30%,15%,30%"]
 |===
-|列番号|カラム名          |概要                               |ステートメント化対象   |備考
+|列番号|カラム名          |概要                                      |ステートメント化対象   |備考
 
-|1     |`date`            | サーバー時間（年月日）            |○                      |
-|2     |`time`            | サーバー時間（時分秒）            |○                      |
-|3     |`tz`              | サーバー時間（タイムゾーン）      |×                      |必ずJSTが設定されると想定
-|4     |`v-event`         | イベント                          |○                      |
-|5     |`v-event-detail`  | イベントの詳細情報                |○                      |`trackchange` イベントの変換時に参照
-|6     |`v-file`          | 再生するビデオのファイル名        |○                      |
-|7     |`v-src-query`     | Secure Token                      |○                      |一連の視聴履歴を特定するための情報
-|8     |`v-current`       | ビデオの現在位置                  |○                      |
-|9     |`u-ip`            | ユーザーのIP                      |×                      |
-|10    |`u-user-agent`    | ユーザーのUser Agent              |×                      |
-|11    |`m-referrer`      | Moodleのどこからアクセスしてきたか|○                      |LTI対応マイクロコンテンツの場合はURL形式でないため、 `https://{lms-domain}/{m-course-id}/{m-referrer}` の形式に変換する。なお、URLに含む `m-course-id` および `m-referrer` からは `{lms-domain}:` を除外する。
-|12    |`m-user-id`       | MoodleのユーザID                  |○                      |LTI対応マイクロコンテンツの場合は文字列 `{lms-domain}:` を除去する。
-|13    |`m-course-id`     | MoodleのコースID                  |○                   .3+|LTI対応マイクロコンテンツの場合のみ有意な値を含む
-|14    |`nonce`           | Nonce                             |○
-|15    |`videoplayerlog`  | 'videoplayerlog'                  |○
+|1     |`date`            | サーバー時間（年月日）                   |○                      |
+|2     |`time`            | サーバー時間（時分秒）                   |○                      |
+|3     |`tz`              | サーバー時間（タイムゾーン）             |×                      |必ずJSTが設定されると想定
+|4     |`v-event`         | イベント                                 |○                      |
+|5     |`v-event-detail`  | イベントの詳細情報                       |○                      |`trackchange` イベントの変換時に参照
+|6     |`v-file`          | 再生するビデオのファイル名               |○                      |
+|7     |`v-src-query`     | Secure Token                             |○                      |一連の視聴履歴を特定するための情報
+|8     |`v-current`       | ビデオの現在位置                         |○                      |
+|9     |`u-ip`            | ユーザーのIP                             |×                      |
+|10    |`u-user-agent`    | ユーザーのUser Agent                     |×                      |
+|11    |`resource-key`    | `getResourceKey()` で取得するリソース情報|○                      |URL形式でないため、 `https://{<CONSUMER_KEY>}/{course-key}/{resource-key}` の形式に変換する。なお、URLに含む `course-key` および `resource-key` からは `{<CONSUMER_KEY>}:` を除外する。
+|12    |`user-key`        | `getUserKey()` で取得するユーザ情報      |○                   .2+|`{<CONSUMER_KEY>}:` を除去する。
+|13    |`course-key`      | `getCourseKey()` で取得するコース情報    |○
+|14    |`nonce`           | Nonce                                    |○                      |
+|15    |`videoplayerlog`  | 'videoplayerlog'                         |○                      |
 |===
 
 <<<
@@ -307,7 +306,7 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 |===
 | id          | type        | name         | description
 
-| `m-user-id` | Person      | `m-user-id`  | -
+| `user-key`  | Person      | `user-key`   | -
 |===
 
 <<<
@@ -348,16 +347,16 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 
 .Objectの仕様（current-time以外のイベント）
 |===
-| id            | type            | name            | extensions.courseId  | extensions.nonce  | extensions.videoplayerlog
+| id              | type            | name            | extensions.courseId  | extensions.nonce  | extensions.videoplayerlog
 
-| `m-referrer`  | VideoObject     | `v-file`        | `m-course-id`        | `nonce`           | `videoplayerlog`
+| `resource-key`  | VideoObject     | `v-file`        | `course-key`         | `nonce`           | `videoplayerlog`
 |===
 
 .Objectの仕様（current-timeイベント）
 |===
-| id            | type            | name            | currentTime                             | extensions.courseId  | extensions.nonce  | extensions.videoplayerlog
+| id              | type            | name            | currentTime                             | extensions.courseId  | extensions.nonce  | extensions.videoplayerlog
 
-| `m-referrer`  | MediaLocation   | `v-file`        | `v-current` をISO8601形式に変換した値   | `m-course-id`        | `nonce`           | `videoplayerlog`
+| `resource-key`  | MediaLocation   | `v-file`        | `v-current` をISO8601形式に変換した値   | `course-key`         | `nonce`           | `videoplayerlog`
 |===
 
 <<<
@@ -367,9 +366,9 @@ TSVファイルはヘッダーを含まず、下表の通りログが格納さ�
 
 .Targetの仕様
 |===
-| id            | type            | currentTime
+| id              | type            | currentTime
 
-| `m-referrer`  | MediaLocation   | `v-current` をISO8601形式に変換した値
+| `resource-key`  | MediaLocation   | `v-current` をISO8601形式に変換した値
 |===
 
 <<<
