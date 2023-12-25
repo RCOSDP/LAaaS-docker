@@ -25,6 +25,20 @@ endif::[]
 
 = LAaaS-docker: ラーニングアナリティクス基盤システム
 
+== 前提
+
+* Docker/Compose V2
+* アーキテクチャ: x86_64
+
+.(参考) 動作確認環境の構成
+[NOTE]
+====
+* OS: Ubuntu 22.04 LTS
+* アーキテクチャ: x86_64
+* Docker Engine: v24.0.7
+* Docker Compose: v2.21.0
+====
+
 == インストール
 
 ----
