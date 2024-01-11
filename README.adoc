@@ -108,6 +108,28 @@ docker exec superset /init.sh
 * link:./sakai/README.adoc[Sakai]( `sakai/` )
 * link:./lti-mc/README.adoc[GakuNinLMS-LTI-MC]( `lti-mc/` ) ※ CHiBi-CHiLO互換
 
+[WARNING]
+====
+各分析環境は同時起動に対応していない。 +
+環境を切り替える際には、作成したコンテナ・ボリュームを削除し、<<init>>から再度実行すること。
+
+.(例)
+----
+# Moodleの学習ログ分析
+cd path/to/moodle/
+# ...
+# 環境の初期化
+docker compose down -v
+
+# 初期設定
+# ...
+
+# GakuNinLMS-LTI-MCの視聴ログ分析
+cd path/to/lti-mc/
+# ...
+----
+====
+
 == FAQ
 === JupyterHubにユーザを追加するには？
 以下のコマンドを実行する。
