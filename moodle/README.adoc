@@ -92,6 +92,10 @@ const config = {
 ----
 <1> xref:../README.adoc#learninglocker_client_settings[クライアントの設定] で確認したLRSのクライアント情報を設定
 
+----
+docker compose up -d moodle-xapi --force-recreate
+----
+
 === ステートメント変換
 学習ログをxAPIステートメントに変換する。
 
