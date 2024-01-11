@@ -101,11 +101,12 @@ docker exec superset /init.sh
 ----
 
 == 学習ログの分析
-ログを取得するLMS/LTIツールに応じて、以下のリンク先を参照する。
+ログを取得するLMS/LTIツールに応じて、以下のリンク先を参照する。 +
+以降の操作は個々のディレクトリ以下で行うこと。
 
-* link:./moodle/README.adoc[Moodle]
-* link:./sakai/README.adoc[Sakai]
-* link:./lti-mc/README.adoc[GakuNinLMS-LTI-MC] (CHiBi-CHiLO互換)
+* link:./moodle/README.adoc[Moodle]( `moodle/` )
+* link:./sakai/README.adoc[Sakai]( `sakai/` )
+* link:./lti-mc/README.adoc[GakuNinLMS-LTI-MC]( `lti-mc/` ) ※ CHiBi-CHiLO互換
 
 == FAQ
 === JupyterHubにユーザを追加するには？
