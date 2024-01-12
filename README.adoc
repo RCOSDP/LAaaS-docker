@@ -30,6 +30,9 @@ endif::[]
 * Docker/Compose V2
 * アーキテクチャ: x86_64
 
+IMPORTANT: v4.1以降はCompose V1をサポートしない。 +
+V1を使用している場合は、Dockerの https://docs.docker.com/compose/migrate/[公式ドキュメント] ( https://docs.docker.jp/compose/index.html#compose-v2-docker-compose[日本語版] )を参照し、V2に移行すること。
+
 .(参考) 動作確認環境の構成
 [NOTE]
 ====
