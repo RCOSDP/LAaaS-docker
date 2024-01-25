@@ -36,6 +36,9 @@ V1を使用している場合は、Dockerの https://docs.docker.com/compose/mig
 .(参考) 動作確認環境の構成
 [NOTE]
 ====
+* サーバ: Amazon EC2 `t3.large` インスタンス
+** CPU: 2 vCPU
+** メモリ: 8 GiB
 * OS: Ubuntu 22.04 LTS
 * アーキテクチャ: x86_64
 * Docker Engine: v24.0.7
