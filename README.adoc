@@ -102,6 +102,8 @@ image::learninglocker/new-xapi-store-client.png[align=center]
 
 TIP: ユーザ情報は `superset` の環境変数 `ADMIN_USERNAME` 、 `ADMIN_PASSWORD` 等で設定する(デフォルトのユーザ名・パスワードは `admin` )。
 
+WARNING: エラーが発生する場合には<<superset_init_error, FAQ>>を参照すること。
+
 ----
 docker exec superset /init.sh
 ----
@@ -137,6 +139,61 @@ cd path/to/lti-mc/
 ====
 
 == FAQ
+[[superset_init_error]]
+=== Supersetの初期設定でエラーが発生する
+`init.sh` の実行で以下のエラーが発生する場合、Supersetがデータベースの初期化に失敗しているため、以降の手順を行うこと。
+
+----
+psycopg2.errors.UndefinedTable: relation "ab_xxx" does not exist
+----
+
+* コンテナとボリュームの削除
+
+----
+docker compose -f base.yaml rm -sf superset superset-db
+docker volume rm laaas-docker_superset-db
+----
+
+* DBの起動確認
+
+----
+docker compose -f base.yaml up -d --no-build superset-db
+docker logs superset-db
+
+...
+PostgreSQL init process complete; ready for start up.
+...
+...database system is ready to accept connections
+----
+
+* Supersetの起動
+
+----
+docker compose -f base.yaml up -d --no-build superset
+----
+
+* エラー原因のテーブル( `ab_xxx` )がDBに存在することを確認
+
+----
+docker exec superset-db psql -U superset superset -c '\d'
+
+                       List of relations
+ Schema |              Name              |   Type   |  Owner
+--------+--------------------------------+----------+----------
+ public | ab_permission                  | table    | superset
+...
+ public | ab_view_menu_id_seq            | sequence | superset
+(16 rows)
+----
+
+* Supersetの初期設定
+
+エラーが発生しないことを確認する。
+
+----
+docker exec superset /init.sh
+----
+
 === JupyterHubにユーザを追加するには？
 以下のコマンドを実行する。
 
