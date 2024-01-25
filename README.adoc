@@ -228,3 +228,8 @@ PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
 既存のデータセットを異なる構成で再登録した場合には、 `[Actions] > [Edit] > [COLUMNS]` から `SYNC COLUMNS FROM SOURCE` を押下し、変更を反映する。
 
 image::superset/edit-dataset.png[align=center, scaledwidth=70%]
+
+== 謝辞
+
+* 本研究は文部科学省「AI 等の活用を推進する研究データエコシステム構築事業」の支援を受けたものです。
+* この研究は２０２３年度国立情報学研究所公募型共同研究（23S1002）の助成を受けています。
