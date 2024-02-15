@@ -1,0 +1,22 @@
+{
+  "id": "{{guid}}",
+  "actor": {{> instructor}},
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {{> context}},
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User created a poll"
+      },
+      "description": {
+        "en-US": "User created a poll with text:example-poll-{{int 1 30}}"
+      },
+      "type": "http://adlnet.gov/expapi/activities/new-poll"
+    },
+    "id": "{{homePage}}/portal/poll",
+    "objectType": "Activity"
+  },
+  "timestamp": "{{timestamp}}"
+}

@@ -1,0 +1,32 @@
+services:
+  lti-mc-log-processor:
+    build: lti-mc/log-processor
+    image: public.ecr.aws/v8a6v1r8/lti-mc-log-processor:1.1.0
+    container_name: lti-mc-log-processor
+  lti-mc-xapi:
+    build: lti-mc/xapi
+    image: public.ecr.aws/v8a6v1r8/lti-mc-xapi:1.1.0
+    container_name: lti-mc-xapi
+    configs:
+      - source: xapi-config-app
+        target: /app/config/app.js
+    volumes:
+      - ./lti-mc/xapi/log:/app/log
+    tty: true
+    environment:
+      - TZ=Asia/Tokyo
+      - VERB_ID_PREFIX=urn:x-lms-event-action
+    restart: always
+  lti-mc-caliper:
+    build: lti-mc/caliper
+    image: public.ecr.aws/v8a6v1r8/lti-mc-caliper:1.1.0
+    container_name: lti-mc-caliper
+    env_file:
+      - ./lti-mc/caliper/.env
+    tty: true
+    environment:
+      - TZ=Asia/Tokyo
+    restart: always
+configs:
+  xapi-config-app:
+    file: ./lti-mc/xapi/src/config/app.js

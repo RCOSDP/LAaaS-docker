@@ -1,0 +1,90 @@
+services:
+  moodle:
+    image: moodlehq/moodle-php-apache:8.0
+    container_name: moodle
+    depends_on:
+      - moodle-db
+    ports:
+      - "8000:80"
+    configs:
+      - source: moodle-config
+        target: /var/www/html/config.php
+    volumes:
+      - ./moodle/moodle:/var/www/html
+      - moodledata:/var/www/moodledata
+    environment:
+      - MOODLE_DOCKER_DBHOST=moodle-db
+      - MOODLE_DOCKER_DBNAME=moodle
+      - MOODLE_DOCKER_DBUSER=moodle
+      - MOODLE_DOCKER_DBPASS=m@0dl3ing
+      - MOODLE_DOCKER_MDLURL=http://localhost:8000
+      - MOODLE_DOCKER_DATAPATH=/var/www/moodledata
+  moodle-db:
+    image: postgres:13.8
+    container_name: moodle-db
+    environment:
+      - POSTGRES_USER=moodle
+      - POSTGRES_PASSWORD=m@0dl3ing
+      - POSTGRES_DB=moodle
+    volumes:
+      - moodle-db:/var/lib/postgresql/data
+  moodle-xapi:
+    build: moodle/xapi
+    image: public.ecr.aws/v8a6v1r8/moodle-xapi:2.10.0
+    container_name: moodle-xapi
+    configs:
+      - source: xapi-config-app
+        target: /app/config/app.js
+    volumes:
+      - ./moodle/xapi/log:/app/log
+    tty: true
+    environment:
+      - TZ=Asia/Tokyo
+      - INTERVAL=-1
+  moodle-caliper:
+    build: moodle/caliper
+    image: public.ecr.aws/v8a6v1r8/moodle-caliper:2.4.1
+    container_name: moodle-caliper
+    configs:
+      - source: caliper-config-lrw
+        target: /app/config/lrw.php
+    env_file:
+      - ./moodle/caliper/.env
+    depends_on:
+      - caliper-log-db
+      - openlrw
+      - openlrw-mongo
+  learning-analytics-db:
+    image: postgres:11
+    container_name: learning-analytics-db
+    environment:
+      - POSTGRES_USER=learning_analytics
+      - POSTGRES_PASSWORD=learning_analytics
+      - POSTGRES_DB=learning_analytics
+    volumes:
+      - ./moodle/learning-analytics-db/init:/docker-entrypoint-initdb.d
+      - learning-analytics-db:/var/lib/postgresql/data
+  caliper-log-db:
+    image: postgres:11
+    container_name: caliper-log-db
+    environment:
+      - POSTGRES_USER=caliper_cli
+      - POSTGRES_PASSWORD=caliper
+      - POSTGRES_DB=caliper_log
+    ports:
+      - "15432:5432"
+    volumes:
+      - ./moodle/caliper-log/init:/docker-entrypoint-initdb.d
+      - caliper-log-db:/var/lib/postgresql/data
+configs:
+  moodle-config:
+    file: ./moodle/config.php
+  xapi-config-app:
+    file: ./moodle/xapi/src/config/app.js
+  caliper-config-lrw:
+    file: ./moodle/caliper/config/lrw.php
+volumes:
+  moodle-db:
+  moodledata:
+  caliper-log-db:
+  learning-analytics-db:

@@ -1,0 +1,98 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      registry_type:
+        type: choice
+        description: Registry type
+        options:
+          - private
+          - public
+        default: private
+        required: true
+      ecr_repository:
+        type: choice
+        description: ECR repository name
+        options:
+          - learninglocker
+          - openlrw
+          - superset
+          - superset-db
+          - jupyterhub
+          - moodle-xapi
+          - moodle-caliper
+          - sakai
+          - sakai-dummy-xapi
+          - lti-mc-log-processor
+          - lti-mc-xapi
+          - lti-mc-caliper
+        required: true
+      image_tag:
+        description: Image tag
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 300
+
+    steps:
+    - if: inputs.ecr_repository == 'learninglocker' ||
+          inputs.ecr_repository == 'openlrw' ||
+          inputs.ecr_repository == 'superset' ||
+          inputs.ecr_repository == 'superset-db' ||
+          inputs.ecr_repository == 'jupyterhub'
+      run: |
+        echo "BUILD_PATH=${{ inputs.ecr_repository }}/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'moodle-xapi'
+      run: |
+        echo "BUILD_PATH=moodle/xapi/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'moodle-caliper'
+      run: |
+        echo "BUILD_PATH=moodle/caliper/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'sakai'
+      run: |
+        echo "BUILD_PATH=sakai/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'sakai-dummy-xapi'
+      run: |
+        echo "BUILD_PATH=sakai/dummy-xapi/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'lti-mc-log-processor'
+      run: |
+        echo "BUILD_PATH=lti-mc/log-processor/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'lti-mc-xapi'
+      run: |
+        echo "BUILD_PATH=lti-mc/xapi/" >> $GITHUB_ENV
+    - if: inputs.ecr_repository == 'lti-mc-caliper'
+      run: |
+        echo "BUILD_PATH=lti-mc/caliper/" >> $GITHUB_ENV
+
+    - uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.registry_type == 'private' && 'ap-northeast-1' || 'us-east-1' }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        registry-type: ${{ inputs.registry_type }}
+
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REGISTRY_ALIAS: ${{ inputs.registry_type == 'public' && 'v8a6v1r8' || '' }}
+        ECR_REPOSITORY: ${{ inputs.ecr_repository }}
+        IMAGE_TAG: ${{ inputs.image_tag }}
+      run: |
+        TAG=$ECR_REGISTRY
+        if [ -n "$ECR_REGISTRY_ALIAS" ];then
+          TAG=$TAG/$ECR_REGISTRY_ALIAS
+        fi
+        TAG=$TAG/$ECR_REPOSITORY:$IMAGE_TAG
+        docker build -t $TAG $BUILD_PATH
+        docker push $TAG

@@ -1,0 +1,197 @@
+:encoding: utf-8
+:lang: ja
+:source-highlighter: rouge
+:doctype: book
+:version-label:
+:chapter-label:
+:toc:
+:toc-title: 目次
+:figure-caption: 図
+:table-caption: 表
+:example-caption: 例
+:appendix-caption: 付録
+:toclevels: 2
+:pagenums:
+:sectnums:
+:imagesdir: images
+:icons: font
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+= GakuNinLMS-LTI-MCの視聴ログ分析
+
+WARNING: 以降の手順を実行する前にxref:../README.adoc#init[初期設定]を行うこと。
+
+https://github.com/RCOSDP/GakuNinLMS-LTI-MC[GakuNinLMS-LTI-MC] (https://github.com/npocccties/chibichilo[CHiBi-CHiLO]互換) の https://npocccties.github.io/chibichilo/V2.1/Design/build/html/Logs.html[視聴ログ]分析基盤を構築する。
+
+----
+docker compose up -d --no-build // <1>
+----
+<1> イメージをビルドする場合は `--no-build` の代わりに `--build` オプションを指定
+
+.システム構成
+|===
+   |項目                  |名称                          |コンテナ名
+   |前処理                |ログフォーマット変換・加工    |lti-mc-log-processor
+.2+|ステートメント変換    |xAPIステートメント変換        |lti-mc-xapi
+                          |Caliperステートメント変換     |lti-mc-caliper
+.5+|学習活動のデータストア|Learning Locker(Web)          |learninglocker
+                       .2+|Learning Locker(DB)           |learninglocker-mongo
+                                                         |learninglocker-redis
+                          |OpenLRW(Web)                  |openlrw
+                          |OpenLRW(DB)                   |openlrw-mongo
+.3+|分析システム          |Superset(Web)                 |superset
+                          |Superset(DB)                  |superset-db
+                          |JupyterHub(Web/DB)            |jupyterhub
+|===
+
+[source, mermaid]
+----
+graph TB
+  ST([生徒])     -- 学習活動                   --> LMS[LMS]         --> VL[/視聴ログ/]
+  subgraph 本システムの対象
+    VL           .-> P[[前処理]]
+    P            -.  学習ログ                  .-> X[[xAPI変換]]    --  xAPIステートメント    --> L[(Learning Locker)]
+    P            -.  学習ログ                  .-> C[[Caliper変換]] --  Caliperステートメント --> O[(OpenLRW)]
+    L            --> S[Superset]
+    L            --> J[JupyterHub]
+    O            --> S
+    O            --> J
+    S            --  可視化                    --> T([教師])
+    J            --  分析結果                  --> T
+    J            -.  分析結果                  .-> S
+  end
+  T              == 教育方法とコース設計の改善 ==> LMS
+  LMS            == 学習体験と成果の向上       ==> ST
+----
+
+== xAPIステートメント変換
+=== 初期設定
+スクリプトの設定ファイルを編集する。
+
+.xapi/src/config/app.js
+[source, javascript]
+----
+const config = {
+  LRS:{
+    url:'http://<learninglocker-ip-address>:8081/data/xAPI/', // <1>
+    clients:{
+      'default':{
+        user:'<lrs-client-username>', // <2>
+        pass:'<lrs-client-password>' // <2>
+      }
+    }
+  },
+...
+----
+<1> Learning LockerのIPアドレスを設定
+<2> xref:../README.adoc#learninglocker_client_settings[クライアントの設定] で確認したLRSのクライアント情報を設定
+
+----
+docker compose up -d lti-mc-xapi --force-recreate
+----
+
+=== ステートメント変換
+視聴ログをxAPIステートメントに変換する。 +
+`<CONSUMER_KEY>` にはLMSから取得する情報に付与される `oauth_consumer_key` を指定する。
+
+----
+./run xapi /path/to/logfile <CONSUMER_KEY>
+----
+
+Learning Lockerにステートメントが登録されていることを確認する。
+
+image::xapi-statements.png[align=center]
+
+== Caliperステートメント変換
+=== 初期設定
+OpenLRWから取得したAPIキー( `mongoOrg.apiKey` )を `caliper/.env` に設定する。
+
+----
+OPENLRW_DATABASE=caliper // <1>
+OPENLRW_USERNAME=caliper // <1>
+OPENLRW_PASSWORD=caliper // <1>
+API_KEY=$(
+  docker exec openlrw-mongo \
+  mongo --quiet ${OPENLRW_DATABASE} \
+    -u ${OPENLRW_USERNAME} \
+    -p ${OPENLRW_PASSWORD} \
+    --eval 'db.mongoOrg.findOne({"org.name": "DEFAULT_ORG"}, {_id:0,apiKey:1}).apiKey'
+)
+
+sed -i -e "s/OPENLRW_APIKEY=.*/OPENLRW_APIKEY=${API_KEY}/" caliper/.env
+
+docker compose up -d lti-mc-caliper # 変更を反映
+----
+<1> link:../openlrw/.env[OpenLRWの設定] を参照
+
+=== ステートメント変換
+学習ログをCaliperステートメントに変換する。 +
+`<CONSUMER_KEY>` にはLMSから取得する情報に付与される `oauth_consumer_key` を指定する。
+
+----
+./run caliper /path/to/logfile <CONSUMER_KEY>
+----
+
+OpenLRWにステートメントが登録されていることを確認する。
+
+----
+docker exec openlrw-mongo \
+  mongo --quiet ${OPENLRW_DATABASE} \
+    -u ${OPENLRW_USERNAME} \
+    -p ${OPENLRW_PASSWORD} \
+    --eval 'db.mongoEvent.find().pretty()'
+----
+
+== Superset
+TIP: 操作方法の詳細は https://superset.apache.org/docs/creating-charts-dashboards/creating-your-first-dashboard[ユーザガイド - Creating Charts and Dashboards] を参照すること。
+
+Superset( http://localhost:8088 )にAdminユーザでログインする。
+
+=== xAPIステートメント
+`[Data] > [Datasets]` で選択した `xapi_statements` を以下の条件で可視化する。
+
+.ユーザの行動毎の件数を円グラフで可視化する例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`timestamp`
+.2+|Query                    |DIMENSIONS         |`statement.verb.display.ja`
+                             |METRIC             |`COUNT(*)`
+|===
+
+image::superset-xapi.png[align=center]
+
+=== Caliperステートメント
+`[Data] > [Datasets]` で選択した `caliper_statements` を以下の条件で可視化する。
+
+.ユーザの行動毎の件数を円グラフで可視化する例
+[cols="30%,30%,40%"]
+|===
+   |大項目                   |小項目             |設定値
+ 2+|Visualization Type                           |`Pie Chart`
+   |Time                     |TIME COLUMN        |`event.eventTime`
+.2+|Query                    |DIMENSIONS         |`event.action`
+                             |METRIC             |`COUNT(*)`
+|===
+
+image::superset-caliper.png[align=center]
+
+== JupyterHub
+JupyterHub( http://localhost:8001 )に `jupyter` ユーザ（パスワード: `jupyter` ）でログインする。
+
+=== xAPIステートメント
+link:../jupyterhub/notebooks/xAPI_statements.ipynb[xAPI_statements.ipynb]を使用して、xAPIステートメントを可視化する例を示す。
+
+image::jupyterhub-xapi.png[align=center]
+
+=== Caliperステートメント
+link:../jupyterhub/notebooks/Caliper_statements.ipynb[Caliper_statements.ipynb]を使用して、Caliperステートメントを可視化する例を示す。
+
+image::jupyterhub-caliper.png[align=center]

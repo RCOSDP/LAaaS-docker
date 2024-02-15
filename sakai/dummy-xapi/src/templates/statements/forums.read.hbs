@@ -1,0 +1,22 @@
+{
+  "id": "{{guid}}",
+  "actor": {{> student}},
+  "verb": {
+    "id": "http://www.adlnet.gov/expapi/verbs/interacted"
+  },
+  "context": {{> context}},
+  "object": {
+    "definition": {
+      "name": {
+        "en-US": "User viewed thread"
+      },
+      "description": {
+        "en-US": "User viewed thread with subject: example-forum-thread-{{int 1 10}}"
+      },
+      "type": "http://adlnet.gov/expapi/activities/viewed-thread"
+    },
+    "id": "{{homePage}}/portal/forums",
+    "objectType": "Activity"
+  },
+  "timestamp": "{{timestamp}}"
+}

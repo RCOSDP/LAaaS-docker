@@ -1,0 +1,125 @@
+#!/usr/bin/env python
+"""Output CSV used to generate video statements."""
+import os
+import sys
+
+import pandas as pd
+
+
+def main():
+    """Main function."""
+    df = pd.read_csv(
+        sys.stdin,
+        header=None,
+        sep='\t'
+    )
+
+    # Set column names
+    df.columns = [
+        'date',            # YYYY-MM-DD
+        'time',            # HH:MM:SS
+        'tz',              # Timezone
+        'v-event',         # Event name
+        'v-event-detail',  # Event detail
+        'v-file',          # File name
+        'v-src-query',     # Secure Token
+        'v-current',       # Current playback time
+        'u-ip',            # User IP
+        'u-user-agent',    # User Agent
+        'resource-key',    # LMS resource key
+        'user-key',        # LMS user key
+        'course-key',      # LMS course key
+        'nonce',           # Nonce
+        'videoplayerlog',  # 'videoplayerlog'
+    ]
+    # Replace v-current '-' with 0
+    df['v-current'] = df['v-current'].replace('-', 0)
+    # Construct object id consisting of resource-key
+    df['resource-key'] = df.apply(_construct_object_id, axis=1)
+    # Remove prefix
+    df['user-key'] = df['user-key'].map(_remove_lti_log_prefix)
+    df['course-key'] = df['course-key'].map(_remove_lti_log_prefix)
+    # Add timestamp column
+    df['timestamp'] = df.apply(_concat_date_time, axis=1)
+
+    df = df[[
+        'timestamp',
+        'v-event',
+        'v-event-detail',
+        'v-file',
+        'v-src-query',
+        'v-current',
+        'resource-key',
+        'user-key',
+        'course-key',
+        'nonce',
+        'videoplayerlog',
+    ]]
+    df.rename(
+        columns={
+            'v-event': 'eventname',
+            'v-event-detail': 'eventdetail',
+            'v-file': 'file',
+            'v-src-query': 'query',
+            'v-current': 'current',
+            'resource-key': 'referrer',
+            'user-key': 'userid',
+            'course-key': 'courseid',
+        }, inplace=True
+    )
+
+    df.sort_values('timestamp', inplace=True)
+
+    # Append 'force-ended' event if 'xxx-ended' event cannot be found
+    force_ended = []
+    for query in df['query'].unique():
+        filtered = df[df['query'] == query]
+        ended = filtered[filtered['eventname'].str.contains('ended')]
+        if len(ended) == 0:
+            last_row = filtered.iloc[-1]
+            force_ended.append({
+                'timestamp': last_row['timestamp'],
+                'eventname': 'force-ended',
+                'eventdetail': last_row['eventdetail'],
+                'file': last_row['file'],
+                'query': last_row['query'],
+                'current': last_row['current'],
+                'referrer': last_row['referrer'],
+                'userid': last_row['userid'],
+                'courseid': last_row['courseid'],
+                'nonce': last_row['nonce'],
+                'videoplayerlog': last_row['videoplayerlog'],
+            })
+    df = pd.concat(
+        [df, pd.DataFrame(force_ended)],
+        sort=False
+    ).sort_values('timestamp')
+
+    df.to_csv(sys.stdout, index=False)
+
+
+def _remove_lti_log_prefix(x):
+    """Remove consumer key from string."""
+    return str(x).replace(f'{os.environ["CONSUMER_KEY"]}:', '')
+
+
+def _construct_object_id(row):
+    """Return object ID."""
+    scheme = 'https'
+    if str(row['resource-key']).startswith(f'{scheme}://'):
+        return row['resource-key']
+    else:
+        # LTI logs
+        consumer_key = os.environ['CONSUMER_KEY']
+        course_id = _remove_lti_log_prefix(row['course-key'])
+        resource_id = _remove_lti_log_prefix(row['resource-key'])
+        return f'{scheme}://{consumer_key}/{course_id}/{resource_id}'
+
+
+def _concat_date_time(row):
+    """Return datetime string."""
+    return '{}T{}+09:00'.format(row['date'], row['time'])
+
+
+if __name__ == '__main__':
+    main()

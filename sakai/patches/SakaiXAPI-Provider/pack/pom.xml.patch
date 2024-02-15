@@ -1,0 +1,11 @@
+--- pom.xml	2021-10-21 17:15:15.000000000 +0900
++++ pom.xml.patched	2021-10-21 17:18:27.000000000 +0900
+@@ -5,7 +5,7 @@
+   <parent>
+     <artifactId>tincanapi-provider-base</artifactId>
+     <groupId>org.sakaiproject</groupId>
+-    <version>12-SNAPSHOT</version>
++    <version>12.6</version>
+     <relativePath>../pom.xml</relativePath>
+   </parent>
+ 

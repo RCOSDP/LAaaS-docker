@@ -1,0 +1,48 @@
+services:
+  sakai:
+    build: sakai
+    image: public.ecr.aws/v8a6v1r8/sakai:1.0.0
+    container_name: sakai
+    depends_on:
+      - sakai-db
+    environment:
+      JAVA_OPTS: -server -Xms512m -Xmx1024m -XX:NewSize=192m -XX:MaxNewSize=384m -Djava.awt.headless=true -Dhttp.agent=Sakai -Dorg.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING=false -Dsun.lang.ClassLoader.allowArraySyntax=true -Djava.util.Arrays.useLegacyMergeSort=true # -Dsakai.demo=true
+      DATABASE_HOST: sakai-db:3306
+      DATABASE_NAME: sakai
+      DATABASE_USER: sakai
+      DATABASE_PASSWORD: sakaipass
+      LRS_USERNAME: c278efa00506cb8636ee93d2f9a29085415366ae
+      LRS_PASSWORD: cf72e40f90f6d02569a93a44b41f841c32fc41a0
+    ports:
+      - "8888:8080"
+  sakai-db:
+    image: mysql:5.6.39
+    container_name: sakai-db
+    # Sakai requires the database to use UTF-8.
+    command: --character-set-server=utf8
+    environment:
+      # See https://docs.docker.com/samples/library/mysql/#environment-variables
+      MYSQL_DATABASE: sakai
+      MYSQL_USER: sakai
+      MYSQL_PASSWORD: sakaipass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - sakai-db:/var/lib/mysql
+  sakai-dummy-xapi:
+    build: sakai/dummy-xapi
+    image: public.ecr.aws/v8a6v1r8/sakai-dummy-xapi:1.1.0
+    container_name: sakai-dummy-xapi
+    tty: true
+    environment:
+      TZ: Asia/Tokyo
+      STATEMENT_NUM: 300
+      TIMESTAMP_MIN: "2021-04-01T00:00:00+00:00"
+      TIMESTAMP_MAX: "2021-10-01T00:00:00+00:00"
+      LRS_URL: http://learninglocker:8081/data/xAPI/
+      LRS_USERNAME: c278efa00506cb8636ee93d2f9a29085415366ae
+      LRS_PASSWORD: cf72e40f90f6d02569a93a44b41f841c32fc41a0
+  jupyterhub:
+    volumes:
+      - ./sakai/notebooks:/home/jupyter
+volumes:
+  sakai-db:

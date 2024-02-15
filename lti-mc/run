@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -e
+
+if [ $# != 3 ] || ([ $1 != "xapi" ] && [ $1 != "caliper" ]); then
+  echo "Usage: run [xapi|caliper] <PATH_TO_LOG> <CONSUMER_KEY>"
+  exit 1
+fi
+
+if [ ! -f "$2" ]; then
+  echo "Log file not found."
+  exit 1
+fi
+
+CONTAINER=lti-mc-$1
+if [ $1 = "xapi" ]; then
+  SCRIPT="cat - > /app/videojs.csv; npm start"
+elif [ $1 = "caliper" ]; then
+  SCRIPT="cat | python3 log_processor_for_caliper.py; php app/run.php /videojs.csv"
+fi
+PATH_TO_LOG=$2
+CONSUMER_KEY=$3
+
+cat "$PATH_TO_LOG" | \
+  docker compose run --rm -T -e CONSUMER_KEY=${CONSUMER_KEY} lti-mc-log-processor | \
+  docker exec -i ${CONTAINER} sh -c "${SCRIPT}"
