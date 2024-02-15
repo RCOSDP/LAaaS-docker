@@ -25,6 +25,26 @@ endif::[]
 
 = LAaaS-docker: ラーニングアナリティクス基盤システム
 
+== 前提
+
+* Docker/Compose V2
+* アーキテクチャ: x86_64
+
+IMPORTANT: v4.1以降はCompose V1をサポートしない。 +
+V1を使用している場合は、Dockerの https://docs.docker.com/compose/migrate/[公式ドキュメント] ( https://docs.docker.jp/compose/index.html#compose-v2-docker-compose[日本語版] )を参照し、V2に移行すること。
+
+.(参考) 動作確認環境の構成
+[NOTE]
+====
+* サーバ: Amazon EC2 `t3.large` インスタンス
+** CPU: 2 vCPU
+** メモリ: 8 GiB
+* OS: Ubuntu 22.04 LTS
+* アーキテクチャ: x86_64
+* Docker Engine: v24.0.7
+* Docker Compose: v2.21.0
+====
+
 == インストール
 
 ----
@@ -82,18 +102,98 @@ image::learninglocker/new-xapi-store-client.png[align=center]
 
 TIP: ユーザ情報は `superset` の環境変数 `ADMIN_USERNAME` 、 `ADMIN_PASSWORD` 等で設定する(デフォルトのユーザ名・パスワードは `admin` )。
 
+WARNING: エラーが発生する場合には<<superset_init_error, FAQ>>を参照すること。
+
 ----
 docker exec superset /init.sh
 ----
 
 == 学習ログの分析
-ログを取得するLMS/LTIツールに応じて、以下のリンク先を参照する。
+ログを取得するLMS/LTIツールに応じて、以下のリンク先を参照する。 +
+以降の操作は個々のディレクトリ以下で行うこと。
 
-* link:./moodle/README.adoc[Moodle]
-* link:./sakai/README.adoc[Sakai]
-* link:./lti-mc/README.adoc[GakuNinLMS-LTI-MC] (CHiBi-CHiLO互換)
+* link:./moodle/README.adoc[Moodle]( `moodle/` )
+* link:./sakai/README.adoc[Sakai]( `sakai/` )
+* link:./lti-mc/README.adoc[GakuNinLMS-LTI-MC]( `lti-mc/` ) ※ CHiBi-CHiLO互換
+
+[WARNING]
+====
+各分析環境は同時起動に対応していない。 +
+環境を切り替える際には、作成したコンテナ・ボリュームを削除し、<<init>>から再度実行すること。
+
+.(例)
+----
+# Moodleの学習ログ分析
+cd path/to/moodle/
+# ...
+# 環境の初期化
+docker compose down -v
+
+# 初期設定
+# ...
+
+# GakuNinLMS-LTI-MCの視聴ログ分析
+cd path/to/lti-mc/
+# ...
+----
+====
 
 == FAQ
+[[superset_init_error]]
+=== Supersetの初期設定でエラーが発生する
+`init.sh` の実行で以下のエラーが発生する場合、Supersetがデータベースの初期化に失敗しているため、以降の手順を行うこと。
+
+----
+psycopg2.errors.UndefinedTable: relation "ab_xxx" does not exist
+----
+
+* コンテナとボリュームの削除
+
+----
+docker compose -f base.yaml rm -sf superset superset-db
+docker volume rm laaas-docker_superset-db
+----
+
+* DBの起動確認
+
+----
+docker compose -f base.yaml up -d --no-build superset-db
+docker logs superset-db
+
+...
+PostgreSQL init process complete; ready for start up.
+...
+...database system is ready to accept connections
+----
+
+* Supersetの起動
+
+----
+docker compose -f base.yaml up -d --no-build superset
+----
+
+* エラー原因のテーブル( `ab_xxx` )がDBに存在することを確認
+
+----
+docker exec superset-db psql -U superset superset -c '\d'
+
+                       List of relations
+ Schema |              Name              |   Type   |  Owner
+--------+--------------------------------+----------+----------
+ public | ab_permission                  | table    | superset
+...
+ public | ab_view_menu_id_seq            | sequence | superset
+(16 rows)
+----
+
+* Supersetの初期設定
+
+エラーが発生しないことを確認する。
+
+----
+docker exec superset /init.sh
+----
+
 === JupyterHubにユーザを追加するには？
 以下のコマンドを実行する。
 
@@ -128,3 +228,8 @@ PermissionError: [Errno 13] Permission denied: '/home/jupyter/.local'
 既存のデータセットを異なる構成で再登録した場合には、 `[Actions] > [Edit] > [COLUMNS]` から `SYNC COLUMNS FROM SOURCE` を押下し、変更を反映する。
 
 image::superset/edit-dataset.png[align=center, scaledwidth=70%]
+
+== 謝辞
+
+* 本研究は文部科学省「AI 等の活用を推進する研究データエコシステム構築事業」の支援を受けたものです。
+* この研究は２０２３年度国立情報学研究所公募型共同研究（23S1002）の助成を受けています。
